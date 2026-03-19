@@ -163,3 +163,15 @@ Syntax validation via `docker compose config`. Full integration test is deferred
 - The Traefik healthcheck requires a `ping` entrypoint — update the Traefik static config from step 03 to include `entryPoints.ping.address: ":8082"` and `ping.entryPoint: "ping"` if not already present.
 - Build context `../..` is relative to the compose file at `infra/compose/dev.yml`. With `--project-directory .` (repo root), Docker resolves this correctly to the repo root. The implementing agent should verify whether `--project-directory` changes context resolution or if the context should be `.` (project root) instead of `../..`. Test with `docker compose config` to confirm.
 - All services share the `kotel-net` network, enabling inter-container DNS resolution by service name.
+
+<CORRECTION by="step-executor" reason="compose path resolution with --project-directory">
+`docker compose --project-directory . -f infra/compose/dev.yml config` resolves `../..` from the compose file location to `/home/aleksey`, not the repository root. To keep build context and bind mounts rooted at the project directory, use `context: .` and `.:/app` in this step implementation.
+</CORRECTION>
+
+<CORRECTION by="step-executor" reason="postgres:18 runtime compatibility">
+`postgres:18.3` fails to start with a direct mount on `/var/lib/postgresql/data` and requests a parent mount path for cluster layout. The implementation uses named volume `postgres-data` mounted at `/var/lib/postgresql` to keep the service healthy while preserving the required named volume.
+</CORRECTION>
+
+<CORRECTION by="step-executor" reason="container command runtime behavior">
+With `node:24` base images and bind-mounted workspace, plain `nest ...` command is treated as a Node entry script when the binary is not in PATH, causing startup failure. The implementation uses `npx nest ...` for backend and `npx prisma studio --browser none --port 5555` for studio to ensure both services stay running in containers.
+</CORRECTION>

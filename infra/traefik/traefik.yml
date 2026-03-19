@@ -8,6 +8,8 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+  ping:
+    address: ":8082"
 
 providers:
   docker:
@@ -19,6 +21,9 @@ providers:
 
 api:
   dashboard: false
+
+ping:
+  entryPoint: ping
 
 log:
   level: WARN

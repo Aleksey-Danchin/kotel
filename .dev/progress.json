@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-19T20:15:50.007Z",
-  "updatedAt": "2026-03-19T20:27:31.275Z",
+  "updatedAt": "2026-03-19T20:33:21.785Z",
   "steps": [
     {
       "order": 1,
@@ -288,10 +288,10 @@
     {
       "order": 4,
       "file": "04-backend-config.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "7d0b2fd",
       "startedAt": "2026-03-19T20:22:18.267Z",
-      "completedAt": null,
+      "completedAt": "2026-03-19T20:27:43.831Z",
       "error": null,
       "retryUsed": true,
       "progress": [
@@ -390,12 +390,134 @@
     {
       "order": 5,
       "file": "05-compose-manifest.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-19T20:27:53.602Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Infra manifest step; no code tests to maintain"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Task verification uses docker compose config"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No backend/frontend code changes requiring regression suites"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Документационные файлы из шаблона отсутствуют в репозитории; для шага compose-manifest обновление документации не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: dev.yml exists and valid YAML",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: five services defined",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: each service has healthcheck",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: postgres uses image 18.3 and volume",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: backend build uses backend Dockerfile",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: backend command matches spec",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: frontend command includes --host",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: studio exposes 5555 directly",
+          "status": "completed"
+        },
+        {
+          "id": "ac-9",
+          "label": "AC: traefik mounts socket/config/certs",
+          "status": "completed"
+        },
+        {
+          "id": "ac-10",
+          "label": "AC: backend router /api higher priority",
+          "status": "completed"
+        },
+        {
+          "id": "ac-11",
+          "label": "AC: frontend router catch-all host",
+          "status": "completed"
+        },
+        {
+          "id": "ac-12",
+          "label": "AC: DATABASE_URL assembled from env vars",
+          "status": "completed"
+        },
+        {
+          "id": "ac-13",
+          "label": "AC: docker compose config validates",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

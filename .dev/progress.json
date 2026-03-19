@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-19T20:15:50.007Z",
-  "updatedAt": "2026-03-19T20:21:57.856Z",
+  "updatedAt": "2026-03-19T20:27:31.275Z",
   "steps": [
     {
       "order": 1,
@@ -186,10 +186,10 @@
     {
       "order": 3,
       "file": "03-traefik-config.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "391cd1f",
       "startedAt": "2026-03-19T20:20:38.179Z",
-      "completedAt": null,
+      "completedAt": "2026-03-19T20:22:13.753Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -288,12 +288,104 @@
     {
       "order": 4,
       "file": "04-backend-config.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-19T20:22:18.267Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": true,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped by orchestrator; health checks deferred"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "Formatted via backend npm run format; scripts/prettier.sh not present"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No test file changes required; step requires backend type-check verification"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "Ran npx tsc --noEmit in apps/backend; pre-existing error in test/app.e2e-spec.ts unrelated to step changes"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No automated regression suite required for this config-only step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model/domain/architecture documentation changes required for this backend config alias/prefix update"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Postflight completed with deferred docker health validation per critical exception; no intermediate health checks performed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: main.ts sets global api prefix",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: tsconfig has ~prisma path mapping",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: baseUrl remains ./",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: no extra file modifications",
+          "status": "completed",
+          "note": "Only apps/backend/src/main.ts and apps/backend/tsconfig.json were intentionally edited for this step"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: backend tsc has no new errors",
+          "status": "completed",
+          "note": "Type-check run completed; reported pre-existing error in test/app.e2e-spec.ts unrelated to api prefix/path alias changes"
+        }
+      ],
+      "resolverLogs": [
+        {
+          "path": "/home/aleksey/Desktop/kotel/.dev/resolver-logs/04-backend-config.md",
+          "registeredAt": "2026-03-19T20:24:43.249Z"
+        }
+      ]
     },
     {
       "order": 5,

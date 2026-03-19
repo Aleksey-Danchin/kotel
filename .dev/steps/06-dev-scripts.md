@@ -17,7 +17,9 @@ infra
 Depends on steps 01, 02, 03, 04, 05.
 
 ## Current Behavior
-No `scripts/` directory exists. No startup/shutdown scripts exist.
+<CORRECTION by="step-executor" reason="factual mismatch: scripts directory already exists">
+`scripts/` already exists and currently contains `scripts/step-queue.js`. No startup/shutdown scripts exist yet.
+</CORRECTION>
 
 ## Expected Behavior
 - `scripts/dev-start.sh` checks/generates TLS certificates, then starts the Docker Compose stack.

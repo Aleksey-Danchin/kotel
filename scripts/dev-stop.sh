@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+docker compose \
+  --project-directory "${PROJECT_ROOT}" \
+  -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
+  down
+
+echo "Kotel dev environment stopped."

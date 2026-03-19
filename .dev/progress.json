@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-19T20:15:50.007Z",
-  "updatedAt": "2026-03-19T20:33:21.785Z",
+  "updatedAt": "2026-03-19T20:36:59.112Z",
   "steps": [
     {
       "order": 1,
@@ -390,10 +390,10 @@
     {
       "order": 5,
       "file": "05-compose-manifest.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "5b69316",
       "startedAt": "2026-03-19T20:27:53.602Z",
-      "completedAt": null,
+      "completedAt": "2026-03-19T20:33:39.843Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -522,12 +522,115 @@
     {
       "order": 6,
       "file": "06-dev-scripts.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-19T20:33:48.497Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped: dev health already verified by orchestrator"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent; formatting step not applicable to shell-only changes"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No automated test files required for shell scripts"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Step defines manual verification only"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No automated suites applicable for this step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data/domain/architecture documentation changes required for shell script entrypoints"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: dev-start exists and executable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: dev-stop exists and executable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dev-start checks docker and mkcert",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: dev-start checks cert paths in mkcert CAROOT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: dev-start regenerates missing or expiring certs",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: dev-start exports MKCERT_CAROOT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: dev-start runs compose up with proper flags",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: dev-stop runs compose down with matching flags",
+          "status": "completed"
+        },
+        {
+          "id": "ac-9",
+          "label": "AC: scripts work from any directory",
+          "status": "completed"
+        }
+      ]
     }
   ]
 }

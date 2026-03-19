@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-19T20:15:50.007Z",
-  "updatedAt": "2026-03-19T20:17:23.027Z",
+  "updatedAt": "2026-03-19T20:20:12.844Z",
   "steps": [
     {
       "order": 1,
       "file": "01-root-env-and-gitignore.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "e46d902",
       "startedAt": "2026-03-19T20:15:57.468Z",
-      "completedAt": null,
+      "completedAt": "2026-03-19T20:17:42.935Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -95,12 +95,93 @@
     {
       "order": 2,
       "file": "02-dockerfiles.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-19T20:17:49.441Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в текущем этапе проекта"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Для Dockerfile шага автотесты не требуются; проверка через docker build"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Регрессионные автотесты для инфраструктурного шага с Dockerfile не применимы"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены dev Dockerfile, проектная документация не требует обновления"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: backend Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: frontend Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: studio Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: no copy and no npm install",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: no CMD in Dockerfiles",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 3,

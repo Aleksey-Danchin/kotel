@@ -19,6 +19,9 @@ None
 
 ## Current Behavior
 The `infra/` directory does not exist. There are no Dockerfiles anywhere in the repository.
+<CORRECTION by="step-executor" reason="Current repository state differs from step text">
+The `infra/` directory already exists with subdirectories (`infra/compose`, `infra/docker`), but `infra/docker` is currently empty and contains no Dockerfiles.
+</CORRECTION>
 
 ## Expected Behavior
 Three Dockerfiles exist at the specified paths. Each uses `node:24` (full Debian-based image, NOT alpine) and sets `WORKDIR` to match the app's location within the bind-mounted repo tree at `/app`.

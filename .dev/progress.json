@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-19T20:15:50.007Z",
+  "updatedAt": "2026-03-19T20:17:23.027Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-root-env-and-gitignore.md",
+      "status": "in_progress",
+      "commitHash": null,
+      "startedAt": "2026-03-19T20:15:57.468Z",
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует на этом шаге"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг не требует автотестов (manual verification only)"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Нет task-specific автотестов для infra-настройки"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Регрессионные автотесты не применимы к этому шагу"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены root .env/.gitignore, документация не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Docker health checks отложены до финального шага по исключительному правилу"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: .env has required postgres vars",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: .gitignore includes .env",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: .gitignore includes node_modules and dist",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: only local dev defaults",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-dockerfiles.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 3,
+      "file": "03-traefik-config.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 4,
+      "file": "04-backend-config.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 5,
+      "file": "05-compose-manifest.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 6,
+      "file": "06-dev-scripts.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    }
+  ]
+}

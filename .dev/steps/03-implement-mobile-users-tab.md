@@ -16,7 +16,10 @@ feature, ui, backend
 Depends on step 02.
 
 ## Current Behavior
-No `users` route exists in mobile tabs.  
+<CORRECTION by="step-executor" reason="users tab scaffold already exists">
+A placeholder `users` route and tab registration already exist in mobile tabs (`app/(tabs)/users.tsx`, `app/(tabs)/_layout.tsx`), but they do not implement API loading behavior.
+</CORRECTION>
+
 Frontend behavior reference is `apps/frontend/src/routes/~users.tsx`, which:
 - keeps query disabled by default;
 - loads on explicit button click;
@@ -73,6 +76,9 @@ Manual-only in Android emulator:
 - error path rendering.
 
 Automated tests are not required for this step.
+<CORRECTION by="step-executor" reason="mobile app has no configured automated test runner">
+`apps/mobile/package.json` does not define test scripts or test dependencies, so this step is verified by code inspection and manual scenario only.
+</CORRECTION>
 
 ## Notes
 Keep behavior parity with frontend logic, but use mobile-native primitives (`View`, `Text`, `Pressable`, `FlatList` or equivalent) instead of web table classes.

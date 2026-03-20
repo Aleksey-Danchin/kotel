@@ -78,7 +78,7 @@ services:
     build:
       context: .
       dockerfile: infra/docker/studio.Dockerfile
-    command: npx prisma studio --browser none --port 5555
+    command: sh -c "npx prisma migrate deploy && npx prisma studio --browser none --port 5555"
     volumes:
       - .:/app
     working_dir: /app/apps/prisma

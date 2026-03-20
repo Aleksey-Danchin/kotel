@@ -1,0 +1,8 @@
+model User {
+    id           String   @id @default(cuid())
+    fullname     String
+    login        String   @unique
+    passwordHash String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}

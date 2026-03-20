@@ -1,0 +1,26 @@
+---
+description: Testing stack and DTO validation policy for all contributors and agents.
+alwaysApply: true
+---
+
+# Testing and DTO Rules
+
+## Mandatory Testing Stack
+
+- Use `Vitest` for all non-E2E automated tests (backend unit/integration, frontend unit/component).
+- Use `Playwright` only for end-to-end flows.
+- Do not add new Jest-based tests or Jest configuration.
+- If legacy Jest artifacts are encountered, migrate or replace them with Vitest coverage in the same change scope.
+
+## Backend Endpoint Test Environment
+
+- Backend endpoint tests must run in the dedicated test environment (Docker test containers), not against host processes.
+- Use the test compose stack from `infra/compose/docker-compose.test.yml`.
+- Seed and migrate the test database before endpoint/integration test runs when backend persistence is involved.
+
+## DTO and Contract Policy (Zod-First)
+
+- Zod is the primary and currently only supported DTO validation mechanism for new backend request/response contracts.
+- New backend request validation must be implemented with explicit Zod schemas and inferred types from the same source.
+- Keep contract artifacts serializable and framework-agnostic so they can be reused safely outside Nest runtime code.
+- When frontend needs shared contract artifacts, import them from a dedicated shared entrypoint/alias (for example, `@contracts/*`) and avoid deep imports from backend runtime modules.

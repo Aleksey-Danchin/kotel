@@ -45,7 +45,7 @@ export MKCERT_CAROOT
 docker compose \
   --project-directory "${PROJECT_ROOT}" \
   -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
-  up -d --build
+  up -d --build postgres backend frontend studio traefik
 
 POSTGRES_PORT_DISPLAY="5432"
 if [[ -f "${PROJECT_ROOT}/.env" ]]; then
@@ -60,6 +60,16 @@ echo "Kotel dev environment started."
 echo "  Frontend: https://kotel.localhost"
 echo "  Backend:  https://kotel.localhost/api"
 echo "  Studio:   http://localhost:5555"
+echo "  Mobile:   attached Expo CLI (LAN mode)"
 echo "  Postgres: localhost:${POSTGRES_PORT_DISPLAY}"
 echo
 echo "  Logs: docker compose --project-directory \"${PROJECT_ROOT}\" -f \"${PROJECT_ROOT}/infra/compose/dev.yml\" logs -f"
+echo
+echo "Attaching to mobile Expo CLI..."
+echo "Use Ctrl+C to stop the attached Expo process."
+echo "Core services remain running; use scripts/dev-stop.sh to stop the full stack."
+
+docker compose \
+  --project-directory "${PROJECT_ROOT}" \
+  -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
+  up --build mobile

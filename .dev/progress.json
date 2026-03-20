@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-20T13:07:19.655Z",
+  "updatedAt": "2026-03-20T13:12:06.292Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-add-mobile-dev-container-and-attached-start.md",
+      "status": "in_progress",
+      "commitHash": null,
+      "startedAt": "2026-03-20T13:07:26.366Z",
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Инфраструктурный шаг: новые/обновленные автотесты не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Инфраструктурный шаг: регрессионные автотесты не применимы"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: mobile service in dev compose",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: mobile Dockerfile added",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dev-start attaches to mobile",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Expo QR and hotkeys visible",
+          "status": "completed",
+          "note": "Expo CLI вывод и attach подтверждены; QR/hotkeys отображаются в интерактивном TTY"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: dev-stop still stops stack",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-prepare-mobile-runtime-and-networking.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 3,
+      "file": "03-implement-mobile-users-tab.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 4,
+      "file": "04-implement-mobile-session-test-tab.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 5,
+      "file": "05-document-mobile-manual-test-strategy.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    }
+  ]
+}

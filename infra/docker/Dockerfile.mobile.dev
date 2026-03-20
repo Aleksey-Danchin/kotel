@@ -1,0 +1,8 @@
+FROM node:24
+
+ENV NODE_ENV=development
+ENV TZ=Europe/Moscow
+
+WORKDIR /apps/mobile
+
+COPY apps/mobile/package*.json ./

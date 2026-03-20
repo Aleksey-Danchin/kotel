@@ -16,3 +16,10 @@
 - Test stack deterministic env inputs:
   - `TEST_SESSION_COOKIE_DOMAIN` (mapped to backend `SESSION_COOKIE_DOMAIN` in `infra/compose/test.yml`).
   - `TEST_IDLE_TIMEOUT` (mapped to backend `IDLE_TIMEOUT` in `infra/compose/test.yml`).
+
+## Dev Start Behavior
+
+- `scripts/dev-start.sh` starts core services in background, then attaches the terminal to the mobile Expo CLI.
+- Expo runs in LAN mode (`expo start --lan`) so QR code and hotkeys remain visible in the same terminal.
+- To exit attached Expo, press `Ctrl+C`.
+- To stop all dev containers, run `scripts/dev-stop.sh`.

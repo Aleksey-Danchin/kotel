@@ -75,6 +75,27 @@ services:
       - traefik.http.routers.frontend.priority=1
       - traefik.http.services.frontend.loadbalancer.server.port=5173
 
+  mobile:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.mobile.dev
+    command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npx expo start --lan"
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/mobile
+    environment:
+      - EXPO_PUBLIC_API_BASE_URL=${EXPO_PUBLIC_API_BASE_URL:-https://kotel.localhost/api}
+      - EXPO_PUBLIC_API_HOST_HEADER=${EXPO_PUBLIC_API_HOST_HEADER:-kotel.localhost}
+    ports:
+      - "8081:8081"
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    networks:
+      - kotel-net
+    labels:
+      - traefik.enable=false
+
   studio:
     build:
       context: ${PROJECT_ROOT:?PROJECT_ROOT is required}

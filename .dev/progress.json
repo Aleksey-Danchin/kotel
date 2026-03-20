@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T13:07:19.655Z",
-  "updatedAt": "2026-03-20T13:24:30.613Z",
+  "updatedAt": "2026-03-20T13:26:51.265Z",
   "steps": [
     {
       "order": 1,
@@ -282,10 +282,10 @@
     {
       "order": 4,
       "file": "04-implement-mobile-session-test-tab.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "5900560",
       "startedAt": "2026-03-20T13:21:47.839Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T13:25:02.481Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -379,12 +379,93 @@
     {
       "order": 5,
       "file": "05-document-mobile-manual-test-strategy.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T13:25:10.109Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository; markdown docs edited without formatter changes"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "Docs-only step; no automated test files required"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Docs verification only per step testing section"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No code-path changes requiring regression suites"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: mobile README is project-specific",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: docs include exact run and stop flow",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: manual checklist for users and session-test",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: docs state Expo automated tests out of scope",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: docs clarify Playwright is web-only",
+          "status": "completed"
+        }
+      ]
     }
   ]
 }

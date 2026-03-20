@@ -1,50 +1,68 @@
-# Welcome to your Expo app 👋
+# Mobile App Manual Test Strategy
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This document is the canonical source for running and manually validating the Expo mobile flow in this repository.
 
-## Get started
+## Run And Stop Flow (Docker-Integrated)
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Run from project root:
 
 ```bash
-npm run reset-project
+scripts/dev-start.sh
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Expected behavior:
+- Starts core services (`postgres`, `backend`, `frontend`, `studio`, `traefik`) in Docker.
+- Attaches the current terminal to Expo CLI (`mobile`) in LAN mode.
+- Prints mobile runtime networking values:
+  - `EXPO_PUBLIC_API_BASE_URL=https://<HOST_IP>/api`
+  - `EXPO_PUBLIC_API_HOST_HEADER=kotel.localhost`
 
-## Learn more
+Stopping:
+- `Ctrl+C` stops only attached Expo process in the current terminal.
+- `scripts/dev-stop.sh` stops all project dev containers.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Environment And Networking
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- Current scope target: **Android emulator** only.
+- `HOST_IP` must resolve from host machine to route emulator API requests through Traefik.
+- Mobile client expects backend API at `https://<HOST_IP>/api` with host header `kotel.localhost`.
+- If API requests fail, confirm:
+  - dev stack is running (`scripts/dev-start.sh`);
+  - emulator and host can reach `<HOST_IP>`;
+  - TLS certificate flow (`mkcert`) is available on host.
 
-## Join the community
+## Manual Checklist
 
-Join our community of developers creating universal apps.
+### Users Tab (`app/(tabs)/users.tsx`)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Open **Users** tab.
+2. Press `загрузить`.
+3. Validate loading state appears: `Загрузка...`.
+4. Validate one of the terminal states:
+   - success: list of cards with `id/fullname/createdAt/updatedAt`;
+   - empty success: `Нет данных`;
+   - error: `Ошибка загрузки: <message>`.
+
+### Session-Test Tab (`app/(tabs)/session-test.tsx`)
+
+Use seeded credentials:
+- `login`: `user1`
+- `password`: `123`
+
+1. Open **Session Test** tab.
+2. Press `signin` and confirm:
+   - temporary state: `Запрос выполняется...`;
+   - JSON state becomes a user object (not `null`);
+   - no error text is shown.
+3. Press `check` and confirm JSON state remains a valid user object.
+4. Press `signout` and confirm:
+   - temporary state: `Запрос выполняется...`;
+   - JSON state returns to `null`;
+   - no error text is shown.
+5. If any request fails, confirm error block appears as `Ошибка: <message>`.
+
+## Testing Policy (Current Scope)
+
+- Expo native app validation is **manual only** in this phase.
+- Automated native Expo E2E is intentionally out of scope for now.
+- Playwright in this repository remains focused on **web E2E** coverage and is not used for current native Expo flow.

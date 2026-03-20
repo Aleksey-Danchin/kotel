@@ -26,3 +26,8 @@
   - `EXPO_PUBLIC_API_HOST_HEADER=kotel.localhost`
 - To exit attached Expo, press `Ctrl+C`.
 - To stop all dev containers, run `scripts/dev-stop.sh`.
+
+## Mobile Manual Testing
+
+- Canonical mobile runbook and manual checklist: `apps/mobile/README.md`.
+- Playwright coverage in this repository is web-focused; native Expo manual testing is currently intentional.

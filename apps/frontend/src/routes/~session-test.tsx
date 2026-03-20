@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAtom } from "jotai";
-import { check, signin, signout } from "../api/session";
+import { signin, signout } from "../api/session";
 import { sessionCheckQueryOptions } from "../queryOptions/session";
 import { sessionErrorAtom, sessionUserAtom } from "../state/session";
 
@@ -36,7 +36,9 @@ function SessionTestPage() {
       setSessionError(null);
     },
     onError: (error) => {
-      setSessionError(error instanceof Error ? error.message : "Ошибка signout");
+      setSessionError(
+        error instanceof Error ? error.message : "Ошибка signout",
+      );
     },
   });
 
@@ -60,7 +62,9 @@ function SessionTestPage() {
       <div className="flex gap-2">
         <button
           className="btn btn-primary"
-          onClick={() => signinMutation.mutate({ login: "user1", password: "123" })}
+          onClick={() =>
+            signinMutation.mutate({ login: "user1", password: "123" })
+          }
           disabled={signinMutation.isPending}
         >
           signin
@@ -85,17 +89,18 @@ function SessionTestPage() {
         </button>
       </div>
 
-      {(signinMutation.isPending || signoutMutation.isPending || checkQuery.isFetching) && (
-        <p role="status">Запрос выполняется...</p>
-      )}
+      {(signinMutation.isPending ||
+        signoutMutation.isPending ||
+        checkQuery.isFetching) && <p role="status">Запрос выполняется...</p>}
 
-      {sessionError ? (
-        <p role="alert">Ошибка: {sessionError}</p>
-      ) : null}
+      {sessionError ? <p role="alert">Ошибка: {sessionError}</p> : null}
 
       <section className="card bg-base-200 p-4">
         <h2 className="font-medium">Текущее состояние сессии</h2>
-        <pre data-testid="session-state" className="whitespace-pre-wrap break-all">
+        <pre
+          data-testid="session-state"
+          className="whitespace-pre-wrap break-all"
+        >
           {JSON.stringify(sessionUser, null, 2)}
         </pre>
       </section>

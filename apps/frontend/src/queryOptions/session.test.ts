@@ -12,7 +12,7 @@ describe("sessionCheckQueryOptions", () => {
 
     expect(options.queryKey).toEqual(["session", "check"]);
 
-    await options.queryFn();
+    await options.queryFn?.({} as never);
     expect(check).toHaveBeenCalledTimes(1);
   });
 });

@@ -25,9 +25,7 @@ function UsersPage() {
         загрузить
       </button>
 
-      {usersQuery.isLoading ? (
-        <p role="status">Загрузка...</p>
-      ) : null}
+      {usersQuery.isLoading ? <p role="status">Загрузка...</p> : null}
 
       {usersQuery.isError ? (
         <p role="alert">

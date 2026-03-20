@@ -42,6 +42,18 @@ else
 fi
 
 export MKCERT_CAROOT
+export TEST_SESSION_COOKIE_DOMAIN="${TEST_SESSION_COOKIE_DOMAIN:-kotel.localhost}"
+export TEST_IDLE_TIMEOUT="${TEST_IDLE_TIMEOUT:-3600}"
+
+if [[ -z "${TEST_SESSION_COOKIE_DOMAIN}" ]]; then
+  echo "Error: TEST_SESSION_COOKIE_DOMAIN must be non-empty." >&2
+  exit 1
+fi
+
+if ! [[ "${TEST_IDLE_TIMEOUT}" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Error: TEST_IDLE_TIMEOUT must be a positive integer (seconds)." >&2
+  exit 1
+fi
 
 "${COMPOSE_CMD[@]}" up -d --build
 

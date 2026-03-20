@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+export PROJECT_ROOT
 COMPOSE_FILE="${PROJECT_ROOT}/infra/compose/test.yml"
 COMPOSE_CMD=(docker compose --project-directory "${PROJECT_ROOT}" -f "${COMPOSE_FILE}")
 
@@ -55,7 +56,7 @@ if ! [[ "${TEST_IDLE_TIMEOUT}" =~ ^[1-9][0-9]*$ ]]; then
   exit 1
 fi
 
-"${COMPOSE_CMD[@]}" up -d --build
+"${COMPOSE_CMD[@]}" up -d postgres-test studio-test
 
 wait_for_healthy() {
   local service="$1"
@@ -84,13 +85,16 @@ wait_for_healthy() {
 }
 
 wait_for_healthy postgres-test
-wait_for_healthy backend-test
-wait_for_healthy frontend-test
 wait_for_healthy studio-test
-wait_for_healthy traefik-test
 
 "${COMPOSE_CMD[@]}" exec -T studio-test npx prisma migrate deploy
 "${COMPOSE_CMD[@]}" exec -T studio-test npx prisma db seed
+
+"${COMPOSE_CMD[@]}" up -d backend-test frontend-test traefik-test
+
+wait_for_healthy backend-test
+wait_for_healthy frontend-test
+wait_for_healthy traefik-test
 
 echo "Kotel test environment started and bootstrapped."
 echo "  Backend (TLS via Traefik): https://kotel.localhost:${TEST_HTTPS_PORT:-8443}/api"

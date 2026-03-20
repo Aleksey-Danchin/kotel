@@ -26,12 +26,11 @@ services:
   backend-test:
     container_name: kris-backend-test
     build:
-      context: .
-      dockerfile: infra/docker/backend.Dockerfile
-    command: npx nest start --watch --webpack -r tsconfig-paths/register
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.backend.dev
     volumes:
-      - .:/app
-    working_dir: /app/apps/backend
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/backend
     environment:
       - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
       - PORT=3000
@@ -59,12 +58,12 @@ services:
   frontend-test:
     container_name: kris-frontend-test
     build:
-      context: .
-      dockerfile: infra/docker/frontend.Dockerfile
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.frontend.dev
     command: npx vite --host
     volumes:
-      - .:/app
-    working_dir: /app/apps/frontend
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/frontend
     networks:
       - kotel-test-net
     healthcheck:
@@ -84,12 +83,12 @@ services:
   studio-test:
     container_name: kris-prisma-studio-test
     build:
-      context: .
-      dockerfile: infra/docker/studio.Dockerfile
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.studio.dev
     command: sh -c "sleep infinity"
     volumes:
-      - .:/app
-    working_dir: /app/apps/prisma
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/prisma
     environment:
       - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
     networks:
@@ -114,8 +113,8 @@ services:
       - "${TEST_HTTPS_PORT:-8443}:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./infra/traefik/traefik.test.yml:/etc/traefik/traefik.yml:ro
-      - ./infra/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/traefik.test.yml:/etc/traefik/traefik.yml:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/dynamic:/etc/traefik/dynamic:ro
       - ${MKCERT_CAROOT:-${HOME}/.local/share/mkcert}/kotel:/certs:ro
     networks:
       - kotel-test-net

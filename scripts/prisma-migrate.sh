@@ -3,6 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+export PROJECT_ROOT
 COMPOSE_FILE="${PROJECT_ROOT}/infra/compose/dev.yml"
 COMPOSE_CMD=(docker compose --project-directory "${PROJECT_ROOT}" -f "${COMPOSE_FILE}")
 
@@ -40,9 +41,9 @@ cleanup() {
   set +e
 
   if [[ -n "$("${COMPOSE_CMD[@]}" ps --status running -q studio)" ]]; then
-    "${COMPOSE_CMD[@]}" exec -T studio sh -lc "chown -R ${HOST_UID}:${HOST_GID} /app/apps/prisma"
+    "${COMPOSE_CMD[@]}" exec -T studio sh -lc "chown -R ${HOST_UID}:${HOST_GID} /apps/prisma"
   else
-    "${COMPOSE_CMD[@]}" run --rm --no-deps studio sh -lc "chown -R ${HOST_UID}:${HOST_GID} /app/apps/prisma"
+    "${COMPOSE_CMD[@]}" run --rm --no-deps studio sh -lc "chown -R ${HOST_UID}:${HOST_GID} /apps/prisma"
   fi
 
   if [[ "${STUDIO_WAS_RUNNING}" -eq 1 ]]; then

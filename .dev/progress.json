@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T10:06:32.352Z",
+  "updatedAt": "2026-03-20T10:06:44.837Z",
   "steps": [
     {
       "order": 1,
@@ -730,10 +730,10 @@
     {
       "order": 9,
       "file": "09-wire-shared-contract-aliases-and-session-envs.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "5086ab0",
       "startedAt": "2026-03-20T09:56:40.420Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T10:06:44.837Z",
       "error": null,
       "retryUsed": false,
       "progress": [

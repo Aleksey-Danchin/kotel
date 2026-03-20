@@ -1,5 +1,5 @@
-import type { PrismaClient as PrismaClientType } from "../../client/client";
-import { createPrismaClient } from "../../factory";
+import type { PrismaClient as PrismaClientType } from "../client/client";
+import { createPrismaClient } from "../factory";
 import { seedUsers } from "./users.seed";
 
 type SeedTask = {

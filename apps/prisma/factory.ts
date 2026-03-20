@@ -6,6 +6,8 @@ export const PRISMA_BASE_OMIT = {
   user: {
     login: true,
     passwordHash: true,
+    createdAt: true,
+    updatedAt: true,
   },
 } as const;
 

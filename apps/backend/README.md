@@ -1,3 +1,10 @@
+## Project Conventions (Overrides Template Defaults)
+
+- Tests in this repository use Vitest for non-E2E coverage and Playwright for E2E.
+- Do not add new Jest-based tests.
+- DTO/request validation is Zod-first for backend contracts.
+- See `.cursor/rules/testing.mdc` for the canonical policy.
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

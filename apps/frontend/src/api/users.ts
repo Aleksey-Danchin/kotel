@@ -1,5 +1,5 @@
 import axios from "axios";
-import { axiosLimitter } from "./axiosLimitter";
+import { axiosLimitter } from "../global/axiosLimitter";
 
 export interface UserRow {
   id: string;

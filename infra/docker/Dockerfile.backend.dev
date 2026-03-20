@@ -1,0 +1,10 @@
+FROM node:24
+
+ENV NODE_ENV=development
+ENV TZ=Europe/Moscow
+
+RUN npm install -g @nestjs/cli typescript ts-node tsconfig-paths
+
+WORKDIR /apps/backend
+
+CMD nest start --watch --webpack -r tsconfig-paths/register

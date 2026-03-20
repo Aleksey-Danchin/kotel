@@ -1,0 +1,135 @@
+name: kotel-test
+
+services:
+  postgres-test:
+    container_name: kris-postgres-test
+    image: postgres:18.3
+    environment:
+      POSTGRES_DB: ${TEST_POSTGRES_DB:-kotel_test}
+      POSTGRES_USER: ${TEST_POSTGRES_USER:-kotel_test}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD:-kotel_test}
+    ports:
+      - "${TEST_POSTGRES_PORT:-55432}:5432"
+    networks:
+      - kotel-test-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${TEST_POSTGRES_USER:-kotel_test} -d ${TEST_POSTGRES_DB:-kotel_test}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend-test:
+    container_name: kris-backend-test
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.backend.dev
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/backend
+    environment:
+      - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
+      - PORT=3000
+      - SESSION_COOKIE_DOMAIN=${TEST_SESSION_COOKIE_DOMAIN:-kotel.localhost}
+      - IDLE_TIMEOUT=${TEST_IDLE_TIMEOUT:-3600}
+    networks:
+      - kotel-test-net
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend-test.rule=Host(`kotel.localhost`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend-test.entrypoints=websecure
+      - traefik.http.routers.backend-test.tls=true
+      - traefik.http.routers.backend-test.priority=100
+      - traefik.http.services.backend-test.loadbalancer.server.port=3000
+
+  frontend-test:
+    container_name: kris-frontend-test
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.frontend.dev
+    command: npx vite --host
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/frontend
+    networks:
+      - kotel-test-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend-test.rule=Host(`kotel.localhost`)
+      - traefik.http.routers.frontend-test.entrypoints=websecure
+      - traefik.http.routers.frontend-test.tls=true
+      - traefik.http.routers.frontend-test.priority=1
+      - traefik.http.services.frontend-test.loadbalancer.server.port=5173
+
+  studio-test:
+    container_name: kris-prisma-studio-test
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.studio.dev
+    command: sh -c "sleep infinity"
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+    working_dir: /apps/prisma
+    environment:
+      - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
+    networks:
+      - kotel-test-net
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "npx prisma -v >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    labels:
+      - traefik.enable=false
+
+  traefik-test:
+    container_name: kris-traefik-test
+    image: traefik:v3
+    ports:
+      - "${TEST_HTTP_PORT:-8080}:80"
+      - "${TEST_HTTPS_PORT:-8443}:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/traefik.test.yml:/etc/traefik/traefik.yml:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ${MKCERT_CAROOT:-${HOME}/.local/share/mkcert}/kotel:/certs:ro
+    networks:
+      - kotel-test-net
+    depends_on:
+      backend-test:
+        condition: service_healthy
+      frontend-test:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8082/ping || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  kotel-test-net:
+    name: kotel-test-net

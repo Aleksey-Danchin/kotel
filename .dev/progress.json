@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T13:07:19.655Z",
-  "updatedAt": "2026-03-20T13:21:17.794Z",
+  "updatedAt": "2026-03-20T13:24:30.613Z",
   "steps": [
     {
       "order": 1,
@@ -190,10 +190,10 @@
     {
       "order": 3,
       "file": "03-implement-mobile-users-tab.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "80fb559",
       "startedAt": "2026-03-20T13:17:23.370Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T13:21:39.331Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -282,12 +282,99 @@
     {
       "order": 4,
       "file": "04-implement-mobile-session-test-tab.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T13:21:47.839Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "В шаге явно указано manual-only, автоматические тесты не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Task-specific автотесты не требуются по спецификации шага"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Regression автотесты не запускались: в шаге manual-only"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменений API/модели/архитектуры не добавлено"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: session-test tab is reachable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: signin sends fixed user1/123 credentials",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: check and signout update session state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: in-flight and error states visible",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: session JSON reflects latest state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: session state uses jotai atoms",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

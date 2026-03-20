@@ -1,6 +1,5 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../client/client";
 import type { PrismaClient as PrismaClientType } from "../../client/client";
+import { createPrismaClient } from "../../factory";
 import { seedUsers } from "./users.seed";
 
 type SeedTask = {
@@ -8,12 +7,7 @@ type SeedTask = {
   run: (prisma: PrismaClientType) => Promise<void>;
 };
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
-}
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+const prisma = createPrismaClient();
 const tasks: SeedTask[] = [{ name: "users", run: seedUsers }];
 
 const run = async (): Promise<void> => {

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T05:16:47.574Z",
-  "updatedAt": "2026-03-20T05:32:31.816Z",
+  "updatedAt": "2026-03-20T05:38:24.037Z",
   "steps": [
     {
       "order": 1,
@@ -184,10 +184,10 @@
     {
       "order": 3,
       "file": "03-add-prisma-seed-pipeline-and-script.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "7761b54",
       "startedAt": "2026-03-20T05:25:17.922Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T05:32:46.061Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -276,12 +276,91 @@
     {
       "order": 4,
       "file": "04-create-shared-prisma-factory-and-nest-module.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T05:32:51.950Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped health check per orchestrator; stale test containers cleaned"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Project docs files (docs/*.md) are absent in this repository snapshot"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: есть shared Prisma factory в apps/prisma",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Prisma конфигурирован adapter-pg",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: global omit скрывает login/passwordHash",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: PrismaModule экспортирует PrismaService и подключен",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: bcryptjs добавлен в backend dependencies",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

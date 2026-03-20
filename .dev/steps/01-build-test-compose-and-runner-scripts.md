@@ -25,6 +25,9 @@ A separate `test` compose manifest exists with test-prefixed service names, isol
 - Add `infra/compose/test.yml` by mirroring `infra/compose/dev.yml` structure, but with explicit test-purpose differences:
   - Compose project name is test-specific (for isolated networks/containers).
   - Service naming uses a `test-` prefix.
+  <CORRECTION by="step-executor" reason="Repository conventions for test service names">
+  In this codebase, test services and containers are consistently named with a `-test` suffix (e.g. `backend-test`, `kris-backend-test`) in skills and runner conventions. Implementation will use `-test` suffix naming to stay compatible with existing test tooling.
+  </CORRECTION>
   - Postgres has no persistent host volume (ephemeral test data only).
   - Studio is present but not published as interactive UI; it is used to run migration and seed before tests.
   - Traefik is included with TLS checks similarly to development flow.

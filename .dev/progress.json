@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T05:16:47.574Z",
-  "updatedAt": "2026-03-20T05:43:56.288Z",
+  "updatedAt": "2026-03-20T05:47:42.316Z",
   "steps": [
     {
       "order": 1,
@@ -365,10 +365,10 @@
     {
       "order": 5,
       "file": "05-create-users-resource-in-backend.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "e9eaba0",
       "startedAt": "2026-03-20T05:38:46.328Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T05:44:14.251Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -453,12 +453,99 @@
     {
       "order": 6,
       "file": "06-add-users-page-and-e2e-flow-check.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T05:44:24.513Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории; измененные файлы уже отформатированы"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "Новые тесты не добавлялись: фронтенд-инфраструктура тестов отсутствует, проверка покрытия выполнена через backend jest + code inspection"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "kotel-backend-1 jest src/users/users.integration.spec.ts passed; API smoke /api/users returned 100 users"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "kotel-backend-1 npm test passed (4 suites); kotel-frontend-1 npm run lint passed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены frontend-страницей /users без изменения API-контракта или модели данных"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: /users показывает пустую таблицу и кнопку загрузить",
+          "status": "completed",
+          "note": "Verified by code inspection of /users route: static table headers + button 'загрузить' with initial empty data"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: до клика запрос не отправляется",
+          "status": "completed",
+          "note": "Verified by code inspection: useQuery enabled:false prevents pre-click request"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: клик запускает /api/users через axiosLimitter",
+          "status": "completed",
+          "note": "Verified by code inspection: button calls refetch -> queryFn getUsers -> axiosLimitter -> axios.get('/api/users')"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: после ответа рендерятся 100 users",
+          "status": "completed",
+          "note": "Verified by API smoke curl and backend integration test: /api/users returns 100 users"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: есть loading и error состояния",
+          "status": "completed",
+          "note": "Verified by code inspection: loading status and error alert rendered from query state"
+        }
+      ]
     }
   ]
 }

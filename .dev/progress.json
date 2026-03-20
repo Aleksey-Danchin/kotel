@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T09:04:38.149Z",
+  "updatedAt": "2026-03-20T09:10:11.416Z",
   "steps": [
     {
       "order": 1,
       "file": "01-build-test-compose-and-runner-scripts.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "e34e109",
       "startedAt": "2026-03-20T08:57:50.164Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T09:05:07.966Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -102,12 +102,86 @@
     {
       "order": 2,
       "file": "02-migrate-backend-tests-to-vitest.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T09:05:15.727Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Test tooling migration only; no API/data/domain/architecture behavior changes"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: backend без Jest зависимостей и скриптов",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Vitest запускается в backend",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: устаревшие scaffold spec удалены",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: backend test команда корректно завершает CI режим",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 3,

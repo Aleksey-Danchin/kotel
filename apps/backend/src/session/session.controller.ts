@@ -7,23 +7,18 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import type { User } from '~prisma/client/client';
+import { SessionUser } from './session-user.decorator';
 import { signinSchema } from './session.contract';
+import {
+  getSessionCookieOptions,
+  SESSION_COOKIE_NAME,
+} from './session.constants';
+import { SessionGuard } from './session.guard';
 import { SessionService } from './session.service';
-
-const SESSION_COOKIE_NAME = 'session';
-const SESSION_COOKIE_PATH = '/api';
-
-const getSessionCookieDomain = (): string =>
-  process.env.SESSION_COOKIE_DOMAIN ?? 'kotel.localhost';
-
-const getSessionCookieOptions = () => ({
-  domain: getSessionCookieDomain(),
-  httpOnly: true,
-  path: SESSION_COOKIE_PATH,
-  secure: true,
-});
 
 @Controller('session')
 export class SessionController {
@@ -64,18 +59,11 @@ export class SessionController {
   }
 
   @Get('check')
-  async check(
-    @Req() request: Request,
+  @UseGuards(new SessionGuard({ strong: false }))
+  check(
+    @SessionUser() sessionUser: User | null,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<void> {
-    const result = await this.sessionService.check(
-      request.cookies?.[SESSION_COOKIE_NAME] as string | undefined,
-    );
-
-    if (result.stale) {
-      response.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
-    }
-
-    response.json(result.user);
+  ): void {
+    response.json(sessionUser);
   }
 }

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T09:26:11.383Z",
+  "updatedAt": "2026-03-20T09:39:46.064Z",
   "steps": [
     {
       "order": 1,
@@ -279,10 +279,10 @@
     {
       "order": 4,
       "file": "04-implement-session-lifecycle-policies.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "ba35485",
       "startedAt": "2026-03-20T09:17:41.314Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T09:26:35.515Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -372,12 +372,90 @@
     {
       "order": 5,
       "file": "05-add-session-guard-and-session-user-decorator.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T09:26:40.680Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No external API/data-model/domain contract changes; internal session auth mechanism only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: SessionGuard поддерживает default/strong/weak режимы",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: guard добавляет lazy async getSessionUser в request",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: повторные getSessionUser в запросе делают один user query",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: @SessionUser возвращает User|null по режиму и состоянию",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: отсутствие getSessionUser вызывает UnauthorizedException",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

@@ -33,7 +33,9 @@ describe('SessionController integration', () => {
   });
 
   beforeEach(async () => {
-    await prismaService.client.session.deleteMany();
+    await prismaService.client.session.deleteMany({
+      where: { userId: user1Id },
+    });
   });
 
   afterAll(async () => {

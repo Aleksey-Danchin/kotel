@@ -157,14 +157,14 @@ export class SessionService {
 
     const now = new Date();
     if (this.isStale(session.lastUsedAt, now)) {
-      await this.prismaService.client.session.delete({
+      await this.prismaService.client.session.deleteMany({
         where: { key: session.key },
       });
 
       return { user: null, stale: true };
     }
 
-    await this.prismaService.client.session.update({
+    await this.prismaService.client.session.updateMany({
       where: { key: session.key },
       data: { lastUsedAt: now },
     });

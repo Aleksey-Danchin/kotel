@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T05:16:47.574Z",
-  "updatedAt": "2026-03-20T05:38:24.037Z",
+  "updatedAt": "2026-03-20T05:43:56.288Z",
   "steps": [
     {
       "order": 1,
@@ -276,10 +276,10 @@
     {
       "order": 4,
       "file": "04-create-shared-prisma-factory-and-nest-module.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "320beb0",
       "startedAt": "2026-03-20T05:32:51.950Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T05:38:34.313Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -365,12 +365,90 @@
     {
       "order": 5,
       "file": "05-create-users-resource-in-backend.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T05:38:46.328Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No docs directory/files exist in this repository yet."
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: users resource создан через Nest CLI",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: GET /api/users возвращает список из DB",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: возвращается полный набор 100 users",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: login/passwordHash отсутствуют в payload",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: backend собирается и стартует",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

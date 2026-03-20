@@ -1,11 +1,12 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
   Injectable,
-  Optional,
+  SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Response } from 'express';
 import type { User } from '~prisma/client/client';
 import {
   getSessionCookieOptions,
@@ -20,6 +21,9 @@ export type SessionGuardOptions = {
 
 const SESSION_GUARD_OPTIONS = 'SESSION_GUARD_OPTIONS';
 
+export const SessionGuardConfig = (options?: SessionGuardOptions) =>
+  SetMetadata(SESSION_GUARD_OPTIONS, options);
+
 const normalizeOptions = (
   options?: SessionGuardOptions,
 ): Required<SessionGuardOptions> => ({
@@ -28,30 +32,20 @@ const normalizeOptions = (
 
 @Injectable()
 export class SessionGuard implements CanActivate {
-  private static sessionService: SessionService | null = null;
-
-  private readonly options: Required<SessionGuardOptions>;
-
   constructor(
-    @Optional()
-    @Inject(SESSION_GUARD_OPTIONS)
-    options?: SessionGuardOptions,
-  ) {
-    this.options = normalizeOptions(options);
-  }
-
-  static bindSessionService(sessionService: SessionService): void {
-    SessionGuard.sessionService = sessionService;
-  }
+    private readonly sessionService: SessionService,
+    private readonly reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<SessionRequest>();
-    const response = context.switchToHttp().getResponse();
-    const sessionService = SessionGuard.sessionService;
-
-    if (!sessionService) {
-      throw new UnauthorizedException();
-    }
+    const response = context.switchToHttp().getResponse<Response>();
+    const options = normalizeOptions(
+      this.reflector.getAllAndOverride<SessionGuardOptions>(
+        SESSION_GUARD_OPTIONS,
+        [context.getHandler(), context.getClass()],
+      ),
+    );
 
     let hasResolved = false;
     let memoizedUser: User | null = null;
@@ -65,7 +59,7 @@ export class SessionGuard implements CanActivate {
       const sessionKey = request.cookies?.[SESSION_COOKIE_NAME] as
         | string
         | undefined;
-      const result = await sessionService.check(sessionKey);
+      const result = await this.sessionService.check(sessionKey);
       if (result.stale) {
         response.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
       }
@@ -74,7 +68,7 @@ export class SessionGuard implements CanActivate {
     };
 
     const sessionUser = await request.getSessionUser();
-    if (this.options.strong && !sessionUser) {
+    if (options.strong && !sessionUser) {
       throw new UnauthorizedException();
     }
 

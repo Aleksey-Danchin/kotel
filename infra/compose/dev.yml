@@ -25,7 +25,7 @@ services:
       context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
       dockerfile: infra/docker/Dockerfile.backend.dev
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/backend
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
@@ -57,7 +57,7 @@ services:
       dockerfile: infra/docker/Dockerfile.frontend.dev
     command: npx vite --host
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/frontend
     networks:
       - kotel-net
@@ -81,7 +81,7 @@ services:
       dockerfile: infra/docker/Dockerfile.studio.dev
     command: sh -c "npx prisma migrate deploy && npx prisma studio --browser none --port 5555"
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/prisma
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}

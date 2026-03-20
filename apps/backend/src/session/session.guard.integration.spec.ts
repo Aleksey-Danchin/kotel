@@ -23,7 +23,8 @@ import type { User } from '~prisma/client/client';
 import { AppModule } from '../app.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { SessionUser } from './session-user.decorator';
-import { SessionGuard } from './session.guard';
+import { SessionGuard, SessionGuardConfig } from './session.guard';
+import { SessionModule } from './session.module';
 import type { SessionRequest } from './session-request';
 
 @Controller('session-guard-spec')
@@ -35,13 +36,15 @@ class SessionGuardSpecController {
   }
 
   @Get('strong-explicit')
-  @UseGuards(new SessionGuard({ strong: true }))
+  @UseGuards(SessionGuard)
+  @SessionGuardConfig({ strong: true })
   strongExplicit(@SessionUser() sessionUser: User) {
     return { id: sessionUser.id, fullname: sessionUser.fullname };
   }
 
   @Get('weak')
-  @UseGuards(new SessionGuard({ strong: false }))
+  @UseGuards(SessionGuard)
+  @SessionGuardConfig({ strong: false })
   weak(
     @SessionUser() sessionUser: User | null,
     @Res({ passthrough: true }) response: Response,
@@ -54,7 +57,8 @@ class SessionGuardSpecController {
   }
 
   @Get('memoized')
-  @UseGuards(new SessionGuard({ strong: false }))
+  @UseGuards(SessionGuard)
+  @SessionGuardConfig({ strong: false })
   async memoized(@Req() request: SessionRequest) {
     const first = await request.getSessionUser?.();
     const second = await request.getSessionUser?.();
@@ -81,7 +85,7 @@ describe('SessionGuard and SessionUser integration', () => {
     process.env.IDLE_TIMEOUT = '3600';
 
     const testingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, SessionModule],
       controllers: [SessionGuardSpecController],
     }).compile();
 
@@ -105,7 +109,9 @@ describe('SessionGuard and SessionUser integration', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   const signinAndGetCookie = async (): Promise<string[]> => {

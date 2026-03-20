@@ -1,4 +1,4 @@
-import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Global, Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SessionController } from './session.controller';
 import { SessionGuard } from './session.guard';
@@ -6,10 +6,12 @@ import { SessionService } from './session.service';
 
 const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
 
+@Global()
 @Module({
   imports: [PrismaModule],
   controllers: [SessionController],
   providers: [SessionService, SessionGuard],
+  exports: [SessionGuard],
 })
 export class SessionModule implements OnModuleInit, OnModuleDestroy {
   private cleanupInterval: NodeJS.Timeout | null = null;
@@ -17,7 +19,6 @@ export class SessionModule implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly sessionService: SessionService) {}
 
   async onModuleInit(): Promise<void> {
-    SessionGuard.bindSessionService(this.sessionService);
     await this.sessionService.cleanupStaleSessions();
     this.cleanupInterval = setInterval(() => {
       void this.sessionService.cleanupStaleSessions();

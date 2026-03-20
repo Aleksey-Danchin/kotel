@@ -29,7 +29,7 @@ services:
       context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
       dockerfile: infra/docker/Dockerfile.backend.dev
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/backend
     environment:
       - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
@@ -62,7 +62,7 @@ services:
       dockerfile: infra/docker/Dockerfile.frontend.dev
     command: npx vite --host
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/frontend
     networks:
       - kotel-test-net
@@ -87,7 +87,7 @@ services:
       dockerfile: infra/docker/Dockerfile.studio.dev
     command: sh -c "sleep infinity"
     volumes:
-      - ${PROJECT_ROOT:?PROJECT_ROOT is required}:/
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/prisma
     environment:
       - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}

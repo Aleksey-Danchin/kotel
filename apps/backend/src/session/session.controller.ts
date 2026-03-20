@@ -17,7 +17,7 @@ import {
   getSessionCookieOptions,
   SESSION_COOKIE_NAME,
 } from './session.constants';
-import { SessionGuard } from './session.guard';
+import { SessionGuard, SessionGuardConfig } from './session.guard';
 import { SessionService } from './session.service';
 
 @Controller('session')
@@ -59,7 +59,8 @@ export class SessionController {
   }
 
   @Get('check')
-  @UseGuards(new SessionGuard({ strong: false }))
+  @UseGuards(SessionGuard)
+  @SessionGuardConfig({ strong: false })
   check(
     @SessionUser() sessionUser: User | null,
     @Res({ passthrough: true }) response: Response,

@@ -6,5 +6,5 @@ export const Route = createFileRoute("/$key/")({
 
 function RouteComponent() {
   const { key } = Route.useParams();
-  return <div>Hello {key}!</div>;
+  return <button className="btn btn-primary">Click me {key}</button>;
 }

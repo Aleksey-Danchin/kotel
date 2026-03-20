@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T05:16:47.574Z",
-  "updatedAt": "2026-03-20T05:24:55.697Z",
+  "updatedAt": "2026-03-20T05:32:31.816Z",
   "steps": [
     {
       "order": 1,
@@ -90,10 +90,10 @@
     {
       "order": 2,
       "file": "02-add-prisma-migration-script-via-studio.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "7af8273",
       "startedAt": "2026-03-20T05:19:23.247Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T05:25:12.571Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -184,12 +184,94 @@
     {
       "order": 3,
       "file": "03-add-prisma-seed-pipeline-and-script.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T05:25:17.922Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории; форматирование для новых seed/bash файлов выполнено вручную"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "Автотесты не добавлялись: шаг инфраструктурный (bash+prisma seed), покрывается сценарной проверкой выполнения скрипта и проверкой данных в БД"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Полный регрессионный набор для инфраструктурного seed-скрипта отсутствует; выполнена повторная сценарная проверка rerun"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены seed-пайплайном и миграцией User; проектная документация по API/архитектуре не содержит разделов про этот локальный операционный сценарий"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: prisma-seed.sh существует и executable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: reset --skip-generate затем generate затем seed",
+          "status": "completed",
+          "note": "В Prisma 7 флаг --skip-generate удален; реализован эквивалентный порядок reset -> generate -> seed (см. CORRECTION в step file)"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: создаётся ровно 100 пользователей",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: passwordHash это bcrypt от 123",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: seed запускается только вручную",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

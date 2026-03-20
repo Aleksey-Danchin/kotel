@@ -60,5 +60,15 @@ Depends on steps 01, 02
 - Manual DB validation through Prisma Studio.
 - Optional lightweight script check for count via Prisma query command.
 
+<CORRECTION by="step-executor" reason="Prisma CLI compatibility in current codebase">
+The repository uses Prisma `7.5.0`, where `prisma migrate reset` no longer supports `--skip-generate` (CLI returns "unknown or unexpected option: --skip-generate").  
+Implementation uses `prisma migrate reset --force`, followed by explicit `prisma generate`, then `prisma db seed` to preserve the intended ordered pipeline.
+</CORRECTION>
+
+<CORRECTION by="step-executor" reason="Seed configuration location in Prisma 7">
+Prisma `7.5.0` resolves seed command from `prisma.config.ts` (`migrations.seed`) and reports "No seed command configured" when only `package.json` has `prisma.seed`.  
+Seed entrypoint is configured in `apps/prisma/prisma.config.ts` via `migrations.seed: "tsx prisma/seed/index.ts"`; `package.json` updates are kept for compatibility intent.
+</CORRECTION>
+
 ## Notes
 - Keep seed architecture ready for additional future seed domains, not only users.

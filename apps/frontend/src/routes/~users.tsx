@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { getUsers } from "../global/usersApi";
+import { usersQueryOptions } from "../queryOptions/users";
 
 export const Route = createFileRoute("/users")({
   component: UsersPage,
@@ -8,8 +8,7 @@ export const Route = createFileRoute("/users")({
 
 function UsersPage() {
   const usersQuery = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
+    ...usersQueryOptions(),
     enabled: false,
   });
 

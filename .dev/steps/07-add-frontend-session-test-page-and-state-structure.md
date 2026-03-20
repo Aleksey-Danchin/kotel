@@ -58,6 +58,11 @@ Frontend has only basic pages (`/`, `/users`) and current API call lives in `src
 ## Testing
 - Manual verification only for frontend session test page (as requested).
 - Ensure backend endpoint tests remain automated in Vitest.
+<CORRECTION by="step-executor" reason="project workflow requires automated runtime verification for UI flow criteria">
+Add automated frontend coverage for this step:
+- at least one frontend unit test for new queryOptions/api wiring;
+- one Playwright E2E scenario for `/session-test` flow (signin -> check -> signout), because Verification Scenario includes runtime UI/API flow.
+</CORRECTION>
 
 ## Notes
 - Do not introduce frontend automated tests for this temporary page in this round.

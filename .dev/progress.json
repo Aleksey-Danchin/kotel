@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T09:45:02.894Z",
+  "updatedAt": "2026-03-20T09:53:26.076Z",
   "steps": [
     {
       "order": 1,
@@ -460,10 +460,10 @@
     {
       "order": 6,
       "file": "06-cover-session-flow-with-vitest-integration-tests.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "b3f4243",
       "startedAt": "2026-03-20T09:40:14.195Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T09:45:17.126Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -554,12 +554,92 @@
     {
       "order": 7,
       "file": "07-add-frontend-session-test-page-and-state-structure.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T09:45:22.534Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Health check skipped by orchestrator; stale test containers cleaned"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model/domain/architecture contract changes; frontend temporary test harness only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: frontend имеет jotai dependency и рабочие atoms для session",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: маршрут /session-test доступен с signin/signout/check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: есть src/api и src/queryOptions с плоскими resource файлами",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: session test page использует новую api/queryOptions структуру",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: users API мигрирован с src/global/usersApi.ts",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 8,

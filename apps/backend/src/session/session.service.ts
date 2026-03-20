@@ -9,9 +9,53 @@ export type SessionAuthResult = {
   user: User;
 };
 
+export type SessionCheckResult = {
+  user: User | null;
+  stale: boolean;
+};
+
+const ACTIVE_SESSION_LIMIT = 10;
+
 @Injectable()
 export class SessionService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private readonly idleTimeoutSeconds: number;
+
+  constructor(private readonly prismaService: PrismaService) {
+    this.idleTimeoutSeconds = this.readIdleTimeoutSeconds();
+  }
+
+  private readIdleTimeoutSeconds(): number {
+    const value = process.env.IDLE_TIMEOUT;
+    if (!value) {
+      throw new Error('IDLE_TIMEOUT is required');
+    }
+
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      throw new Error('IDLE_TIMEOUT must be a positive number');
+    }
+
+    return parsed;
+  }
+
+  private getStaleCutoff(now: Date): Date {
+    return new Date(now.getTime() - this.idleTimeoutSeconds * 1000);
+  }
+
+  private isStale(lastUsedAt: Date, now: Date): boolean {
+    return lastUsedAt < this.getStaleCutoff(now);
+  }
+
+  async cleanupStaleSessions(userId?: string): Promise<number> {
+    const deleteResult = await this.prismaService.client.session.deleteMany({
+      where: {
+        ...(userId ? { userId } : {}),
+        lastUsedAt: { lt: this.getStaleCutoff(new Date()) },
+      },
+    });
+
+    return deleteResult.count;
+  }
 
   async signin(dto: SigninDto): Promise<SessionAuthResult> {
     const credentials = await this.prismaService.client.user.findUnique({
@@ -34,10 +78,47 @@ export class SessionService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const session = await this.prismaService.client.session.create({
-      data: {
-        userId: credentials.id,
-      },
+    const now = new Date();
+    const staleCutoff = this.getStaleCutoff(now);
+
+    const session = await this.prismaService.client.$transaction(async (tx) => {
+      await tx.session.deleteMany({
+        where: {
+          userId: credentials.id,
+          lastUsedAt: { lt: staleCutoff },
+        },
+      });
+
+      const activeCount = await tx.session.count({
+        where: {
+          userId: credentials.id,
+          lastUsedAt: { gte: staleCutoff },
+        },
+      });
+
+      if (activeCount >= ACTIVE_SESSION_LIMIT) {
+        const youngestActiveSession = await tx.session.findFirst({
+          where: {
+            userId: credentials.id,
+            lastUsedAt: { gte: staleCutoff },
+          },
+          orderBy: [{ lastUsedAt: 'desc' }, { createdAt: 'desc' }],
+          select: { key: true },
+        });
+
+        if (youngestActiveSession) {
+          await tx.session.delete({
+            where: { key: youngestActiveSession.key },
+          });
+        }
+      }
+
+      return tx.session.create({
+        data: {
+          userId: credentials.id,
+          lastUsedAt: now,
+        },
+      });
     });
 
     const user = await this.prismaService.client.user.findUniqueOrThrow({
@@ -60,9 +141,9 @@ export class SessionService {
     });
   }
 
-  async check(sessionKey: string | undefined): Promise<User | null> {
+  async check(sessionKey: string | undefined): Promise<SessionCheckResult> {
     if (!sessionKey) {
-      return null;
+      return { user: null, stale: false };
     }
 
     const session = await this.prismaService.client.session.findUnique({
@@ -70,6 +151,24 @@ export class SessionService {
       include: { user: true },
     });
 
-    return session?.user ?? null;
+    if (!session) {
+      return { user: null, stale: false };
+    }
+
+    const now = new Date();
+    if (this.isStale(session.lastUsedAt, now)) {
+      await this.prismaService.client.session.delete({
+        where: { key: session.key },
+      });
+
+      return { user: null, stale: true };
+    }
+
+    await this.prismaService.client.session.update({
+      where: { key: session.key },
+      data: { lastUsedAt: now },
+    });
+
+    return { user: session.user, stale: false };
   }
 }

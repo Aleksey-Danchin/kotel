@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T09:17:15.353Z",
+  "updatedAt": "2026-03-20T09:26:11.383Z",
   "steps": [
     {
       "order": 1,
@@ -186,10 +186,10 @@
     {
       "order": 3,
       "file": "03-create-session-resource-and-http-contract.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "72bd43e",
       "startedAt": "2026-03-20T09:10:33.908Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T09:17:34.765Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -279,12 +279,95 @@
     {
       "order": 4,
       "file": "04-implement-session-lifecycle-policies.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T09:17:41.314Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Documentation files (docs/api.md, docs/data-model.md, docs/domain.md, docs/architecture.md) are absent in repository"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: IDLE_TIMEOUT обязателен для session logic",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: успешный доступ к сессии обновляет lastUsedAt",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: stale-сессии удаляются и cookie очищается",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: при >10 удаляется youngest active перед созданием",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: cleanup запускается сразу и каждый час",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: interval освобождается при shutdown",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

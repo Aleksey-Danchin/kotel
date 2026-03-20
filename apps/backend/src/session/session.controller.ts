@@ -68,9 +68,14 @@ export class SessionController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ): Promise<void> {
-    const user = await this.sessionService.check(
+    const result = await this.sessionService.check(
       request.cookies?.[SESSION_COOKIE_NAME] as string | undefined,
     );
-    response.json(user);
+
+    if (result.stale) {
+      response.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
+    }
+
+    response.json(result.user);
   }
 }

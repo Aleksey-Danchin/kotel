@@ -32,6 +32,7 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - PORT=3000
       - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-kotel.localhost}
+      - IDLE_TIMEOUT=${IDLE_TIMEOUT:-3600}
     networks:
       - kotel-net
     depends_on:

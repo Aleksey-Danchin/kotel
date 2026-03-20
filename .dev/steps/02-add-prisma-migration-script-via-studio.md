@@ -62,6 +62,10 @@ must:
 4. Check `docker compose ps` and confirm `studio` ended stopped.
 5. Start `studio` manually, run script again with another name, and confirm `studio` restarts and remains running after completion.
 
+<CORRECTION by="step-executor" reason="current schema has no pending changes">
+In the current repository state, `npx prisma migrate dev --name <name>` completes with "Already in sync" and does not create a new migration directory unless schema changes are introduced first. Verification for this step therefore confirms command execution and post-actions (`prisma generate`, ownership recovery, lifecycle behavior), while migration file creation remains conditional on actual schema diffs.
+</CORRECTION>
+
 ## Testing
 - Manual script validation with both service-state branches (running/not running).
 - Negative test: call with zero args and two args.

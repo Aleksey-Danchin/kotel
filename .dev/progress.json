@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-20T08:57:44.751Z",
-  "updatedAt": "2026-03-20T09:10:11.416Z",
+  "updatedAt": "2026-03-20T09:17:15.353Z",
   "steps": [
     {
       "order": 1,
@@ -102,10 +102,10 @@
     {
       "order": 2,
       "file": "02-migrate-backend-tests-to-vitest.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "4c3a9e8",
       "startedAt": "2026-03-20T09:05:15.727Z",
-      "completedAt": null,
+      "completedAt": "2026-03-20T09:10:26.929Z",
       "error": null,
       "retryUsed": false,
       "progress": [
@@ -186,12 +186,95 @@
     {
       "order": 3,
       "file": "03-create-session-resource-and-http-contract.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-20T09:10:33.908Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No docs directory/files present in repository to update for this step"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: session module/controller/service подключены в AppModule",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: signin валидирует Zod и возвращает пользователя",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: signout очищает cookie и инвалидирует сессию",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: check всегда 200 и user|null",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: cookie опции соответствуют требованиям безопасности",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: Zod установлен и используется в session DTO",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

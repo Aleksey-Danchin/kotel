@@ -88,6 +88,7 @@ async function handleMessageEvent(
   if (!pendingFlow) {
     return;
   }
+  pendingFlows.delete(state);
 
   try {
     if (pendingFlow.state !== state) {
@@ -116,7 +117,8 @@ async function handleMessageEvent(
       error instanceof Error ? error : new Error("OAuth callback failed"),
     );
   } finally {
-    clearFlow(pendingFlow.serverUrl, state);
+    sessionStorage.removeItem(storageStateKey(pendingFlow.serverUrl));
+    sessionStorage.removeItem(storageVerifierKey(pendingFlow.serverUrl));
   }
 }
 

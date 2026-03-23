@@ -87,6 +87,13 @@ Old E2E tests deleted in Step 03. No E2E coverage for new auth system.
 npx playwright test apps/frontend/e2e/auth/
 ```
 All tests green.
+<CORRECTION by="step-executor" reason="playwright command path mismatch with frontend-local config">
+Use frontend-local Playwright config and paths:
+```bash
+cd apps/frontend
+npx playwright test --config e2e/playwright.config.ts e2e/auth/
+```
+</CORRECTION>
 
 ## Testing
 This step IS the testing step.

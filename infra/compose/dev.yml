@@ -86,7 +86,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES2_USER:-postgres}:${POSTGRES2_PASSWORD:-postgres}@postgres2:5432/${POSTGRES2_DB:-kotel2}
       - PORT=3000
-      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-.localhost}
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN_2:-katel.localhost}
       - IDLE_TIMEOUT=${IDLE_TIMEOUT:-3600}
       - REUSE_DETECTION_MODE=${REUSE_DETECTION_MODE:-quarantine}
       - RECOMMENDED_CLIENT_URL=${RECOMMENDED_CLIENT_URL_2:-https://kotel.localhost}

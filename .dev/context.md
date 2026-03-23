@@ -31,3 +31,7 @@
 
 ## Step 22: Mobile multi-server store and axios client
 - Mobile Vitest and TypeScript checks run reliably in `kotel-mobile-1` (`/apps/mobile`); `kris-frontend-test` targets the web frontend and does not validate mobile sources.
+
+## Step 27: E2E Playwright tests - OAuth web flow
+- In dev, React Strict Mode can double-invoke `useEffect` in the OAuth callback route, so callback postMessage should be guarded to avoid duplicate one-time code exchange.
+- For two-server local OAuth (`kotel.localhost` + `katel.localhost`), `backend2` must use a host-scoped cookie domain (e.g., `SESSION_COOKIE_DOMAIN_2=katel.localhost`) to avoid cross-host auth cookie collisions.

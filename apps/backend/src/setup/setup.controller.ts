@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import type { UserRole } from '~prisma/client/client';
 import { Public } from '../session/public.decorator';
 import { SetupService } from './setup.service';
 
@@ -18,7 +19,7 @@ export class SetupController {
     id: string;
     login: string;
     fullname: string;
-    role: 'ROOT';
+    role: UserRole;
   }> {
     return this.setupService.init(body);
   }

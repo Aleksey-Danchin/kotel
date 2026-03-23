@@ -16,3 +16,6 @@
 
 ## Step 10: Reuse detection and alertness modes
 - `scripts/prettier.sh` is not present in this repo; use `npm --prefix apps/backend run format` for backend formatting in step execution.
+
+## Step 11: Session status, logout, and maintenance
+- Prisma client has global omit in `apps/prisma/factory.ts` (`user.login`, `user.passwordHash`, timestamps), so `request.user` populated by `SessionGuard` does not include `login` at runtime.

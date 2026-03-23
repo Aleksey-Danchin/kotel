@@ -127,6 +127,147 @@ describe('SessionController refresh integration', () => {
     });
   });
 
+  it('returns session status for valid access token', async () => {
+    const accessToken = `access-${randomUUID()}`;
+    const session = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      accessToken,
+      refreshToken: `refresh-${randomUUID()}`,
+    });
+
+    const response = await request(app.getHttpServer())
+      .get('/api/session/status')
+      .set('Origin', 'https://kotel.localhost')
+      .set('Cookie', [`${ACCESS_TOKEN_COOKIE}=${accessToken}`])
+      .expect(200);
+
+    expect(response.body).toEqual({
+      sessionId: session.sessionId,
+      user: {
+        id: userId,
+        fullname: 'Refresh Spec User',
+        role: 'USER',
+      },
+    });
+  });
+
+  it('returns 401 for status without token', async () => {
+    await request(app.getHttpServer()).get('/api/session/status').expect(401);
+  });
+
+  it('logout current revokes current session and clears cookies', async () => {
+    const accessToken = `access-${randomUUID()}`;
+    const refreshToken = `refresh-${randomUUID()}`;
+    const session = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      accessToken,
+      refreshToken,
+    });
+
+    const response = await request(app.getHttpServer())
+      .post('/api/session/logout')
+      .set('Origin', 'https://kotel.localhost')
+      .set('Cookie', [
+        `${ACCESS_TOKEN_COOKIE}=${accessToken}`,
+        `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
+      ])
+      .send({ allDevices: false })
+      .expect(201);
+
+    expect(response.body).toEqual({ ok: true });
+    const updated = await prismaService.client.session.findUnique({
+      where: { id: session.id },
+    });
+    expect(updated?.status).toBe('REVOKED');
+    expect(updated?.noActiveReason).toBe('LOGOUT_CURRENT');
+
+    const setCookieHeader = response.headers['set-cookie'];
+    expect(setCookieHeader).toBeDefined();
+    expect(
+      setCookieHeader.some(
+        (item: string) =>
+          item.startsWith(`${ACCESS_TOKEN_COOKIE}=`) &&
+          item.includes('Expires=Thu, 01 Jan 1970'),
+      ),
+    ).toBe(true);
+    expect(
+      setCookieHeader.some(
+        (item: string) =>
+          item.startsWith(`${REFRESH_TOKEN_COOKIE}=`) &&
+          item.includes('Expires=Thu, 01 Jan 1970'),
+      ),
+    ).toBe(true);
+  });
+
+  it('old access token returns 401 after current logout', async () => {
+    const accessToken = `access-${randomUUID()}`;
+    const refreshToken = `refresh-${randomUUID()}`;
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      accessToken,
+      refreshToken,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/logout')
+      .set('Origin', 'https://kotel.localhost')
+      .set('Cookie', [
+        `${ACCESS_TOKEN_COOKIE}=${accessToken}`,
+        `${REFRESH_TOKEN_COOKIE}=${refreshToken}`,
+      ])
+      .send({ allDevices: false })
+      .expect(201);
+
+    await request(app.getHttpServer())
+      .get('/api/session/status')
+      .set('Origin', 'https://kotel.localhost')
+      .set('Cookie', [`${ACCESS_TOKEN_COOKIE}=${accessToken}`])
+      .expect(401);
+  });
+
+  it('logout all devices revokes every active user session', async () => {
+    const origin = 'https://kotel.localhost';
+    const callerAccessToken = `access-${randomUUID()}`;
+    const callerRefreshToken = `refresh-${randomUUID()}`;
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: origin,
+      accessToken: callerAccessToken,
+      refreshToken: callerRefreshToken,
+    });
+    const secondSession = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: origin,
+      accessToken: `access-${randomUUID()}`,
+      refreshToken: `refresh-${randomUUID()}`,
+    });
+
+    const response = await request(app.getHttpServer())
+      .post('/api/session/logout')
+      .set('Origin', origin)
+      .set('Cookie', [
+        `${ACCESS_TOKEN_COOKIE}=${callerAccessToken}`,
+        `${REFRESH_TOKEN_COOKIE}=${callerRefreshToken}`,
+      ])
+      .send({ allDevices: true })
+      .expect(201);
+
+    expect(response.body).toEqual({ ok: true });
+    const activeSessions = await prismaService.client.session.findMany({
+      where: { userId, status: 'ACTIVE' },
+    });
+    expect(activeSessions).toHaveLength(0);
+
+    const updatedSecond = await prismaService.client.session.findUnique({
+      where: { id: secondSession.id },
+    });
+    expect(updatedSecond?.status).toBe('REVOKED');
+    expect(updatedSecond?.noActiveReason).toBe('LOGOUT_ALL');
+  });
+
   it('rotates EXPO refresh token and returns tokens in body', async () => {
     const refreshToken = `refresh-${randomUUID()}`;
     const oldSession = await createActiveSession({
@@ -400,6 +541,7 @@ describe('SessionController refresh integration', () => {
   async function createActiveSession(params: {
     clientType: 'WEB' | 'EXPO';
     fingerprint: string;
+    accessToken?: string;
     refreshToken: string;
   }) {
     const now = Date.now();
@@ -409,7 +551,9 @@ describe('SessionController refresh integration', () => {
         clientType: params.clientType,
         fingerprint: params.fingerprint,
         sessionId: randomUUID(),
-        accessTokenHash: hashToken(`access-${randomUUID()}`),
+        accessTokenHash: hashToken(
+          params.accessToken ?? `access-${randomUUID()}`,
+        ),
         refreshTokenHash: hashToken(params.refreshToken),
         accessTokenExpiresAt: new Date(now + 60_000),
         refreshTokenExpiresAt: new Date(now + 120_000),

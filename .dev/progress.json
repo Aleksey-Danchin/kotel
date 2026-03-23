@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T13:54:12.257Z",
+  "updatedAt": "2026-03-23T14:02:20.825Z",
   "steps": [
     {
       "order": 1,
@@ -811,10 +811,10 @@
     {
       "order": 10,
       "file": "10-reuse-detection-alertness-modes.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "a1711af",
       "startedAt": "2026-03-23T13:50:07.626Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T13:54:56.221Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -920,12 +920,101 @@
     {
       "order": 11,
       "file": "11-session-status-logout-maintenance.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T13:55:06.176Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model documentation changes required; behavior covered by tests and step correction."
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: /api/session/status с valid token -> 200 user+sessionId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: /api/session/status без токена -> 401",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: logout allDevices false отзывает текущую сессию и чистит cookies",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: после single logout старый access token -> 401",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: logout allDevices true отзывает все сессии пользователя",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: maintenance cleanup запускается при init и каждый час",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: expired sessions помечаются EXPIRED",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 12,

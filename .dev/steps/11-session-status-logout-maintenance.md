@@ -29,9 +29,15 @@ Returns the user info and session ID from the authenticated request:
 ```json
 {
   "sessionId": "string",
-  "user": { "id": "...", "fullname": "...", "login": "...", "role": "..." }
+  "user": { "id": "...", "fullname": "...", "role": "..." }
 }
 ```
+
+<CORRECTION by="step-executor" reason="global prisma omit policy hides login field">
+In the current codebase, Prisma client uses global omit config (`apps/prisma/factory.ts`) that excludes `user.login` by default.
+`request.user` from `SessionGuard` therefore does not include `login` at runtime. Status response returns safe user fields:
+`id`, `fullname`, `role`.
+</CORRECTION>
 
 Simple endpoint — reads `request.session.sessionId` and `request.user`, returns them.
 

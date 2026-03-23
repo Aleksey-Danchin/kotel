@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T14:30:52.936Z",
+  "updatedAt": "2026-03-23T14:35:29.962Z",
   "steps": [
     {
       "order": 1,
@@ -1220,10 +1220,10 @@
     {
       "order": 14,
       "file": "14-setup-wellknown.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "7a591ed",
       "startedAt": "2026-03-23T14:23:39.803Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T14:31:13.206Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1321,12 +1321,90 @@
     {
       "order": 15,
       "file": "15-seed-data-update.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T14:31:22.545Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "No prettier script for prisma seed; file kept formatted"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No dedicated test files required; validation via seed execution and SQL checks"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "Seed executed successfully in test DB"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Regression suite has pre-existing unrelated failures in session/setup integration tests"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/model/domain documentation changes required for seed-only update"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: user1 имеет роль ROOT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: user2-4 имеют роль ADMIN",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: user5-100 имеют роль USER",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: seed выполняется без ошибок",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 16,

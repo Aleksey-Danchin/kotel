@@ -28,3 +28,6 @@
 
 ## Step 20: Session test/setup/logout retry frontend
 - Test compose commands (`infra/compose/test.yml`) require `PROJECT_ROOT=/home/aleksey/Desktop/kotel` in this environment; without it, compose interpolation fails before container startup.
+
+## Step 22: Mobile multi-server store and axios client
+- Mobile Vitest and TypeScript checks run reliably in `kotel-mobile-1` (`/apps/mobile`); `kris-frontend-test` targets the web frontend and does not validate mobile sources.

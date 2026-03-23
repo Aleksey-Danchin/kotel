@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T15:06:37.833Z",
+  "updatedAt": "2026-03-23T15:12:42.397Z",
   "steps": [
     {
       "order": 1,
@@ -1888,10 +1888,10 @@
     {
       "order": 21,
       "file": "21-mobile-deep-link-scheme-oauth.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "2f18e9a",
       "startedAt": "2026-03-23T15:02:09.197Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T15:07:02.768Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1982,12 +1982,91 @@
     {
       "order": 22,
       "file": "22-mobile-multiserver-store-axios-client.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T15:07:10.834Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model/domain architecture docs changed; mobile internal client/store only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: per-server axios instances с Bearer auth",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: access token добавляется в каждый запрос",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: 401 делает refresh Bearer и сохраняет новые токены",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: старые http-client и api-config удалены",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: mobile проект компилируется",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 23,

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T15:12:42.397Z",
+  "updatedAt": "2026-03-23T15:17:51.209Z",
   "steps": [
     {
       "order": 1,
@@ -1982,10 +1982,10 @@
     {
       "order": 22,
       "file": "22-mobile-multiserver-store-axios-client.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "14cb7af",
       "startedAt": "2026-03-23T15:07:10.834Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T15:13:15.599Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -2071,12 +2071,97 @@
     {
       "order": 23,
       "file": "23-mobile-session-test-screen.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T15:13:24.014Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории; форматирование обеспечено существующим стилем и проверкой TypeScript/Vitest"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены мобильным dev-экраном и тестами; документация API/домена не изменилась"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: таб Auth Test виден в tab bar",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: можно добавить сервер через OAuth",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: подключенные серверы отображаются с user info",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: кнопки status/logout/refresh работают",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: token debug показывает сохраненные значения",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: приложение компилируется и запускается",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 24,

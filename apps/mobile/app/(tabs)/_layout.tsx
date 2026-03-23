@@ -18,6 +18,13 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="session-test"
+        options={{
+          title: "Auth Test",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="lock" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="users"
         options={{
           title: "Пользователи",

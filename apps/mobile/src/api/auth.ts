@@ -20,6 +20,7 @@ export type SessionStatusResponse = {
   user: {
     id: string;
     fullname: string;
+    login?: string;
     role: string;
   };
 };

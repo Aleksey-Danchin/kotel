@@ -1,15 +1,19 @@
 # Step 05: Auth module — code store, login page, POST /auth/login
 
 ## Goal
+
 Create the `AuthModule` with the in-memory authorization code store, the static HTML login page, and the `POST /api/auth/login` endpoint that processes the login form and generates an authorization code.
 
 ## Motivation
+
 This is the OAuth authorization endpoint — the entry point where the user authenticates on the server's own page. The code store holds short-lived authorization codes in memory. The login page is what appears in the popup (web) or system browser (mobile).
 
 ## Type
+
 feature, backend
 
 ## Affected Area
+
 - `apps/backend/src/auth/` — new module (generate via `npx nest generate resource auth --no-spec`)
 - `apps/backend/src/auth/auth.module.ts`
 - `apps/backend/src/auth/auth.controller.ts`
@@ -19,9 +23,11 @@ feature, backend
 - `apps/backend/src/app.module.ts` — register AuthModule
 
 ## Dependencies
+
 Depends on Step 04 (token utils, Zod contracts).
 
 ## Current Behavior
+
 No auth module exists.
 
 ## Expected Behavior
@@ -36,12 +42,13 @@ type CodeEntry = {
   redirectUri: string;
   state: string;
   userId: string;
-  clientType: 'WEB' | 'EXPO';
+  clientType: "WEB" | "EXPO";
   createdAt: number; // Date.now()
 };
 ```
 
 Methods:
+
 - `store(code: string, entry: CodeEntry): void` — saves entry.
 - `consume(code: string): CodeEntry | null` — returns entry and deletes it. Returns null if not found or expired (>60 seconds).
 - Periodic cleanup: `setInterval` every 60s removes expired entries.
@@ -66,6 +73,7 @@ The HTML is MVP — no CSS framework, plain HTML elements, minimal inline JS.
 Request body: validated with `loginFormSchema` from contracts.
 
 Behavior:
+
 1. Validate body with Zod. Invalid → 400.
 2. Find user by `login`. Not found → 401 `{ message: "Invalid credentials" }`.
 3. Compare password with bcrypt. Mismatch → 401.
@@ -91,6 +99,7 @@ Both `GET` and `POST` at `/auth/login` are on the same controller path. The GET 
 7. Import `PrismaModule` in `AuthModule` for user lookup.
 
 ## Acceptance Criteria
+
 1. `GET /api/auth/login?redirect_uri=...&code_challenge=...&code_challenge_method=S256&state=...` returns HTML page with login form.
 2. Submitting the form with valid credentials returns JSON with redirect URL containing `code` and `state`.
 3. Invalid credentials return 401.
@@ -101,15 +110,21 @@ Both `GET` and `POST` at `/auth/login` are on the same controller path. The GET 
 8. `clientType` correctly detected from redirect_uri.
 
 ## Verification Scenario
-1. Open browser: `https://kotel.localhost/api/auth/login?redirect_uri=https://kotel.localhost/callback&code_challenge=test123&code_challenge_method=S256&state=abc123`.
+
+<CORRECTION by="step-executor" reason="Verification values must satisfy loginFormSchema">
+`code_challenge` from Step 04 contracts requires a minimum length of 43 characters, so `test123` is invalid for a successful login scenario.
+</CORRECTION>
+1. Open browser: `https://kotel.localhost/api/auth/login?redirect_uri=https://kotel.localhost/callback&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&code_challenge_method=S256&state=abc123`.
 2. See a login form.
 3. Enter `user1` / `123`, submit.
 4. Response contains `{ redirect: "https://kotel.localhost/callback?code=...&state=abc123" }`.
 
 ## Testing
+
 Unit tests in Step 24.
 
 ## Notes
+
 - The login page must work in both popup (web) and system browser (mobile). No `window.opener` assumptions.
 - The POST endpoint is NOT protected by the access token guard (it's called before any token exists).
 - Rate limiting will be added in Step 12.

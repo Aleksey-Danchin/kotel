@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T13:14:49.486Z",
+  "updatedAt": "2026-03-23T13:21:37.299Z",
   "steps": [
     {
       "order": 1,
@@ -190,10 +190,10 @@
     {
       "order": 4,
       "file": "04-token-utils-cookie-constants-contracts.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "09f594f",
       "startedAt": "2026-03-23T13:09:19.169Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T13:15:08.699Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -285,12 +285,107 @@
     {
       "order": 5,
       "file": "05-auth-code-store-login-page-endpoint.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T13:15:15.605Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "Formatted with npx prettier (scripts/prettier.sh отсутствует)"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No project docs files from step template (docs/api.md etc.) exist; AUTH_DESIGN already covers flow"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: GET /api/auth/login возвращает HTML форму",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: valid login возвращает redirect с code и state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: invalid credentials возвращают 401",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: код сохраняется и consume извлекает",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: код истекает через 60 сек",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: consume одноразовый",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: Zod malformed -> 400",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: clientType определяется по redirect_uri",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

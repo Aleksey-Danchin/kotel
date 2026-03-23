@@ -4,3 +4,6 @@
 
 ## Step 04: Token utilities, cookie constants, and contracts
 - In `infra/compose/test.yml`, Prisma Studio service key is `studio-test` (container `kris-prisma-studio-test`), not `prisma-studio-test`.
+
+## Step 05: Auth module — code store, login page, POST /auth/login
+- In backend dev container (`nest start --watch` with webpack bundle), `__dirname` resolves to `/apps/backend/dist`, so static files from `src/` should be read via `process.cwd()` paths unless copied to `dist`.

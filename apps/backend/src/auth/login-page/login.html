@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign in</title>
+  </head>
+  <body>
+    <main>
+      <h1>Sign in</h1>
+      <form id="login-form">
+        <label for="login">Login</label>
+        <input id="login" name="login" type="text" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+
+        <button type="submit">Submit</button>
+      </form>
+      <p id="error" role="alert"></p>
+    </main>
+
+    <script>
+      const form = document.getElementById('login-form');
+      const errorElement = document.getElementById('error');
+
+      const params = new URLSearchParams(window.location.search);
+      const redirectUri = params.get('redirect_uri');
+      const codeChallenge = params.get('code_challenge');
+      const codeChallengeMethod = params.get('code_challenge_method');
+      const state = params.get('state');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorElement.textContent = '';
+
+        const formData = new FormData(form);
+        const login = formData.get('login');
+        const password = formData.get('password');
+
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              login,
+              password,
+              redirect_uri: redirectUri,
+              code_challenge: codeChallenge,
+              code_challenge_method: codeChallengeMethod,
+              state,
+            }),
+          });
+
+          const payload = await response.json();
+
+          if (!response.ok) {
+            errorElement.textContent = payload.message ?? 'Login failed';
+            return;
+          }
+
+          if (payload.redirect) {
+            window.location.href = payload.redirect;
+            return;
+          }
+
+          errorElement.textContent = 'Login failed';
+        } catch (error) {
+          errorElement.textContent = 'Request failed';
+        }
+      });
+    </script>
+  </body>
+</html>

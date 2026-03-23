@@ -19,3 +19,6 @@
 
 ## Step 11: Session status, logout, and maintenance
 - Prisma client has global omit in `apps/prisma/factory.ts` (`user.login`, `user.passwordHash`, timestamps), so `request.user` populated by `SessionGuard` does not include `login` at runtime.
+
+## Step 13: Role guard and admin endpoints
+- For backend smoke checks after adding new endpoints, calling `curl` inside `kotel-backend-1` (`docker exec ... http://localhost:3000/api/...`) is more reliable than host-domain probing when dev/test Traefik hostnames differ.

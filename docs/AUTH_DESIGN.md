@@ -377,6 +377,10 @@ async function loginToServer(serverUrl) {
   GET  /api/session/status       — проверка живости сессии
   POST /api/session/refresh      — rotation refreshToken
   POST /api/session/logout       — выход (текущая сессия или все)
+  GET  /api/admin/users          — список пользователей (ADMIN | ROOT)
+  POST /api/admin/users          — создание пользователя (ADMIN | ROOT)
+  DELETE /api/admin/users/:id    — удаление пользователя с ролевыми ограничениями
+  POST /api/admin/sessions/revoke — принудительный отзыв сессий (ADMIN | ROOT)
   ...  /api/*                    — все остальные маршруты мессенджера
 ```
 

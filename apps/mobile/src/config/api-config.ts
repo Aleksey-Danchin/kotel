@@ -1,5 +1,3 @@
-const DEFAULT_API_HOST_HEADER = "kotel.localhost";
-
 function readRequiredEnv(name: string, fallback?: string): string {
   const value = (process.env[name] ?? fallback)?.trim();
 
@@ -10,6 +8,11 @@ function readRequiredEnv(name: string, fallback?: string): string {
   }
 
   return value;
+}
+
+function readOptionalEnv(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
 }
 
 function validateApiBaseUrl(rawValue: string): string {
@@ -23,9 +26,9 @@ function validateApiBaseUrl(rawValue: string): string {
     );
   }
 
-  if (parsedUrl.protocol !== "https:") {
+  if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
     throw new Error(
-      `[mobile][config] EXPO_PUBLIC_API_BASE_URL must use HTTPS for Traefik routing. Received protocol: "${parsedUrl.protocol}".`,
+      `[mobile][config] EXPO_PUBLIC_API_BASE_URL must use HTTP or HTTPS. Received protocol: "${parsedUrl.protocol}".`,
     );
   }
 
@@ -34,8 +37,5 @@ function validateApiBaseUrl(rawValue: string): string {
 
 export const apiConfig = Object.freeze({
   baseUrl: validateApiBaseUrl(readRequiredEnv("EXPO_PUBLIC_API_BASE_URL")),
-  hostHeader: readRequiredEnv(
-    "EXPO_PUBLIC_API_HOST_HEADER",
-    DEFAULT_API_HOST_HEADER,
-  ),
+  hostHeader: readOptionalEnv("EXPO_PUBLIC_API_HOST_HEADER"),
 });

@@ -11,7 +11,7 @@ const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
   imports: [PrismaModule],
   controllers: [SessionController],
   providers: [SessionService, SessionGuard],
-  exports: [SessionGuard],
+  exports: [SessionService, SessionGuard],
 })
 export class SessionModule implements OnModuleInit, OnModuleDestroy {
   private cleanupInterval: NodeJS.Timeout | null = null;

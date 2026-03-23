@@ -6,3 +6,5 @@ ENV TZ=Europe/Moscow
 WORKDIR /apps/mobile
 
 COPY apps/mobile/package*.json ./
+
+CMD ["npx", "expo", "start", "--lan"]

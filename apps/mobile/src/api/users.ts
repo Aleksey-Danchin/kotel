@@ -8,6 +8,6 @@ export type UserRow = {
 };
 
 export async function getUsers(): Promise<UserRow[]> {
-  const response = await httpClient.get<UserRow[]>("/users");
+  const response = await httpClient.get<UserRow[]>("/api/users");
   return response.data;
 }

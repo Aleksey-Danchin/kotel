@@ -32,6 +32,8 @@ services:
       - PORT=3000
       - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-kotel.localhost}
       - IDLE_TIMEOUT=${IDLE_TIMEOUT:-3600}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
     networks:
       - kotel-net
     depends_on:
@@ -79,13 +81,17 @@ services:
     build:
       context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
       dockerfile: infra/docker/Dockerfile.mobile.dev
-    command: sh -c "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ]; then npm ci; fi && npx expo start --lan"
     volumes:
       - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
     working_dir: /apps/mobile
     environment:
       - EXPO_PUBLIC_API_BASE_URL=${EXPO_PUBLIC_API_BASE_URL:?EXPO_PUBLIC_API_BASE_URL is required}
-      - EXPO_PUBLIC_API_HOST_HEADER=${EXPO_PUBLIC_API_HOST_HEADER:-kotel.localhost}
+      - EXPO_PUBLIC_API_HOST_HEADER=${EXPO_PUBLIC_API_HOST_HEADER:-}
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_IP:?HOST_IP is required}
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - EXPO_PACKAGER_PROXY_URL=http://${HOST_IP:?HOST_IP is required}:8081
+    stdin_open: true
+    tty: true
     ports:
       - "8081:8081"
       - "19000:19000"

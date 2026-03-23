@@ -1,16 +1,6 @@
 import { httpClient } from "@/src/api/http-client";
-
-// TODO: reuse @contracts/session in mobile once path aliases are configured for Expo.
-const SESSION_API_PATHS = {
-  signin: "/api/session/signin",
-  signout: "/api/session/signout",
-  check: "/api/session/check",
-} as const;
-
-export type SigninInput = {
-  login: string;
-  password: string;
-};
+import { SESSION_API_PATHS } from "@contracts/session";
+import type { SigninDto } from "@contracts/session";
 
 export type SessionUser = {
   id: string;
@@ -20,7 +10,7 @@ export type SessionUser = {
   updatedAt: string;
 };
 
-export async function signin(input: SigninInput): Promise<SessionUser> {
+export async function signin(input: SigninDto): Promise<SessionUser> {
   const response = await httpClient.post<SessionUser>(SESSION_API_PATHS.signin, input);
   return response.data;
 }

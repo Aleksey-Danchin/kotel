@@ -63,8 +63,8 @@ if [[ -z "${HOST_IP:-}" ]]; then
 fi
 
 export HOST_IP
-export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-https://${HOST_IP}/api}"
-export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-kotel.localhost}"
+export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-http://${HOST_IP}:3000}"
+export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-}"
 
 docker compose \
   --project-directory "${PROJECT_ROOT}" \
@@ -89,7 +89,16 @@ echo "Attaching to mobile Expo CLI..."
 echo "Use Ctrl+C to stop the attached Expo process."
 echo "Core services remain running; use scripts/dev-stop.sh to stop the full stack."
 
+MOBILE_CONTAINERS="$(
+  docker ps -aq \
+    --filter "label=com.docker.compose.project=kotel" \
+    --filter "label=com.docker.compose.service=mobile"
+)"
+if [[ -n "${MOBILE_CONTAINERS}" ]]; then
+  docker rm -f ${MOBILE_CONTAINERS} >/dev/null 2>&1 || true
+fi
+
 docker compose \
   --project-directory "${PROJECT_ROOT}" \
   -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
-  up --build mobile
+  run --build --rm --service-ports mobile

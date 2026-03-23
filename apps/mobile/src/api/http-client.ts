@@ -12,6 +12,10 @@ export const httpClient = axios.create({
 });
 
 httpClient.interceptors.request.use((requestConfig) => {
+  if (!apiConfig.hostHeader) {
+    return requestConfig;
+  }
+
   const headers = AxiosHeaders.from(requestConfig.headers);
   headers.set("Host", apiConfig.hostHeader);
   requestConfig.headers = headers;

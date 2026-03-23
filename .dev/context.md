@@ -25,3 +25,6 @@
 
 ## Step 17: Frontend per-server axios auth refresh
 - In this environment, `docker compose -f infra/compose/dev.yml ps` may fail without full env interpolation; `docker ps --format '{{.Names}}\t{{.Status}}'` is a reliable fallback for post-flight dev health checks.
+
+## Step 20: Session test/setup/logout retry frontend
+- Test compose commands (`infra/compose/test.yml`) require `PROJECT_ROOT=/home/aleksey/Desktop/kotel` in this environment; without it, compose interpolation fails before container startup.

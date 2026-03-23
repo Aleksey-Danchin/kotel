@@ -6,7 +6,8 @@ import {
   serversStore,
   setActiveServer,
 } from "../state/servers";
-import { addServer, removeServer } from "../api/auth";
+import { addServer } from "../api/auth";
+import { logout } from "../api/logout";
 
 function displayServerHost(serverUrl: string): string {
   try {
@@ -51,7 +52,7 @@ export function Sidebar() {
   async function onDisconnect(serverUrl: string) {
     setError(null);
     try {
-      await removeServer(serverUrl);
+      await logout(serverUrl, false);
     } catch (disconnectError) {
       const message =
         disconnectError instanceof Error

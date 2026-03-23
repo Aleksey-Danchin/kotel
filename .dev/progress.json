@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T14:56:48.173Z",
+  "updatedAt": "2026-03-23T15:01:33.493Z",
   "steps": [
     {
       "order": 1,
@@ -1683,10 +1683,10 @@
     {
       "order": 19,
       "file": "19-frontend-sidebar-layout.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "fe5c266",
       "startedAt": "2026-03-23T14:53:35.868Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T14:57:28.341Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1783,12 +1783,107 @@
     {
       "order": 20,
       "file": "20-frontend-test-page-setup-page-logout-retry.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T14:57:38.501Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения не затрагивают проектную документацию в docs/"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: /session-test показывает input, список и action buttons",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: кнопки делают корректные API вызовы",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: raw state отображает store",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: /setup проверяет availability и показывает нужный UI",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: setup form создает root user",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: logout failure ставится в retry queue",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: online reconnect ретраит queued logout",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: all-devices logout failure показывает warning",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 21,

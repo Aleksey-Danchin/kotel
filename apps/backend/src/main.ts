@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import { RequestMethod } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -12,7 +13,9 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [{ path: '.well-known/client', method: RequestMethod.GET }],
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

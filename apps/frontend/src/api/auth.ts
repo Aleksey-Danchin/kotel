@@ -210,11 +210,18 @@ export async function addServer(serverUrl: string): Promise<ServerSession> {
   });
 }
 
-export function removeServer(serverUrl: string): void {
-  removeServerSession(serverUrl);
-  removeServerClient(serverUrl);
-  sessionStorage.removeItem(storageStateKey(serverUrl));
-  sessionStorage.removeItem(storageVerifierKey(serverUrl));
+export async function removeServer(serverUrl: string): Promise<void> {
+  try {
+    await fetch(`${serverUrl}/api/session/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  } finally {
+    removeServerSession(serverUrl);
+    removeServerClient(serverUrl);
+    sessionStorage.removeItem(storageStateKey(serverUrl));
+    sessionStorage.removeItem(storageVerifierKey(serverUrl));
+  }
 }
 
 export function initAuthMessageListener(): void {

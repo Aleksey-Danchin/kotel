@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T14:52:55.449Z",
+  "updatedAt": "2026-03-23T14:56:48.173Z",
   "steps": [
     {
       "order": 1,
@@ -1594,10 +1594,10 @@
     {
       "order": 18,
       "file": "18-frontend-shared-worker.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "b2920d9",
       "startedAt": "2026-03-23T14:49:46.088Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T14:53:26.395Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1683,12 +1683,102 @@
     {
       "order": 19,
       "file": "19-frontend-sidebar-layout.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T14:53:35.868Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменений API/модели/архитектуры, требующих обновления docs/, нет"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: sidebar виден на всех страницах",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: показывает серверы с URL, user и role badge",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: активный сервер подсвечен",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: клик по серверу переключает active",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Add server запускает OAuth и добавляет в список",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: Disconnect удаляет сервер из списка",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: пустой state отображается без серверов",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 20,

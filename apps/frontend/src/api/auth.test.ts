@@ -174,7 +174,7 @@ describe("oauth auth api", () => {
     expect(servers.has("https://other.localhost")).toBe(true);
   });
 
-  it("cleans local storage keys when removing server", async () => {
+  it("cleans local storage keys and calls logout when removing server", async () => {
     const pending = addServer("https://kotel.localhost");
     await vi.waitFor(() => {
       expect(openMock).toHaveBeenCalledTimes(1);
@@ -187,7 +187,7 @@ describe("oauth auth api", () => {
 
     sessionStorage.setItem("oauth_state_https://kotel.localhost", "state-1");
     sessionStorage.setItem("oauth_verifier_https://kotel.localhost", "v-1");
-    removeServer("https://kotel.localhost");
+    await removeServer("https://kotel.localhost");
 
     expect(
       sessionStorage.getItem("oauth_state_https://kotel.localhost"),
@@ -195,5 +195,12 @@ describe("oauth auth api", () => {
     expect(
       sessionStorage.getItem("oauth_verifier_https://kotel.localhost"),
     ).toBeNull();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://kotel.localhost/api/session/logout",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "include",
+      }),
+    );
   });
 });

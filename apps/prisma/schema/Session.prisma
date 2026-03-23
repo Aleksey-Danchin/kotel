@@ -1,8 +1,42 @@
 model Session {
-    key        String   @id @default(cuid())
-    userId     String
-    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt  DateTime @default(now())
-    lastUsedAt DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+  id                    String          @id @default(cuid())
+  accessTokenHash       String          @unique
+  refreshTokenHash      String          @unique
+  sessionId             String
+  userId                String
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientType            ClientType
+  status                SessionStatus   @default(ACTIVE)
+  fingerprint           String
+  prevSessionId         String?         @unique
+  prevSession           Session?        @relation("SessionChain", fields: [prevSessionId], references: [id])
+  nextSession           Session?        @relation("SessionChain")
+  accessTokenExpiresAt  DateTime
+  refreshTokenExpiresAt DateTime
+  refreshUsedAt         DateTime?
+  noActiveAt            DateTime?
+  noActiveReason        NoActiveReason?
+  noActiveDescribe      String?
+  createdAt             DateTime        @default(now())
+}
+
+enum ClientType {
+  WEB
+  EXPO
+}
+
+enum SessionStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+}
+
+enum NoActiveReason {
+  LOGOUT_CURRENT
+  LOGOUT_ALL
+  REUSE_DETECTED
+  MANUAL_REVOKE
+  LOCKDOWN
+  EXPIRED
 }

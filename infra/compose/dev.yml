@@ -99,6 +99,12 @@ services:
       - "19002:19002"
     networks:
       - kotel-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/status | grep -q running || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     labels:
       - traefik.enable=false
 

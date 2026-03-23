@@ -20,7 +20,7 @@ Everything else is communicated exclusively through progress tracking in `progre
 
 - **NEVER execute git commands** (commit, push, checkout, etc.) — git is managed exclusively by the user.
 - **NEVER run backend/frontend processes on the host.** Everything runs inside Docker containers.
-- **NEVER run Prisma commands on the host.** Use `docker exec kris-prisma-studio ...` for migrations/seeds.
+- **NEVER run Prisma commands on the host.** Use `docker exec kotel-studio-1 ...` for migrations/seeds.
 - **NEVER invent test credentials.** Get them from the seed implementation or project docs.
 - Code identifiers are in **English**; UI text and user-facing strings are in **Russian**.
 
@@ -32,13 +32,13 @@ Everything else is communicated exclusively through progress tracking in `progre
 
 **Skip this check** if the caller (steps-man) explicitly states that dev health was already verified. In that case, mark `preflight` as `completed` and proceed.
 
-Otherwise, verify that all 5 **dev** containers are Up and healthy:
+Otherwise, verify that all 6 **dev** containers are Up and healthy:
 
 ```bash
-docker compose -f infra/compose/docker-compose.dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kris-(traefik|postgres|backend|frontend|prisma-studio)' | grep -v '\-test'
+docker compose -f infra/compose/dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kotel-(traefik|postgres|backend|frontend|studio|mobile)-'
 ```
 
-**All 5 must show `Up` and `(healthy)`.** If any container is not Up or not healthy:
+**All 6 must show `Up` and `(healthy)`.** If any container is not Up or not healthy:
 1. Report which containers are unhealthy.
 2. **STOP immediately.** Do not proceed with implementation.
 3. Output: "Pre-flight failed: containers [list] are not healthy. Fix the environment before running this step."
@@ -49,13 +49,15 @@ docker compose -f infra/compose/docker-compose.dev.yml ps --format '{{.Name}}\t{
 Test containers may have been left running by a previous agent (resolver, previous step-imp run). Always clean them up before starting work:
 
 ```bash
-docker compose -f infra/compose/docker-compose.test.yml down 2>/dev/null || true
+docker compose -f infra/compose/test.yml down 2>/dev/null || true
 ```
 
 ### Phase 1: Task Analysis
 
 1. Read the step file provided by the user.
-2. Identify:
+2. Read `.dev/context.md` if it exists — this contains discoveries from previous steps (naming conventions, import patterns, testing quirks) that may affect your implementation.
+3. Read the **step context file** at `.dev/steps/<step-filename-without-ext>-context.md` if it exists (e.g., for `01-foo.md` → `01-foo-context.md`). This is a session-independent log shared between you, extraordinary-resolver, and steps-man. It contains the full history of work on this step: previous step-imp entries, resolver invocations, and steps-man decisions. Use it to understand what was already done and what went wrong.
+4. Identify:
    - **Type**: bugfix, feature, ui, refactor
    - **Affected area**: backend (`back/`), frontend (`front/`), strategies (`strategies/`), or mixed
    - **Dependencies**: check if prerequisite steps are completed (look for the code changes they describe)
@@ -228,17 +230,17 @@ The agent **owns the test container lifecycle**: starts them before testing, sto
 
 #### 5a. Start test containers
 
-Kill any existing test containers, then start fresh using the **test compose file** (`infra/compose/docker-compose.test.yml`):
+Kill any existing test containers, then start fresh using the **test compose file** (`infra/compose/test.yml`):
 
 ```bash
 # Kill existing (ignore errors if not running)
-docker compose -f infra/compose/docker-compose.test.yml down 2>/dev/null || true
+docker compose -f infra/compose/test.yml down 2>/dev/null || true
 
 # Start what's needed based on affected area:
 # Backend / Strategies:
-docker compose -f infra/compose/docker-compose.test.yml up -d backend-test postgres-test prisma-studio-test
+docker compose -f infra/compose/test.yml up -d backend-test postgres-test prisma-studio-test
 # Frontend:
-docker compose -f infra/compose/docker-compose.test.yml up -d frontend-test
+docker compose -f infra/compose/test.yml up -d frontend-test
 # Mixed: start all four
 ```
 
@@ -276,7 +278,7 @@ Note: the `kris-frontend-test` container must have Chromium installed (`npx play
 ```bash
 cd front && npx playwright test --config e2e/playwright.config.ts <path-to-e2e-test>
 ```
-Playwright E2E runs on the **host** against the live dev environment. All 5 dev containers must be Up and healthy.
+Playwright E2E runs on the **host** against the live dev environment. All 6 dev containers must be Up and healthy.
 
 **If tests fail:**
 1. Analyze the failure — is the problem in the test or in the implementation?
@@ -315,7 +317,7 @@ After test containers pass, verify the **live dev backend** serves the new funct
 1. Send a quick HTTP request (via `curl -sk`) to the dev backend (`https://kris.localhost/api/...`) exercising the new functionality.
 2. If the dev backend returns an unexpected error (e.g., Zod validation failure on an action type that passed in test containers), restart the backend container:
    ```bash
-   docker restart kris-backend
+   docker restart kotel-backend-1
    # Wait for healthy (poll every 5s, max 60s)
    ```
 3. Re-test the curl request to confirm the fix.
@@ -378,23 +380,23 @@ Mark `postflight` as `in_progress`.
 Stop and remove all test containers started in Phase 5:
 
 ```bash
-docker compose -f infra/compose/docker-compose.test.yml down
+docker compose -f infra/compose/test.yml down
 ```
 
 Alternatively: `scripts/test-stop.sh`.
 
 #### 7b. Dev environment health check
 
-Verify all 5 dev containers are still healthy:
+Verify all 6 dev containers are still healthy:
 
 ```bash
-docker compose -f infra/compose/docker-compose.dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kris-(traefik|postgres|backend|frontend|prisma-studio)' | grep -v '\-test'
+docker compose -f infra/compose/dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kotel-(traefik|postgres|backend|frontend|studio|mobile)-'
 ```
 
-**All 5 must be Up and healthy.**
+**All 6 must be Up and healthy.**
 
 If any container became unhealthy during your work:
-1. Check container logs: `docker compose -f infra/compose/docker-compose.dev.yml logs --tail 50 <service>`
+1. Check container logs: `docker compose -f infra/compose/dev.yml logs --tail 50 <service>`
 2. Identify the cause — likely a syntax error or runtime crash in your code changes.
 3. Fix the code.
 4. Wait for the container to recover (it has hot reload).
@@ -402,6 +404,23 @@ If any container became unhealthy during your work:
 6. Recheck dev health.
 7. Stop test containers again (Phase 7a).
 8. **Do not finish until all dev containers are healthy and test containers are stopped.**
+
+#### 7c. Update cross-step context
+
+If during this step you discovered non-obvious facts about the project that are not in the documentation and could help future steps, append them to `.dev/context.md` (create the file if it doesn't exist). Examples:
+- Naming conventions not captured in docs (e.g., "Backend services use `*.service.ts` naming, not `*.provider.ts`")
+- Import patterns (e.g., "Prisma client must be imported via `@db/client`, not `@prisma/client`")
+- Testing quirks (e.g., "Backend tests require `TEST_SESSION_COOKIE_DOMAIN` to be set")
+- Infrastructure behavior (e.g., "Backend container hot-reloads TypeScript but requires restart for new Zod schemas in `discriminatedUnion`")
+
+Format — append a section per step:
+```markdown
+## Step <NN>: <title>
+- <discovery 1>
+- <discovery 2>
+```
+
+Skip this sub-phase if no new discoveries were made. Do not repeat information already in `docs/` or `.cursor/rules/`.
 
 Mark `postflight` as `completed`. At this point, every progress item should be `completed` or `cancelled`.
 
@@ -418,13 +437,76 @@ Mark `postflight` as `completed`. At this point, every progress item should be `
 `steps-man` parses this line to decide the next action:
 - `infra` → calls `extraordinary-resolver` to fix the environment, then resumes you.
 - `implementation` → launches a **new** step-imp instance with fresh context and your error details (one retry).
-- `spec` / `dependency` → fails the step and reports to the user.
+- `spec` / `dependency` → calls `extraordinary-resolver` first. If all ACs are completed and the resolver classifies the problem as transitional, commits the step and continues to the next one. Otherwise fails the step.
 
-**Choose the category carefully** — it determines what happens next. If unsure between `infra` and `implementation`, prefer `infra` (the resolver will reclassify if needed).
+**Choose the category carefully** — it determines what happens next. When in doubt, prefer `infra` — the resolver will reclassify if needed. Specifically:
+- If the dev container is unhealthy for **any** reason (including post-migration code incompatibility, schema changes breaking existing code), use `BLOCKED infra` — **not** `BLOCKED dependency`.
+- Use `BLOCKED dependency` **only** when prerequisite step code is entirely missing and you cannot even begin implementation.
+- The resolver handles all environmental issues, including transitional states between steps.
+
+## Step Context File
+
+The **step context file** is a session-independent log at `.dev/steps/<step-filename-without-ext>-context.md` (e.g., `01-foo.md` → `01-foo-context.md`). It is shared between you, `extraordinary-resolver`, and `steps-man`. All three agents read from and write to the same file.
+
+**Append an entry before reporting ANY result** (both SUCCESS and BLOCKED). This ensures the file always reflects the latest state.
+
+### Format — SUCCESS entry
+
+```markdown
+---
+
+## step-imp — <ISO timestamp>
+
+**Result**: SUCCESS
+
+### Changed Files
+- `path/to/file.ts` — description of change
+
+### Tests
+- Task-specific: X passed, 0 failed
+- Regression: X passed, 0 failed
+
+### Acceptance Criteria
+- [x] AC-1: <criterion> — verified by: <method>
+- [x] AC-2: <criterion> — verified by: <method>
+
+### Discoveries
+- <non-obvious fact about the project> (or "none")
+```
+
+### Format — BLOCKED entry
+
+```markdown
+---
+
+## step-imp — <ISO timestamp>
+
+**Result**: BLOCKED <category>
+
+### Changed Files
+- `path/to/file.ts` — what was changed and why
+
+### Approaches Tried
+- Approach 1: <description> → <outcome>
+- Approach 2: <description> → <outcome>
+
+### Test Results
+- `path/to/test.spec.ts` — passed / failed (error summary)
+
+### Blocking Problem
+<specific error, stack trace, or diagnosis>
+
+### Hypothesis
+<your best guess about the root cause and what to try next>
+```
+
+On resume after a resolver fix or retry, read existing entries to understand context, then append a new entry when done.
 
 ## Completion Report
 
-When done (before the `RESULT:` line), provide a summary:
+When done (before the `RESULT:` line):
+1. **Append a SUCCESS entry to the step context file** (see Step Context File above).
+2. Provide a summary to chat:
 
 ```
 ### Step Execution Report: {step-number} — {step-title}
@@ -448,7 +530,7 @@ When done (before the `RESULT:` line), provide a summary:
 
 **Step File Corrections:** (if any `<CORRECTION>` tags were added — list them)
 
-**Docker Health:** All 5 dev containers healthy ✅ | Test containers stopped ✅
+**Docker Health:** All 6 dev containers healthy ✅ | Test containers stopped ✅
 
 **Notes:** (any caveats, pre-existing failures, edge cases discovered, or follow-up recommendations)
 ```
@@ -466,9 +548,10 @@ If you encounter a situation you cannot resolve, classify it into one of the BLO
 | Prerequisite step code is missing | `dependency` | Which dependency is missing |
 
 **Before reporting any BLOCKED:**
-1. Stop all test containers: `docker compose -f infra/compose/docker-compose.test.yml down 2>/dev/null || true`
-2. Report what you've done so far, what's blocking, and your diagnosis.
-3. Output `RESULT: BLOCKED <category>` as the **very last line**.
+1. Stop all test containers: `docker compose -f infra/compose/test.yml down 2>/dev/null || true`
+2. **Append an entry to the step context file** (see Step Context File below).
+3. Report what you've done so far, what's blocking, and your diagnosis.
+4. Output `RESULT: BLOCKED <category>` as the **very last line**.
 
 ## Skills Reference
 

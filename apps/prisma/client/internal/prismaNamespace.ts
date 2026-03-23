@@ -593,11 +593,22 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 
 export const SessionScalarFieldEnum = {
-  key: 'key',
+  id: 'id',
+  accessTokenHash: 'accessTokenHash',
+  refreshTokenHash: 'refreshTokenHash',
+  sessionId: 'sessionId',
   userId: 'userId',
-  createdAt: 'createdAt',
-  lastUsedAt: 'lastUsedAt',
-  updatedAt: 'updatedAt'
+  clientType: 'clientType',
+  status: 'status',
+  fingerprint: 'fingerprint',
+  prevSessionId: 'prevSessionId',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  refreshUsedAt: 'refreshUsedAt',
+  noActiveAt: 'noActiveAt',
+  noActiveReason: 'noActiveReason',
+  noActiveDescribe: 'noActiveDescribe',
+  createdAt: 'createdAt'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -608,6 +619,7 @@ export const UserScalarFieldEnum = {
   fullname: 'fullname',
   login: 'login',
   passwordHash: 'passwordHash',
+  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -631,6 +643,14 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
 
 /**
  * Field references
@@ -652,6 +672,34 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'ClientType'
+ */
+export type EnumClientTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClientType'>
+    
+
+
+/**
+ * Reference to a field of type 'ClientType[]'
+ */
+export type ListEnumClientTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ClientType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SessionStatus'
+ */
+export type EnumSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SessionStatus[]'
+ */
+export type ListEnumSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -662,6 +710,34 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'NoActiveReason'
+ */
+export type EnumNoActiveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NoActiveReason'>
+    
+
+
+/**
+ * Reference to a field of type 'NoActiveReason[]'
+ */
+export type ListEnumNoActiveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NoActiveReason[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole'
+ */
+export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole[]'
+ */
+export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
     
 
 

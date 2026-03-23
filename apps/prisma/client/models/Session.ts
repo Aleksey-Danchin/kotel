@@ -27,53 +27,119 @@ export type AggregateSession = {
 }
 
 export type SessionMinAggregateOutputType = {
-  key: string | null
+  id: string | null
+  accessTokenHash: string | null
+  refreshTokenHash: string | null
+  sessionId: string | null
   userId: string | null
+  clientType: $Enums.ClientType | null
+  status: $Enums.SessionStatus | null
+  fingerprint: string | null
+  prevSessionId: string | null
+  accessTokenExpiresAt: Date | null
+  refreshTokenExpiresAt: Date | null
+  refreshUsedAt: Date | null
+  noActiveAt: Date | null
+  noActiveReason: $Enums.NoActiveReason | null
+  noActiveDescribe: string | null
   createdAt: Date | null
-  lastUsedAt: Date | null
-  updatedAt: Date | null
 }
 
 export type SessionMaxAggregateOutputType = {
-  key: string | null
+  id: string | null
+  accessTokenHash: string | null
+  refreshTokenHash: string | null
+  sessionId: string | null
   userId: string | null
+  clientType: $Enums.ClientType | null
+  status: $Enums.SessionStatus | null
+  fingerprint: string | null
+  prevSessionId: string | null
+  accessTokenExpiresAt: Date | null
+  refreshTokenExpiresAt: Date | null
+  refreshUsedAt: Date | null
+  noActiveAt: Date | null
+  noActiveReason: $Enums.NoActiveReason | null
+  noActiveDescribe: string | null
   createdAt: Date | null
-  lastUsedAt: Date | null
-  updatedAt: Date | null
 }
 
 export type SessionCountAggregateOutputType = {
-  key: number
+  id: number
+  accessTokenHash: number
+  refreshTokenHash: number
+  sessionId: number
   userId: number
+  clientType: number
+  status: number
+  fingerprint: number
+  prevSessionId: number
+  accessTokenExpiresAt: number
+  refreshTokenExpiresAt: number
+  refreshUsedAt: number
+  noActiveAt: number
+  noActiveReason: number
+  noActiveDescribe: number
   createdAt: number
-  lastUsedAt: number
-  updatedAt: number
   _all: number
 }
 
 
 export type SessionMinAggregateInputType = {
-  key?: true
+  id?: true
+  accessTokenHash?: true
+  refreshTokenHash?: true
+  sessionId?: true
   userId?: true
+  clientType?: true
+  status?: true
+  fingerprint?: true
+  prevSessionId?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
+  refreshUsedAt?: true
+  noActiveAt?: true
+  noActiveReason?: true
+  noActiveDescribe?: true
   createdAt?: true
-  lastUsedAt?: true
-  updatedAt?: true
 }
 
 export type SessionMaxAggregateInputType = {
-  key?: true
+  id?: true
+  accessTokenHash?: true
+  refreshTokenHash?: true
+  sessionId?: true
   userId?: true
+  clientType?: true
+  status?: true
+  fingerprint?: true
+  prevSessionId?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
+  refreshUsedAt?: true
+  noActiveAt?: true
+  noActiveReason?: true
+  noActiveDescribe?: true
   createdAt?: true
-  lastUsedAt?: true
-  updatedAt?: true
 }
 
 export type SessionCountAggregateInputType = {
-  key?: true
+  id?: true
+  accessTokenHash?: true
+  refreshTokenHash?: true
+  sessionId?: true
   userId?: true
+  clientType?: true
+  status?: true
+  fingerprint?: true
+  prevSessionId?: true
+  accessTokenExpiresAt?: true
+  refreshTokenExpiresAt?: true
+  refreshUsedAt?: true
+  noActiveAt?: true
+  noActiveReason?: true
+  noActiveDescribe?: true
   createdAt?: true
-  lastUsedAt?: true
-  updatedAt?: true
   _all?: true
 }
 
@@ -150,11 +216,22 @@ export type SessionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 export type SessionGroupByOutputType = {
-  key: string
+  id: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
   userId: string
+  clientType: $Enums.ClientType
+  status: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId: string | null
+  accessTokenExpiresAt: Date
+  refreshTokenExpiresAt: Date
+  refreshUsedAt: Date | null
+  noActiveAt: Date | null
+  noActiveReason: $Enums.NoActiveReason | null
+  noActiveDescribe: string | null
   createdAt: Date
-  lastUsedAt: Date
-  updatedAt: Date
   _count: SessionCountAggregateOutputType | null
   _min: SessionMinAggregateOutputType | null
   _max: SessionMaxAggregateOutputType | null
@@ -179,41 +256,91 @@ export type SessionWhereInput = {
   AND?: Prisma.SessionWhereInput | Prisma.SessionWhereInput[]
   OR?: Prisma.SessionWhereInput[]
   NOT?: Prisma.SessionWhereInput | Prisma.SessionWhereInput[]
-  key?: Prisma.StringFilter<"Session"> | string
+  id?: Prisma.StringFilter<"Session"> | string
+  accessTokenHash?: Prisma.StringFilter<"Session"> | string
+  refreshTokenHash?: Prisma.StringFilter<"Session"> | string
+  sessionId?: Prisma.StringFilter<"Session"> | string
   userId?: Prisma.StringFilter<"Session"> | string
+  clientType?: Prisma.EnumClientTypeFilter<"Session"> | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFilter<"Session"> | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFilter<"Session"> | string
+  prevSessionId?: Prisma.StringNullableFilter<"Session"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshUsedAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveReason?: Prisma.EnumNoActiveReasonNullableFilter<"Session"> | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.StringNullableFilter<"Session"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  prevSession?: Prisma.XOR<Prisma.SessionNullableScalarRelationFilter, Prisma.SessionWhereInput> | null
+  nextSession?: Prisma.XOR<Prisma.SessionNullableScalarRelationFilter, Prisma.SessionWhereInput> | null
 }
 
 export type SessionOrderByWithRelationInput = {
-  key?: Prisma.SortOrder
+  id?: Prisma.SortOrder
+  accessTokenHash?: Prisma.SortOrder
+  refreshTokenHash?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  clientType?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  fingerprint?: Prisma.SortOrder
+  prevSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
+  refreshUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveDescribe?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
+  prevSession?: Prisma.SessionOrderByWithRelationInput
+  nextSession?: Prisma.SessionOrderByWithRelationInput
 }
 
 export type SessionWhereUniqueInput = Prisma.AtLeast<{
-  key?: string
+  id?: string
+  accessTokenHash?: string
+  refreshTokenHash?: string
+  prevSessionId?: string
   AND?: Prisma.SessionWhereInput | Prisma.SessionWhereInput[]
   OR?: Prisma.SessionWhereInput[]
   NOT?: Prisma.SessionWhereInput | Prisma.SessionWhereInput[]
+  sessionId?: Prisma.StringFilter<"Session"> | string
   userId?: Prisma.StringFilter<"Session"> | string
+  clientType?: Prisma.EnumClientTypeFilter<"Session"> | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFilter<"Session"> | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFilter<"Session"> | string
+  accessTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshUsedAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveReason?: Prisma.EnumNoActiveReasonNullableFilter<"Session"> | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.StringNullableFilter<"Session"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-}, "key">
+  prevSession?: Prisma.XOR<Prisma.SessionNullableScalarRelationFilter, Prisma.SessionWhereInput> | null
+  nextSession?: Prisma.XOR<Prisma.SessionNullableScalarRelationFilter, Prisma.SessionWhereInput> | null
+}, "id" | "accessTokenHash" | "refreshTokenHash" | "prevSessionId">
 
 export type SessionOrderByWithAggregationInput = {
-  key?: Prisma.SortOrder
+  id?: Prisma.SortOrder
+  accessTokenHash?: Prisma.SortOrder
+  refreshTokenHash?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  clientType?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  fingerprint?: Prisma.SortOrder
+  prevSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
+  refreshUsedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  noActiveDescribe?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
   _count?: Prisma.SessionCountOrderByAggregateInput
   _max?: Prisma.SessionMaxOrderByAggregateInput
   _min?: Prisma.SessionMinOrderByAggregateInput
@@ -223,90 +350,219 @@ export type SessionScalarWhereWithAggregatesInput = {
   AND?: Prisma.SessionScalarWhereWithAggregatesInput | Prisma.SessionScalarWhereWithAggregatesInput[]
   OR?: Prisma.SessionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SessionScalarWhereWithAggregatesInput | Prisma.SessionScalarWhereWithAggregatesInput[]
-  key?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  id?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  accessTokenHash?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  refreshTokenHash?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  sessionId?: Prisma.StringWithAggregatesFilter<"Session"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  clientType?: Prisma.EnumClientTypeWithAggregatesFilter<"Session"> | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusWithAggregatesFilter<"Session"> | $Enums.SessionStatus
+  fingerprint?: Prisma.StringWithAggregatesFilter<"Session"> | string
+  prevSessionId?: Prisma.StringNullableWithAggregatesFilter<"Session"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"Session"> | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeWithAggregatesFilter<"Session"> | Date | string
+  refreshUsedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Session"> | Date | string | null
+  noActiveAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Session"> | Date | string | null
+  noActiveReason?: Prisma.EnumNoActiveReasonNullableWithAggregatesFilter<"Session"> | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.StringNullableWithAggregatesFilter<"Session"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Session"> | Date | string
-  lastUsedAt?: Prisma.DateTimeWithAggregatesFilter<"Session"> | Date | string
-  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Session"> | Date | string
 }
 
 export type SessionCreateInput = {
-  key?: string
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSessionsInput
+  prevSession?: Prisma.SessionCreateNestedOneWithoutNextSessionInput
+  nextSession?: Prisma.SessionCreateNestedOneWithoutPrevSessionInput
 }
 
 export type SessionUncheckedCreateInput = {
-  key?: string
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
   userId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId?: string | null
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
+  nextSession?: Prisma.SessionUncheckedCreateNestedOneWithoutPrevSessionInput
 }
 
 export type SessionUpdateInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSessionsNestedInput
+  prevSession?: Prisma.SessionUpdateOneWithoutNextSessionNestedInput
+  nextSession?: Prisma.SessionUpdateOneWithoutPrevSessionNestedInput
 }
 
 export type SessionUncheckedUpdateInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  prevSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  nextSession?: Prisma.SessionUncheckedUpdateOneWithoutPrevSessionNestedInput
 }
 
 export type SessionCreateManyInput = {
-  key?: string
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
   userId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId?: string | null
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type SessionUpdateManyMutationInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SessionUncheckedUpdateManyInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  prevSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SessionNullableScalarRelationFilter = {
+  is?: Prisma.SessionWhereInput | null
+  isNot?: Prisma.SessionWhereInput | null
 }
 
 export type SessionCountOrderByAggregateInput = {
-  key?: Prisma.SortOrder
+  id?: Prisma.SortOrder
+  accessTokenHash?: Prisma.SortOrder
+  refreshTokenHash?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  clientType?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  fingerprint?: Prisma.SortOrder
+  prevSessionId?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
+  refreshUsedAt?: Prisma.SortOrder
+  noActiveAt?: Prisma.SortOrder
+  noActiveReason?: Prisma.SortOrder
+  noActiveDescribe?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type SessionMaxOrderByAggregateInput = {
-  key?: Prisma.SortOrder
+  id?: Prisma.SortOrder
+  accessTokenHash?: Prisma.SortOrder
+  refreshTokenHash?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  clientType?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  fingerprint?: Prisma.SortOrder
+  prevSessionId?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
+  refreshUsedAt?: Prisma.SortOrder
+  noActiveAt?: Prisma.SortOrder
+  noActiveReason?: Prisma.SortOrder
+  noActiveDescribe?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type SessionMinOrderByAggregateInput = {
-  key?: Prisma.SortOrder
+  id?: Prisma.SortOrder
+  accessTokenHash?: Prisma.SortOrder
+  refreshTokenHash?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
+  clientType?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  fingerprint?: Prisma.SortOrder
+  prevSessionId?: Prisma.SortOrder
+  accessTokenExpiresAt?: Prisma.SortOrder
+  refreshTokenExpiresAt?: Prisma.SortOrder
+  refreshUsedAt?: Prisma.SortOrder
+  noActiveAt?: Prisma.SortOrder
+  noActiveReason?: Prisma.SortOrder
+  noActiveDescribe?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
-  lastUsedAt?: Prisma.SortOrder
-  updatedAt?: Prisma.SortOrder
 }
 
 export type SessionListRelationFilter = {
@@ -319,12 +575,80 @@ export type SessionOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type SessionCreateNestedOneWithoutNextSessionInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutNextSessionInput, Prisma.SessionUncheckedCreateWithoutNextSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutNextSessionInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
+export type SessionCreateNestedOneWithoutPrevSessionInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutPrevSessionInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
+export type SessionUncheckedCreateNestedOneWithoutPrevSessionInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutPrevSessionInput
+  connect?: Prisma.SessionWhereUniqueInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type EnumClientTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ClientType
+}
+
+export type EnumSessionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.SessionStatus
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableEnumNoActiveReasonFieldUpdateOperationsInput = {
+  set?: $Enums.NoActiveReason | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type SessionUpdateOneWithoutNextSessionNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutNextSessionInput, Prisma.SessionUncheckedCreateWithoutNextSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutNextSessionInput
+  upsert?: Prisma.SessionUpsertWithoutNextSessionInput
+  disconnect?: Prisma.SessionWhereInput | boolean
+  delete?: Prisma.SessionWhereInput | boolean
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutNextSessionInput, Prisma.SessionUpdateWithoutNextSessionInput>, Prisma.SessionUncheckedUpdateWithoutNextSessionInput>
+}
+
+export type SessionUpdateOneWithoutPrevSessionNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutPrevSessionInput
+  upsert?: Prisma.SessionUpsertWithoutPrevSessionInput
+  disconnect?: Prisma.SessionWhereInput | boolean
+  delete?: Prisma.SessionWhereInput | boolean
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutPrevSessionInput, Prisma.SessionUpdateWithoutPrevSessionInput>, Prisma.SessionUncheckedUpdateWithoutPrevSessionInput>
+}
+
+export type SessionUncheckedUpdateOneWithoutPrevSessionNestedInput = {
+  create?: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+  connectOrCreate?: Prisma.SessionCreateOrConnectWithoutPrevSessionInput
+  upsert?: Prisma.SessionUpsertWithoutPrevSessionInput
+  disconnect?: Prisma.SessionWhereInput | boolean
+  delete?: Prisma.SessionWhereInput | boolean
+  connect?: Prisma.SessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SessionUpdateToOneWithWhereWithoutPrevSessionInput, Prisma.SessionUpdateWithoutPrevSessionInput>, Prisma.SessionUncheckedUpdateWithoutPrevSessionInput>
 }
 
 export type SessionCreateNestedManyWithoutUserInput = {
@@ -369,18 +693,226 @@ export type SessionUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.SessionScalarWhereInput | Prisma.SessionScalarWhereInput[]
 }
 
-export type SessionCreateWithoutUserInput = {
-  key?: string
+export type SessionCreateWithoutNextSessionInput = {
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSessionsInput
+  prevSession?: Prisma.SessionCreateNestedOneWithoutNextSessionInput
+}
+
+export type SessionUncheckedCreateWithoutNextSessionInput = {
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  userId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId?: string | null
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
+  createdAt?: Date | string
+}
+
+export type SessionCreateOrConnectWithoutNextSessionInput = {
+  where: Prisma.SessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SessionCreateWithoutNextSessionInput, Prisma.SessionUncheckedCreateWithoutNextSessionInput>
+}
+
+export type SessionCreateWithoutPrevSessionInput = {
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSessionsInput
+  nextSession?: Prisma.SessionCreateNestedOneWithoutPrevSessionInput
+}
+
+export type SessionUncheckedCreateWithoutPrevSessionInput = {
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  userId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
+  createdAt?: Date | string
+  nextSession?: Prisma.SessionUncheckedCreateNestedOneWithoutPrevSessionInput
+}
+
+export type SessionCreateOrConnectWithoutPrevSessionInput = {
+  where: Prisma.SessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+}
+
+export type SessionUpsertWithoutNextSessionInput = {
+  update: Prisma.XOR<Prisma.SessionUpdateWithoutNextSessionInput, Prisma.SessionUncheckedUpdateWithoutNextSessionInput>
+  create: Prisma.XOR<Prisma.SessionCreateWithoutNextSessionInput, Prisma.SessionUncheckedCreateWithoutNextSessionInput>
+  where?: Prisma.SessionWhereInput
+}
+
+export type SessionUpdateToOneWithWhereWithoutNextSessionInput = {
+  where?: Prisma.SessionWhereInput
+  data: Prisma.XOR<Prisma.SessionUpdateWithoutNextSessionInput, Prisma.SessionUncheckedUpdateWithoutNextSessionInput>
+}
+
+export type SessionUpdateWithoutNextSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSessionsNestedInput
+  prevSession?: Prisma.SessionUpdateOneWithoutNextSessionNestedInput
+}
+
+export type SessionUncheckedUpdateWithoutNextSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  prevSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SessionUpsertWithoutPrevSessionInput = {
+  update: Prisma.XOR<Prisma.SessionUpdateWithoutPrevSessionInput, Prisma.SessionUncheckedUpdateWithoutPrevSessionInput>
+  create: Prisma.XOR<Prisma.SessionCreateWithoutPrevSessionInput, Prisma.SessionUncheckedCreateWithoutPrevSessionInput>
+  where?: Prisma.SessionWhereInput
+}
+
+export type SessionUpdateToOneWithWhereWithoutPrevSessionInput = {
+  where?: Prisma.SessionWhereInput
+  data: Prisma.XOR<Prisma.SessionUpdateWithoutPrevSessionInput, Prisma.SessionUncheckedUpdateWithoutPrevSessionInput>
+}
+
+export type SessionUpdateWithoutPrevSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSessionsNestedInput
+  nextSession?: Prisma.SessionUpdateOneWithoutPrevSessionNestedInput
+}
+
+export type SessionUncheckedUpdateWithoutPrevSessionInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  nextSession?: Prisma.SessionUncheckedUpdateOneWithoutPrevSessionNestedInput
+}
+
+export type SessionCreateWithoutUserInput = {
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
+  createdAt?: Date | string
+  prevSession?: Prisma.SessionCreateNestedOneWithoutNextSessionInput
+  nextSession?: Prisma.SessionCreateNestedOneWithoutPrevSessionInput
 }
 
 export type SessionUncheckedCreateWithoutUserInput = {
-  key?: string
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId?: string | null
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
+  nextSession?: Prisma.SessionUncheckedCreateNestedOneWithoutPrevSessionInput
 }
 
 export type SessionCreateOrConnectWithoutUserInput = {
@@ -413,100 +945,222 @@ export type SessionScalarWhereInput = {
   AND?: Prisma.SessionScalarWhereInput | Prisma.SessionScalarWhereInput[]
   OR?: Prisma.SessionScalarWhereInput[]
   NOT?: Prisma.SessionScalarWhereInput | Prisma.SessionScalarWhereInput[]
-  key?: Prisma.StringFilter<"Session"> | string
+  id?: Prisma.StringFilter<"Session"> | string
+  accessTokenHash?: Prisma.StringFilter<"Session"> | string
+  refreshTokenHash?: Prisma.StringFilter<"Session"> | string
+  sessionId?: Prisma.StringFilter<"Session"> | string
   userId?: Prisma.StringFilter<"Session"> | string
+  clientType?: Prisma.EnumClientTypeFilter<"Session"> | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFilter<"Session"> | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFilter<"Session"> | string
+  prevSessionId?: Prisma.StringNullableFilter<"Session"> | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFilter<"Session"> | Date | string
+  refreshUsedAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveAt?: Prisma.DateTimeNullableFilter<"Session"> | Date | string | null
+  noActiveReason?: Prisma.EnumNoActiveReasonNullableFilter<"Session"> | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.StringNullableFilter<"Session"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  lastUsedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Session"> | Date | string
 }
 
 export type SessionCreateManyUserInput = {
-  key?: string
+  id?: string
+  accessTokenHash: string
+  refreshTokenHash: string
+  sessionId: string
+  clientType: $Enums.ClientType
+  status?: $Enums.SessionStatus
+  fingerprint: string
+  prevSessionId?: string | null
+  accessTokenExpiresAt: Date | string
+  refreshTokenExpiresAt: Date | string
+  refreshUsedAt?: Date | string | null
+  noActiveAt?: Date | string | null
+  noActiveReason?: $Enums.NoActiveReason | null
+  noActiveDescribe?: string | null
   createdAt?: Date | string
-  lastUsedAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type SessionUpdateWithoutUserInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  prevSession?: Prisma.SessionUpdateOneWithoutNextSessionNestedInput
+  nextSession?: Prisma.SessionUpdateOneWithoutPrevSessionNestedInput
 }
 
 export type SessionUncheckedUpdateWithoutUserInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  prevSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  nextSession?: Prisma.SessionUncheckedUpdateOneWithoutPrevSessionNestedInput
 }
 
 export type SessionUncheckedUpdateManyWithoutUserInput = {
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  accessTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  refreshTokenHash?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientType?: Prisma.EnumClientTypeFieldUpdateOperationsInput | $Enums.ClientType
+  status?: Prisma.EnumSessionStatusFieldUpdateOperationsInput | $Enums.SessionStatus
+  fingerprint?: Prisma.StringFieldUpdateOperationsInput | string
+  prevSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accessTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshTokenExpiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  refreshUsedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  noActiveReason?: Prisma.NullableEnumNoActiveReasonFieldUpdateOperationsInput | $Enums.NoActiveReason | null
+  noActiveDescribe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastUsedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
 
 export type SessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  key?: boolean
+  id?: boolean
+  accessTokenHash?: boolean
+  refreshTokenHash?: boolean
+  sessionId?: boolean
   userId?: boolean
+  clientType?: boolean
+  status?: boolean
+  fingerprint?: boolean
+  prevSessionId?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
+  refreshUsedAt?: boolean
+  noActiveAt?: boolean
+  noActiveReason?: boolean
+  noActiveDescribe?: boolean
   createdAt?: boolean
-  lastUsedAt?: boolean
-  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
+  nextSession?: boolean | Prisma.Session$nextSessionArgs<ExtArgs>
 }, ExtArgs["result"]["session"]>
 
 export type SessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  key?: boolean
+  id?: boolean
+  accessTokenHash?: boolean
+  refreshTokenHash?: boolean
+  sessionId?: boolean
   userId?: boolean
+  clientType?: boolean
+  status?: boolean
+  fingerprint?: boolean
+  prevSessionId?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
+  refreshUsedAt?: boolean
+  noActiveAt?: boolean
+  noActiveReason?: boolean
+  noActiveDescribe?: boolean
   createdAt?: boolean
-  lastUsedAt?: boolean
-  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
 }, ExtArgs["result"]["session"]>
 
 export type SessionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  key?: boolean
+  id?: boolean
+  accessTokenHash?: boolean
+  refreshTokenHash?: boolean
+  sessionId?: boolean
   userId?: boolean
+  clientType?: boolean
+  status?: boolean
+  fingerprint?: boolean
+  prevSessionId?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
+  refreshUsedAt?: boolean
+  noActiveAt?: boolean
+  noActiveReason?: boolean
+  noActiveDescribe?: boolean
   createdAt?: boolean
-  lastUsedAt?: boolean
-  updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
 }, ExtArgs["result"]["session"]>
 
 export type SessionSelectScalar = {
-  key?: boolean
+  id?: boolean
+  accessTokenHash?: boolean
+  refreshTokenHash?: boolean
+  sessionId?: boolean
   userId?: boolean
+  clientType?: boolean
+  status?: boolean
+  fingerprint?: boolean
+  prevSessionId?: boolean
+  accessTokenExpiresAt?: boolean
+  refreshTokenExpiresAt?: boolean
+  refreshUsedAt?: boolean
+  noActiveAt?: boolean
+  noActiveReason?: boolean
+  noActiveDescribe?: boolean
   createdAt?: boolean
-  lastUsedAt?: boolean
-  updatedAt?: boolean
 }
 
-export type SessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"key" | "userId" | "createdAt" | "lastUsedAt" | "updatedAt", ExtArgs["result"]["session"]>
+export type SessionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "accessTokenHash" | "refreshTokenHash" | "sessionId" | "userId" | "clientType" | "status" | "fingerprint" | "prevSessionId" | "accessTokenExpiresAt" | "refreshTokenExpiresAt" | "refreshUsedAt" | "noActiveAt" | "noActiveReason" | "noActiveDescribe" | "createdAt", ExtArgs["result"]["session"]>
 export type SessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
+  nextSession?: boolean | Prisma.Session$nextSessionArgs<ExtArgs>
 }
 export type SessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
 }
 export type SessionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  prevSession?: boolean | Prisma.Session$prevSessionArgs<ExtArgs>
 }
 
 export type $SessionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Session"
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
+    prevSession: Prisma.$SessionPayload<ExtArgs> | null
+    nextSession: Prisma.$SessionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    key: string
+    id: string
+    accessTokenHash: string
+    refreshTokenHash: string
+    sessionId: string
     userId: string
+    clientType: $Enums.ClientType
+    status: $Enums.SessionStatus
+    fingerprint: string
+    prevSessionId: string | null
+    accessTokenExpiresAt: Date
+    refreshTokenExpiresAt: Date
+    refreshUsedAt: Date | null
+    noActiveAt: Date | null
+    noActiveReason: $Enums.NoActiveReason | null
+    noActiveDescribe: string | null
     createdAt: Date
-    lastUsedAt: Date
-    updatedAt: Date
   }, ExtArgs["result"]["session"]>
   composites: {}
 }
@@ -590,8 +1244,8 @@ export interface SessionDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    * // Get first 10 Sessions
    * const sessions = await prisma.session.findMany({ take: 10 })
    * 
-   * // Only select the `key`
-   * const sessionWithKeyOnly = await prisma.session.findMany({ select: { key: true } })
+   * // Only select the `id`
+   * const sessionWithIdOnly = await prisma.session.findMany({ select: { id: true } })
    * 
    */
   findMany<T extends SessionFindManyArgs>(args?: Prisma.SelectSubset<T, SessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -635,9 +1289,9 @@ export interface SessionDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    *   ]
    * })
    * 
-   * // Create many Sessions and only return the `key`
-   * const sessionWithKeyOnly = await prisma.session.createManyAndReturn({
-   *   select: { key: true },
+   * // Create many Sessions and only return the `id`
+   * const sessionWithIdOnly = await prisma.session.createManyAndReturn({
+   *   select: { id: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -726,9 +1380,9 @@ export interface SessionDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    *   ]
    * })
    * 
-   * // Update zero or more Sessions and only return the `key`
-   * const sessionWithKeyOnly = await prisma.session.updateManyAndReturn({
-   *   select: { key: true },
+   * // Update zero or more Sessions and only return the `id`
+   * const sessionWithIdOnly = await prisma.session.updateManyAndReturn({
+   *   select: { id: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -902,6 +1556,8 @@ readonly fields: SessionFieldRefs;
 export interface Prisma__SessionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  prevSession<T extends Prisma.Session$prevSessionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$prevSessionArgs<ExtArgs>>): Prisma.Prisma__SessionClient<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  nextSession<T extends Prisma.Session$nextSessionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Session$nextSessionArgs<ExtArgs>>): Prisma.Prisma__SessionClient<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -931,11 +1587,22 @@ export interface Prisma__SessionClient<T, Null = never, ExtArgs extends runtime.
  * Fields of the Session model
  */
 export interface SessionFieldRefs {
-  readonly key: Prisma.FieldRef<"Session", 'String'>
+  readonly id: Prisma.FieldRef<"Session", 'String'>
+  readonly accessTokenHash: Prisma.FieldRef<"Session", 'String'>
+  readonly refreshTokenHash: Prisma.FieldRef<"Session", 'String'>
+  readonly sessionId: Prisma.FieldRef<"Session", 'String'>
   readonly userId: Prisma.FieldRef<"Session", 'String'>
+  readonly clientType: Prisma.FieldRef<"Session", 'ClientType'>
+  readonly status: Prisma.FieldRef<"Session", 'SessionStatus'>
+  readonly fingerprint: Prisma.FieldRef<"Session", 'String'>
+  readonly prevSessionId: Prisma.FieldRef<"Session", 'String'>
+  readonly accessTokenExpiresAt: Prisma.FieldRef<"Session", 'DateTime'>
+  readonly refreshTokenExpiresAt: Prisma.FieldRef<"Session", 'DateTime'>
+  readonly refreshUsedAt: Prisma.FieldRef<"Session", 'DateTime'>
+  readonly noActiveAt: Prisma.FieldRef<"Session", 'DateTime'>
+  readonly noActiveReason: Prisma.FieldRef<"Session", 'NoActiveReason'>
+  readonly noActiveDescribe: Prisma.FieldRef<"Session", 'String'>
   readonly createdAt: Prisma.FieldRef<"Session", 'DateTime'>
-  readonly lastUsedAt: Prisma.FieldRef<"Session", 'DateTime'>
-  readonly updatedAt: Prisma.FieldRef<"Session", 'DateTime'>
 }
     
 
@@ -1334,6 +2001,44 @@ export type SessionDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Sessions to delete.
    */
   limit?: number
+}
+
+/**
+ * Session.prevSession
+ */
+export type Session$prevSessionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Session
+   */
+  select?: Prisma.SessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Session
+   */
+  omit?: Prisma.SessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SessionInclude<ExtArgs> | null
+  where?: Prisma.SessionWhereInput
+}
+
+/**
+ * Session.nextSession
+ */
+export type Session$nextSessionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Session
+   */
+  select?: Prisma.SessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Session
+   */
+  omit?: Prisma.SessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SessionInclude<ExtArgs> | null
+  where?: Prisma.SessionWhereInput
 }
 
 /**

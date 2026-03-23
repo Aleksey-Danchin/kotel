@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './../routes/~__root'
 import { Route as UsersRouteImport } from './../routes/~users'
+import { Route as CallbackRouteImport } from './../routes/~callback'
 import { Route as IndexRouteImport } from './../routes/~index'
 import { Route as KeyIndexRouteImport } from './../routes/~$key/~index'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CallbackRoute = CallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,30 +37,34 @@ const KeyIndexRoute = KeyIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/users': typeof UsersRoute
   '/$key/': typeof KeyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/users': typeof UsersRoute
   '/$key': typeof KeyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/users': typeof UsersRoute
   '/$key/': typeof KeyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/users' | '/$key/'
+  fullPaths: '/' | '/callback' | '/users' | '/$key/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/users' | '/$key'
-  id: '__root__' | '/' | '/users' | '/$key/'
+  to: '/' | '/callback' | '/users' | '/$key'
+  id: '__root__' | '/' | '/callback' | '/users' | '/$key/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CallbackRoute: typeof CallbackRoute
   UsersRoute: typeof UsersRoute
   KeyIndexRoute: typeof KeyIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/callback': {
+      id: '/callback'
+      path: '/callback'
+      fullPath: '/callback'
+      preLoaderRoute: typeof CallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CallbackRoute: CallbackRoute,
   UsersRoute: UsersRoute,
   KeyIndexRoute: KeyIndexRoute,
 }

@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import type { Response } from 'express';
 import type {
   ClientType,
   NoActiveReason,
@@ -6,6 +7,15 @@ import type {
   SessionStatus,
   User,
 } from '~prisma/client/client';
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  getAccessTokenCookieOptions,
+  getAccessTokenTtlSeconds,
+  getRefreshTokenCookieOptions,
+  getRefreshTokenTtlSeconds,
+} from '../shared/cookie.constants';
+import { generateToken, hashToken } from '../shared/token.utils';
 import { PrismaService } from '../prisma/prisma.service';
 
 type SessionWithUser = Session & { user: User };
@@ -29,6 +39,7 @@ type MarkAsUsedResult = {
   clientType: ClientType;
   fingerprint: string;
 };
+type TokenSource = 'cookie' | 'bearer';
 
 @Injectable()
 export class SessionService {
@@ -76,6 +87,70 @@ export class SessionService {
     `;
 
     return rows[0] ?? null;
+  }
+
+  async refreshSession(
+    refreshToken: string,
+    source: TokenSource,
+    response: Response,
+  ): Promise<
+    | { sessionId: string }
+    | { accessToken: string; refreshToken: string; sessionId: string }
+  > {
+    const refreshTokenHash = hashToken(refreshToken);
+    const existingSession = await this.findByRefreshTokenHash(refreshTokenHash);
+    if (!existingSession) {
+      throw new UnauthorizedException();
+    }
+
+    this.verifyClientType(source, existingSession.clientType);
+
+    const usedSession = await this.markAsUsed(refreshTokenHash);
+    if (!usedSession) {
+      throw new UnauthorizedException();
+    }
+
+    const accessToken = generateToken();
+    const newRefreshToken = generateToken();
+    const now = Date.now();
+    const accessTokenExpiresAt = new Date(
+      now + getAccessTokenTtlSeconds() * 1000,
+    );
+    const refreshTokenExpiresAt = new Date(
+      now + getRefreshTokenTtlSeconds() * 1000,
+    );
+
+    await this.createSession({
+      userId: usedSession.userId,
+      clientType: usedSession.clientType,
+      fingerprint: usedSession.fingerprint,
+      sessionId: usedSession.sessionId,
+      accessTokenHash: hashToken(accessToken),
+      refreshTokenHash: hashToken(newRefreshToken),
+      accessTokenExpiresAt,
+      refreshTokenExpiresAt,
+      prevSessionId: usedSession.id,
+    });
+
+    if (usedSession.clientType === 'WEB') {
+      response.cookie(
+        ACCESS_TOKEN_COOKIE,
+        accessToken,
+        getAccessTokenCookieOptions(),
+      );
+      response.cookie(
+        REFRESH_TOKEN_COOKIE,
+        newRefreshToken,
+        getRefreshTokenCookieOptions(),
+      );
+      return { sessionId: usedSession.sessionId };
+    }
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+      sessionId: usedSession.sessionId,
+    };
   }
 
   async revokeChain(
@@ -154,5 +229,14 @@ export class SessionService {
     });
 
     return result.count;
+  }
+
+  private verifyClientType(source: TokenSource, clientType: ClientType): void {
+    if (clientType === 'WEB' && source !== 'cookie') {
+      throw new UnauthorizedException();
+    }
+    if (clientType === 'EXPO' && source !== 'bearer') {
+      throw new UnauthorizedException();
+    }
   }
 }

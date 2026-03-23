@@ -10,3 +10,6 @@
 
 ## Step 08: Access token guard and @Public decorator
 - Dev backend healthcheck probes `GET /api` and expects 200; when introducing a global auth guard, keep this route public (e.g., `@Public()` on `AppController.getHello`) so container health remains stable.
+
+## Step 09: Refresh rotation happy path
+- Backend tests in this repo run on Vitest (`npm test` / `npx vitest run ...` inside `kris-backend-test`); using `npx jest` may install ad-hoc Jest and fail on TypeScript specs.

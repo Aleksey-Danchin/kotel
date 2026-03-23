@@ -12,6 +12,10 @@ feature, backend
 ## Affected Area
 - `apps/backend/src/session/session.controller.ts` — add refresh endpoint
 - `apps/backend/src/session/session.service.ts` — add `refreshSession` method
+<CORRECTION by="step-executor" reason="controller file missing in current codebase">
+`apps/backend/src/session/session.controller.ts` does not exist yet in this branch.  
+Resolution: create this controller file and register it in `session.module.ts` to expose `POST /api/session/refresh`.
+</CORRECTION>
 
 ## Dependencies
 Depends on Step 07 (SessionService with markAsUsed, createSession) and Step 08 (guard with @Public).

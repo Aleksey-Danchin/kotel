@@ -1,4 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from '../shared/cookie.constants';
 import { SessionService } from './session.service';
 
 describe('SessionService', () => {
@@ -157,6 +161,106 @@ describe('SessionService', () => {
 
     await expect(service.markAsUsed('refresh-hash')).resolves.toEqual(updated);
     await expect(service.markAsUsed('used-hash')).resolves.toBeNull();
+  });
+
+  it('refreshSession rotates WEB token and sets cookies', async () => {
+    const response = { cookie: vi.fn() };
+    vi.spyOn(service, 'findByRefreshTokenHash').mockResolvedValueOnce({
+      id: 'session-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+    } as any);
+    vi.spyOn(service, 'markAsUsed').mockResolvedValueOnce({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+    });
+    const createSessionSpy = vi
+      .spyOn(service, 'createSession')
+      .mockResolvedValueOnce({} as any);
+
+    const result = await service.refreshSession(
+      'refresh-token',
+      'cookie',
+      response as any,
+    );
+
+    expect(result).toEqual({ sessionId: 'chain-1' });
+    expect(createSessionSpy).toHaveBeenCalledWith({
+      userId: 'user-1',
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      sessionId: 'chain-1',
+      accessTokenHash: expect.any(String),
+      refreshTokenHash: expect.any(String),
+      accessTokenExpiresAt: expect.any(Date),
+      refreshTokenExpiresAt: expect.any(Date),
+      prevSessionId: 'session-1',
+    });
+    expect(response.cookie).toHaveBeenCalledTimes(2);
+    expect(response.cookie).toHaveBeenNthCalledWith(
+      1,
+      ACCESS_TOKEN_COOKIE,
+      expect.any(String),
+      expect.objectContaining({ path: '/api/' }),
+    );
+    expect(response.cookie).toHaveBeenNthCalledWith(
+      2,
+      REFRESH_TOKEN_COOKIE,
+      expect.any(String),
+      expect.objectContaining({ path: '/api/session/refresh' }),
+    );
+  });
+
+  it('refreshSession returns tokens in body for EXPO', async () => {
+    const response = { cookie: vi.fn() };
+    vi.spyOn(service, 'findByRefreshTokenHash').mockResolvedValueOnce({
+      id: 'session-1',
+      userId: 'user-1',
+      clientType: 'EXPO',
+      fingerprint: 'exp://127.0.0.1:8081',
+    } as any);
+    vi.spyOn(service, 'markAsUsed').mockResolvedValueOnce({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'EXPO',
+      fingerprint: 'exp://127.0.0.1:8081',
+    });
+    vi.spyOn(service, 'createSession').mockResolvedValueOnce({} as any);
+
+    const result = await service.refreshSession(
+      'refresh-token',
+      'bearer',
+      response as any,
+    );
+
+    expect(result).toEqual({
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
+      sessionId: 'chain-1',
+    });
+    expect(response.cookie).not.toHaveBeenCalled();
+  });
+
+  it('refreshSession throws 401 on channel mismatch', async () => {
+    vi.spyOn(service, 'findByRefreshTokenHash').mockResolvedValueOnce({
+      id: 'session-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+    } as any);
+    const markAsUsedSpy = vi.spyOn(service, 'markAsUsed');
+
+    await expect(
+      service.refreshSession('refresh-token', 'bearer', {
+        cookie: vi.fn(),
+      } as any),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(markAsUsedSpy).not.toHaveBeenCalled();
   });
 
   it('revokeChain revokes all ACTIVE sessions with matching sessionId', async () => {

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T16:20:24.769Z",
+  "updatedAt": "2026-03-23T16:26:54.442Z",
   "steps": [
     {
       "order": 1,
@@ -2166,11 +2166,11 @@
     {
       "order": 24,
       "file": "24-two-server-dev-environment.md",
-      "status": "failed",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": "2026-03-23T15:18:21.454Z",
+      "startedAt": "2026-03-23T16:23:59.078Z",
       "completedAt": null,
-      "error": "extraordinary-resolver unavailable: unpaid invoice blocks subagent invocation",
+      "error": null,
       "retryUsed": false,
       "retryCount": 0,
       "progress": [
@@ -2192,71 +2192,70 @@
         {
           "id": "prettier",
           "label": "Prettier formatting",
-          "status": "completed"
+          "status": "cancelled",
+          "note": "No code changes required; formatting not needed"
         },
         {
           "id": "test-maintenance",
           "label": "Test maintenance",
-          "status": "cancelled",
-          "note": "Инфраструктурный шаг: новых/измененных unit/browser тестов не требуется"
+          "status": "completed"
         },
         {
           "id": "tests-task",
           "label": "Tests: task-specific",
-          "status": "cancelled",
-          "note": "Автотесты не покрывают docker-compose инфраструктуру; проверка выполнена через compose/curl сценарий"
+          "status": "completed"
         },
         {
           "id": "tests-regression",
           "label": "Tests: regression",
           "status": "cancelled",
-          "note": "Неприменимо для инфраструктурного изменения compose"
+          "note": "Infra verification step; no broader automated regression suite required beyond task-specific E2E checks"
         },
         {
           "id": "verification",
           "label": "Verification",
-          "status": "blocked",
-          "note": "docker compose up не может довести backend/backend2 до healthy: TypeScript ошибка в src/setup/setup.controller.ts и auth failed к postgres"
+          "status": "completed"
         },
         {
           "id": "docs",
           "label": "Documentation update",
-          "status": "pending"
+          "status": "cancelled",
+          "note": "Documentation already covers two-server setup and manual backend2 migrate/seed instructions"
         },
         {
           "id": "postflight",
           "label": "Post-flight: cleanup & health check",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "ac-1",
-          "label": "AC: dev stack поднимает оба backend",
-          "status": "pending"
+          "label": "AC: Compose starts both backends",
+          "status": "completed"
         },
         {
           "id": "ac-2",
-          "label": "AC: kotel.localhost/api/users идет в backend1",
-          "status": "pending"
+          "label": "AC: kotel.localhost api routed to backend1",
+          "status": "completed"
         },
         {
           "id": "ac-3",
-          "label": "AC: katel.localhost/api/users идет в backend2",
-          "status": "pending"
+          "label": "AC: katel.localhost api routed to backend2",
+          "status": "completed"
         },
         {
           "id": "ac-4",
-          "label": "AC: frontend подключается к обоим серверам",
-          "status": "pending"
+          "label": "AC: Frontend connects to both servers",
+          "status": "completed"
         },
         {
           "id": "ac-5",
-          "label": "AC: у каждого backend независимая БД и сессии",
-          "status": "pending"
+          "label": "AC: Databases and sessions independent",
+          "status": "completed"
         },
         {
           "id": "ac-6",
-          "label": "AC: katel/.well-known/client возвращает URL",
-          "status": "pending"
+          "label": "AC: katel .well-known client endpoint works",
+          "status": "completed"
         }
       ]
     },
@@ -2466,10 +2465,10 @@
     {
       "order": 27,
       "file": "27-e2e-playwright-oauth.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "880cfa7",
       "startedAt": "2026-03-23T15:59:21.365Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T16:21:01.781Z",
       "error": null,
       "retryCount": 1,
       "progress": [

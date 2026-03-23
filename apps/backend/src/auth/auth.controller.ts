@@ -26,4 +26,15 @@ export class AuthController {
   login(@Body() body: unknown): Promise<{ redirect: string }> {
     return this.authService.login(body);
   }
+
+  @Post('token')
+  exchangeCode(
+    @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<
+    | { sessionId: string }
+    | { accessToken: string; refreshToken: string; sessionId: string }
+  > {
+    return this.authService.exchangeCode(body, response);
+  }
 }

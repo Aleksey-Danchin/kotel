@@ -20,6 +20,27 @@ services:
       retries: 10
     restart: unless-stopped
 
+  postgres2:
+    image: postgres:18.3
+    environment:
+      POSTGRES_DB: ${POSTGRES2_DB:-kotel2}
+      POSTGRES_USER: ${POSTGRES2_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES2_PASSWORD:-postgres}
+    volumes:
+      - postgres2-data:/var/lib/postgresql
+    networks:
+      - kotel-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES2_USER:-postgres} -d ${POSTGRES2_DB:-kotel2}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   backend:
     build:
       context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
@@ -54,6 +75,43 @@ services:
       - traefik.http.routers.backend.tls=true
       - traefik.http.routers.backend.priority=100
       - traefik.http.services.backend.loadbalancer.server.port=3000
+
+  backend2:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.backend.dev
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES2_USER:-postgres}:${POSTGRES2_PASSWORD:-postgres}@postgres2:5432/${POSTGRES2_DB:-kotel2}
+      - PORT=3000
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-.localhost}
+      - IDLE_TIMEOUT=${IDLE_TIMEOUT:-3600}
+      - REUSE_DETECTION_MODE=${REUSE_DETECTION_MODE:-quarantine}
+      - RECOMMENDED_CLIENT_URL=${RECOMMENDED_CLIENT_URL_2:-https://kotel.localhost}
+    networks:
+      - kotel-net
+    depends_on:
+      postgres2:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend2-api.rule=Host(`katel.localhost`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend2-api.entrypoints=websecure
+      - traefik.http.routers.backend2-api.tls=true
+      - traefik.http.routers.backend2-api.priority=100
+      - traefik.http.routers.backend2-wellknown.rule=Host(`katel.localhost`) && PathPrefix(`/.well-known`)
+      - traefik.http.routers.backend2-wellknown.entrypoints=websecure
+      - traefik.http.routers.backend2-wellknown.tls=true
+      - traefik.http.routers.backend2-wellknown.priority=100
+      - traefik.http.services.backend2.loadbalancer.server.port=3000
 
   frontend:
     build:
@@ -151,6 +209,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+      backend2:
+        condition: service_healthy
       frontend:
         condition: service_healthy
     healthcheck:
@@ -163,6 +223,7 @@ services:
 
 volumes:
   postgres-data:
+  postgres2-data:
 
 networks:
   kotel-net:

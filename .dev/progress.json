@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T15:17:51.209Z",
+  "updatedAt": "2026-03-23T15:52:27.756Z",
   "steps": [
     {
       "order": 1,
@@ -2071,10 +2071,10 @@
     {
       "order": 23,
       "file": "23-mobile-session-test-screen.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "2daaf71",
       "startedAt": "2026-03-23T15:13:24.014Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T15:18:12.318Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -2166,22 +2166,206 @@
     {
       "order": 24,
       "file": "24-two-server-dev-environment.md",
-      "status": "pending",
+      "status": "failed",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T15:18:21.454Z",
       "completedAt": null,
-      "error": null,
-      "retryUsed": false
+      "error": "extraordinary-resolver unavailable: unpaid invoice blocks subagent invocation",
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Инфраструктурный шаг: новых/измененных unit/browser тестов не требуется"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Автотесты не покрывают docker-compose инфраструктуру; проверка выполнена через compose/curl сценарий"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Неприменимо для инфраструктурного изменения compose"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "blocked",
+          "note": "docker compose up не может довести backend/backend2 до healthy: TypeScript ошибка в src/setup/setup.controller.ts и auth failed к postgres"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "pending"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "pending"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: dev stack поднимает оба backend",
+          "status": "pending"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: kotel.localhost/api/users идет в backend1",
+          "status": "pending"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: katel.localhost/api/users идет в backend2",
+          "status": "pending"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: frontend подключается к обоим серверам",
+          "status": "pending"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: у каждого backend независимая БД и сессии",
+          "status": "pending"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: katel/.well-known/client возвращает URL",
+          "status": "pending"
+        }
+      ]
     },
     {
       "order": 25,
       "file": "25-backend-unit-tests-auth-session.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T15:45:34.735Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped by orchestrator: dev health already verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "pre-existing-failure",
+          "note": "Full backend suite has pre-existing failures in auth/session integration specs unrelated to this step (seed user/login mismatch)."
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/model/domain/architecture changes; test-only step."
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: All tests pass",
+          "status": "completed",
+          "note": "Task-specific auth/session backend vitest suite passed (44/44). Full backend regression has pre-existing unrelated failures."
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Token utils has 4+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Code store has 4+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Auth service has 8+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Session service has 6+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: Session guard has 7+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: Reuse detection has 4+ tests",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: Vitest only no Jest",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 26,

@@ -49,4 +49,42 @@ describe('CodeStore', () => {
 
     store.onModuleDestroy();
   });
+
+  it('stores multiple codes and consumes each independently', () => {
+    const store = new CodeStore();
+
+    store.store('code-a', {
+      codeChallenge: 'challenge-a',
+      redirectUri: 'https://kotel.localhost/callback-a',
+      state: 'state-a',
+      userId: 'user-a',
+      clientType: 'WEB',
+    });
+    store.store('code-b', {
+      codeChallenge: 'challenge-b',
+      redirectUri: 'exp://127.0.0.1:8081/--/callback',
+      state: 'state-b',
+      userId: 'user-b',
+      clientType: 'EXPO',
+    });
+
+    expect(store.consume('code-a')).toMatchObject({
+      userId: 'user-a',
+      clientType: 'WEB',
+    });
+    expect(store.consume('code-b')).toMatchObject({
+      userId: 'user-b',
+      clientType: 'EXPO',
+    });
+
+    store.onModuleDestroy();
+  });
+
+  it('returns null for unknown code', () => {
+    const store = new CodeStore();
+
+    expect(store.consume('missing-code')).toBeNull();
+
+    store.onModuleDestroy();
+  });
 });

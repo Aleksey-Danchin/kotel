@@ -27,6 +27,17 @@
 - To exit attached Expo, press `Ctrl+C`.
 - To stop all dev containers, run `scripts/dev-stop.sh`.
 
+## Two Backend Dev Servers
+
+- The dev stack includes two backend servers behind Traefik:
+  - `https://kotel.localhost/api/*` -> `backend` with `postgres`
+  - `https://katel.localhost/api/*` and `https://katel.localhost/.well-known/*` -> `backend2` with `postgres2`
+- The frontend is still served only from `https://kotel.localhost`.
+- `backend2` uses `RECOMMENDED_CLIENT_URL` from `RECOMMENDED_CLIENT_URL_2` (defaults to `https://kotel.localhost`).
+- On first start for the second server DB, run migrations and seed manually:
+  - `docker compose -f infra/compose/dev.yml exec backend2 npx prisma migrate deploy`
+  - `docker compose -f infra/compose/dev.yml exec backend2 npx prisma db seed`
+
 ## Mobile Manual Testing
 
 - Canonical mobile runbook and manual checklist: `apps/mobile/README.md`.

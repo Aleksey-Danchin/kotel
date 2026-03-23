@@ -1,0 +1,355 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-23T11:51:20.502Z",
+  "updatedAt": "2026-03-23T11:53:17.874Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-update-auth-design-doc.md",
+      "status": "in_progress",
+      "commitHash": null,
+      "startedAt": "2026-03-23T11:51:26.502Z",
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not found in repository; markdown change does not require formatter"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Documentation-only step; automated test changes not required"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Documentation-only step; no task-specific automated tests"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Documentation-only step; no regression test run required"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test containers stopped via infra/compose/test.yml; dev containers healthy under kotel-* naming"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Implementation Decisions section with 13 items",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: No messenger:// occurrences",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: kotel:// appears in required sections",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Existing sections remain intact",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-db-migrations-new-session-schema.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 3,
+      "file": "03-remove-old-session-code-enable-cors.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 4,
+      "file": "04-token-utils-cookie-constants-contracts.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 5,
+      "file": "05-auth-code-store-login-page-endpoint.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 6,
+      "file": "06-auth-token-exchange-pkce.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 7,
+      "file": "07-session-service-fingerprint.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 8,
+      "file": "08-access-token-guard.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 9,
+      "file": "09-refresh-rotation-happy-path.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 10,
+      "file": "10-reuse-detection-alertness-modes.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 11,
+      "file": "11-session-status-logout-maintenance.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 12,
+      "file": "12-rate-limiting.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 13,
+      "file": "13-role-guard-admin-endpoints.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 14,
+      "file": "14-setup-wellknown.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 15,
+      "file": "15-seed-data-update.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 16,
+      "file": "16-frontend-multiserver-store-oauth-callback.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 17,
+      "file": "17-frontend-per-server-axios-auth-refresh.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 18,
+      "file": "18-frontend-shared-worker.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 19,
+      "file": "19-frontend-sidebar-layout.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 20,
+      "file": "20-frontend-test-page-setup-page-logout-retry.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 21,
+      "file": "21-mobile-deep-link-scheme-oauth.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 22,
+      "file": "22-mobile-multiserver-store-axios-client.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 23,
+      "file": "23-mobile-session-test-screen.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 24,
+      "file": "24-two-server-dev-environment.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 25,
+      "file": "25-backend-unit-tests-auth-session.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 26,
+      "file": "26-backend-unit-tests-admin-setup-ratelimit.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    },
+    {
+      "order": 27,
+      "file": "27-e2e-playwright-oauth.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryUsed": false
+    }
+  ]
+}

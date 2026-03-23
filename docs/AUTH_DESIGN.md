@@ -845,15 +845,13 @@ security:
     username_block_threshold: 10
     username_block_duration: 15m
 
-    # Прогрессивные задержки
-    backoff:
-      - attempts: 4
-        delay: 5s
-      - attempts: 6
-        delay: 30s
+    # Прогрессивная задержка в зоне CAPTCHA
+    # (применяется до проверки пароля, включая успешные логины)
+    captcha_delay: 5s
 ```
 
-Клиент получает `429 Too Many Requests` — реализация полностью на стороне сервера, одинакова для web и Expo.
+При попытках 4-6 сервер также возвращает `captchaRequired: true` в `401`, чтобы клиент мог показать CAPTCHA-челлендж.
+Клиент получает `429 Too Many Requests` при блокировке — реализация полностью на стороне сервера, одинакова для web и Expo.
 
 ---
 

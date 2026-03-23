@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T14:02:20.825Z",
+  "updatedAt": "2026-03-23T14:15:08.629Z",
   "steps": [
     {
       "order": 1,
@@ -920,10 +920,10 @@
     {
       "order": 11,
       "file": "11-session-status-logout-maintenance.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "77985ca",
       "startedAt": "2026-03-23T13:55:06.176Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T14:02:39.505Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1019,12 +1019,100 @@
     {
       "order": 12,
       "file": "12-rate-limiting.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T14:02:50.481Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: первые 3 неверных пароля -> 401",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: 4-я попытка -> 401 + captchaRequired + ~5s delay",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: 7-я попытка с одного IP -> 429 retryAfter",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: 10-я попытка по username -> 429",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: успешный login сбрасывает username counter",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: после окна блокировки доступ восстанавливается",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: request.ip возвращает реальный client IP",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 13,

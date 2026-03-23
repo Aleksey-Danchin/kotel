@@ -66,6 +66,9 @@ type RateLimitResult = {
 ### Progressive delays
 
 At 4+ attempts: `await new Promise(resolve => setTimeout(resolve, 5000))` before responding. At 6+ attempts: 30s delay. Delays apply to both success and failure (prevents timing attacks).
+<CORRECTION by="step-executor" reason="contradiction with dual-counter thresholds and acceptance criteria">
+Applied a single progressive delay of ~5s for the CAPTCHA range only (IP attempts 4-6). The 30s delay at 6+ conflicts with the table above (`4-6 -> 5s`, `7+ -> block`) and would make the 6th attempt behavior inconsistent.
+</CORRECTION>
 
 ### Integration into auth login
 
@@ -109,6 +112,9 @@ app.getHttpAdapter().getInstance().set('trust proxy', 1);
 
 ## Testing
 Unit tests in Step 26.
+<CORRECTION by="step-executor" reason="step execution requires verification in the current step">
+Added and ran backend integration tests for login rate limiting in this step to verify all acceptance criteria now, instead of postponing tests to a later step.
+</CORRECTION>
 
 ## Notes
 - In-memory counters reset on server restart — acceptable for single-instance self-hosted server.

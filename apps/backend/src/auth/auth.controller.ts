@@ -2,12 +2,14 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Controller, Get, Header, Post, Res, Body } from '@nestjs/common';
 import type { Response } from 'express';
+import { Public } from '../session/public.decorator';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Get('login')
   @Header('Content-Type', 'text/html; charset=utf-8')
   async getLoginPage(@Res() response: Response): Promise<void> {
@@ -22,11 +24,13 @@ export class AuthController {
     response.send(html);
   }
 
+  @Public()
   @Post('login')
   login(@Body() body: unknown): Promise<{ redirect: string }> {
     return this.authService.login(body);
   }
 
+  @Public()
   @Post('token')
   exchangeCode(
     @Body() body: unknown,

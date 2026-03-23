@@ -7,3 +7,6 @@
 
 ## Step 05: Auth module — code store, login page, POST /auth/login
 - In backend dev container (`nest start --watch` with webpack bundle), `__dirname` resolves to `/apps/backend/dist`, so static files from `src/` should be read via `process.cwd()` paths unless copied to `dist`.
+
+## Step 08: Access token guard and @Public decorator
+- Dev backend healthcheck probes `GET /api` and expects 200; when introducing a global auth guard, keep this route public (e.g., `@Public()` on `AppController.getHello`) so container health remains stable.

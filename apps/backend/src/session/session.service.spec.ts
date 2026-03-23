@@ -91,7 +91,9 @@ describe('SessionService', () => {
       noActiveDescribe: null,
       createdAt: now,
     };
-    mockPrismaService.client.session.create.mockResolvedValueOnce(createdSession);
+    mockPrismaService.client.session.create.mockResolvedValueOnce(
+      createdSession,
+    );
 
     await expect(
       service.createSession({
@@ -127,9 +129,9 @@ describe('SessionService', () => {
       .mockResolvedValueOnce(session)
       .mockResolvedValueOnce(null);
 
-    await expect(service.findByRefreshTokenHash('refresh-hash')).resolves.toEqual(
-      session,
-    );
+    await expect(
+      service.findByRefreshTokenHash('refresh-hash'),
+    ).resolves.toEqual(session);
     await expect(service.findByRefreshTokenHash('missing')).resolves.toBeNull();
     expect(mockPrismaService.client.session.findUnique).toHaveBeenNthCalledWith(
       1,
@@ -212,6 +214,23 @@ describe('SessionService', () => {
         status: 'REVOKED',
         noActiveAt: expect.any(Date),
         noActiveReason: 'LOGOUT_CURRENT',
+      },
+    });
+  });
+
+  it('markExpired marks session as EXPIRED', async () => {
+    mockPrismaService.client.session.update.mockResolvedValueOnce({
+      id: 'session-1',
+    });
+
+    const now = new Date('2026-03-23T12:00:00.000Z');
+    await service.markExpired('session-1', now);
+    expect(mockPrismaService.client.session.update).toHaveBeenCalledWith({
+      where: { id: 'session-1' },
+      data: {
+        status: 'EXPIRED',
+        noActiveAt: now,
+        noActiveReason: 'EXPIRED',
       },
     });
   });

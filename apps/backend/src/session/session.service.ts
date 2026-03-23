@@ -129,6 +129,17 @@ export class SessionService {
     });
   }
 
+  async markExpired(id: string, at: Date): Promise<void> {
+    await this.prismaService.client.session.update({
+      where: { id },
+      data: {
+        status: 'EXPIRED',
+        noActiveAt: at,
+        noActiveReason: 'EXPIRED',
+      },
+    });
+  }
+
   async cleanupExpiredSessions(): Promise<number> {
     const result = await this.prismaService.client.session.updateMany({
       where: {

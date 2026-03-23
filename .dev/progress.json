@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T14:41:22.023Z",
+  "updatedAt": "2026-03-23T14:49:01.009Z",
   "steps": [
     {
       "order": 1,
@@ -1409,10 +1409,10 @@
     {
       "order": 16,
       "file": "16-frontend-multiserver-store-oauth-callback.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "e3f3ae4",
       "startedAt": "2026-03-23T14:36:20.955Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T14:42:05.725Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -1504,12 +1504,92 @@
     {
       "order": 17,
       "file": "17-frontend-per-server-axios-auth-refresh.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T14:44:36.510Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории; отдельный prettier-скрипт для frontend не задан"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения не затрагивают публичную документацию API/домена/архитектуры"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: getServerClient создает axios baseURL+withCredentials",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: одинаковый URL возвращает кешированный instance",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: на 401 вызывается refresh и запрос ретраится",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: removeServerClient очищает кеш",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: разные серверы имеют независимые instances",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 18,

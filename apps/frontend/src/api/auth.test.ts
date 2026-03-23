@@ -9,6 +9,12 @@ import {
   serversAtom,
   serversStore,
 } from "../state/servers";
+import { getServerClient } from "./create-server-client";
+
+vi.mock("./create-server-client", () => ({
+  getServerClient: vi.fn(),
+  removeServerClient: vi.fn(),
+}));
 
 interface ListenerRegistry {
   message?: (event: MessageEvent<{ code?: string; state?: string }>) => void;
@@ -33,6 +39,7 @@ describe("oauth auth api", () => {
   const listeners: ListenerRegistry = {};
   let openMock: ReturnType<typeof vi.fn>;
   let fetchMock: ReturnType<typeof vi.fn>;
+  let clientGetMock: ReturnType<typeof vi.fn>;
   let randomUUIDMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -52,19 +59,21 @@ describe("oauth auth api", () => {
           json: async () => ({}),
         };
       }
-      return {
-        ok: true,
-        json: async () => ({
-          sessionId: "sess-1",
-          user: {
-            id: "u-1",
-            fullname: "OAuth User",
-            login: "oauth-user",
-            role: "admin",
-          },
-        }),
-      };
     });
+    clientGetMock = vi.fn(async () => ({
+      data: {
+        sessionId: "sess-1",
+        user: {
+          id: "u-1",
+          fullname: "OAuth User",
+          login: "oauth-user",
+          role: "admin",
+        },
+      },
+    }));
+    vi.mocked(getServerClient).mockReturnValue({
+      get: clientGetMock,
+    } as unknown as ReturnType<typeof getServerClient>);
     randomUUIDMock = vi.fn(() => "state-1");
 
     vi.stubGlobal("fetch", fetchMock);
@@ -118,7 +127,8 @@ describe("oauth auth api", () => {
 
     const session = await pending;
     expect(session.serverUrl).toBe("https://kotel.localhost");
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(clientGetMock).toHaveBeenCalledWith("/api/session/status");
 
     const servers = serversStore.get(serversAtom);
     expect(servers.get("https://kotel.localhost")?.user.login).toBe(

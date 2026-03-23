@@ -22,3 +22,6 @@
 
 ## Step 13: Role guard and admin endpoints
 - For backend smoke checks after adding new endpoints, calling `curl` inside `kotel-backend-1` (`docker exec ... http://localhost:3000/api/...`) is more reliable than host-domain probing when dev/test Traefik hostnames differ.
+
+## Step 17: Frontend per-server axios auth refresh
+- In this environment, `docker compose -f infra/compose/dev.yml ps` may fail without full env interpolation; `docker ps --format '{{.Names}}\t{{.Status}}'` is a reliable fallback for post-flight dev health checks.

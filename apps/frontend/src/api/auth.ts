@@ -3,6 +3,7 @@ import {
   setServerSession,
 } from "../state/servers";
 import type { ServerSession } from "../state/servers";
+import { getServerClient, removeServerClient } from "./create-server-client";
 
 interface OAuthMessageData {
   code: string;
@@ -107,8 +108,7 @@ async function handleMessageEvent(
       throw new Error("PKCE verifier is missing");
     }
 
-    await exchangeCode(pendingFlow.serverUrl, code, verifier);
-    const session = await fetchSessionStatus(pendingFlow.serverUrl);
+    const session = await exchangeCode(pendingFlow.serverUrl, code, verifier);
     setServerSession(session);
     pendingFlow.resolve(session);
   } catch (error) {
@@ -153,7 +153,7 @@ export async function exchangeCode(
   serverUrl: string,
   code: string,
   codeVerifier: string,
-): Promise<void> {
+): Promise<ServerSession> {
   const response = await fetch(`${serverUrl}/api/auth/token`, {
     method: "POST",
     credentials: "include",
@@ -164,19 +164,12 @@ export async function exchangeCode(
   if (!response.ok) {
     throw new Error(`Token exchange failed for ${serverUrl}`);
   }
-}
 
-async function fetchSessionStatus(serverUrl: string): Promise<ServerSession> {
-  const response = await fetch(`${serverUrl}/api/session/status`, {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Session status request failed for ${serverUrl}`);
-  }
-
-  const payload = (await response.json()) as SessionStatusResponse;
+  const client = getServerClient(serverUrl);
+  const statusResponse = await client.get<SessionStatusResponse>(
+    "/api/session/status",
+  );
+  const payload = statusResponse.data;
   return {
     serverUrl,
     sessionId: payload.sessionId,
@@ -219,6 +212,7 @@ export async function addServer(serverUrl: string): Promise<ServerSession> {
 
 export function removeServer(serverUrl: string): void {
   removeServerSession(serverUrl);
+  removeServerClient(serverUrl);
   sessionStorage.removeItem(storageStateKey(serverUrl));
   sessionStorage.removeItem(storageVerifierKey(serverUrl));
 }

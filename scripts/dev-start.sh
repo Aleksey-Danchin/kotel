@@ -42,24 +42,63 @@ fi
 
 export MKCERT_CAROOT
 
-docker compose \
-  --project-directory "${PROJECT_ROOT}" \
-  -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
-  up -d --build
-
-POSTGRES_PORT_DISPLAY="5432"
 if [[ -f "${PROJECT_ROOT}/.env" ]]; then
   set -a
   # shellcheck disable=SC1091
   source "${PROJECT_ROOT}/.env"
   set +a
-  POSTGRES_PORT_DISPLAY="${POSTGRES_PORT:-${POSTGRES_PORT_DISPLAY}}"
 fi
+
+if [[ -z "${HOST_IP:-}" ]]; then
+  HOST_IP="$(ip route get 1.1.1.1 2>/dev/null | awk '{for (i=1; i<=NF; i++) if ($i == "src") {print $(i+1); exit}}')"
+fi
+
+if [[ -z "${HOST_IP:-}" ]]; then
+  HOST_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+fi
+
+if [[ -z "${HOST_IP:-}" ]]; then
+  echo "Error: unable to detect HOST_IP for mobile API routing." >&2
+  exit 1
+fi
+
+export HOST_IP
+export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-http://${HOST_IP}:3000}"
+export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-}"
+
+docker compose \
+  --project-directory "${PROJECT_ROOT}" \
+  -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
+  up -d --build postgres backend frontend studio traefik
+
+POSTGRES_PORT_DISPLAY="5432"
+POSTGRES_PORT_DISPLAY="${POSTGRES_PORT:-${POSTGRES_PORT_DISPLAY}}"
 
 echo "Kotel dev environment started."
 echo "  Frontend: https://kotel.localhost"
 echo "  Backend:  https://kotel.localhost/api"
 echo "  Studio:   http://localhost:5555"
+echo "  Mobile:   attached Expo CLI (LAN mode)"
+echo "  Mobile API base URL: ${EXPO_PUBLIC_API_BASE_URL}"
+echo "  Mobile host header:  ${EXPO_PUBLIC_API_HOST_HEADER}"
 echo "  Postgres: localhost:${POSTGRES_PORT_DISPLAY}"
 echo
 echo "  Logs: docker compose --project-directory \"${PROJECT_ROOT}\" -f \"${PROJECT_ROOT}/infra/compose/dev.yml\" logs -f"
+echo
+echo "Attaching to mobile Expo CLI..."
+echo "Use Ctrl+C to stop the attached Expo process."
+echo "Core services remain running; use scripts/dev-stop.sh to stop the full stack."
+
+MOBILE_CONTAINERS="$(
+  docker ps -aq \
+    --filter "label=com.docker.compose.project=kotel" \
+    --filter "label=com.docker.compose.service=mobile"
+)"
+if [[ -n "${MOBILE_CONTAINERS}" ]]; then
+  docker rm -f ${MOBILE_CONTAINERS} >/dev/null 2>&1 || true
+fi
+
+docker compose \
+  --project-directory "${PROJECT_ROOT}" \
+  -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
+  run --build --rm --service-ports mobile

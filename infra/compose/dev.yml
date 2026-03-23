@@ -32,6 +32,7 @@ services:
       - PORT=3000
       - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-kotel.localhost}
       - IDLE_TIMEOUT=${IDLE_TIMEOUT:-3600}
+      - REUSE_DETECTION_MODE=${REUSE_DETECTION_MODE:-quarantine}
     ports:
       - "${BACKEND_PORT:-3000}:3000"
     networks:

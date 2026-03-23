@@ -19,6 +19,7 @@ describe('SessionController refresh integration', () => {
   let prismaService: PrismaService;
   let userId: string;
   const testLogin = `refresh-spec-${randomUUID()}`;
+  const originalReuseDetectionMode = process.env.REUSE_DETECTION_MODE;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -45,11 +46,17 @@ describe('SessionController refresh integration', () => {
 
   beforeEach(async () => {
     await prismaService.client.session.deleteMany({ where: { userId } });
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
   });
 
   afterAll(async () => {
     await prismaService.client.session.deleteMany({ where: { userId } });
     await prismaService.client.user.deleteMany({ where: { id: userId } });
+    if (originalReuseDetectionMode === undefined) {
+      delete process.env.REUSE_DETECTION_MODE;
+    } else {
+      process.env.REUSE_DETECTION_MODE = originalReuseDetectionMode;
+    }
     await app.close();
   });
 
@@ -198,6 +205,196 @@ describe('SessionController refresh integration', () => {
       .post('/api/session/refresh')
       .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
       .expect(401);
+  });
+
+  it('returns 401 for unknown refresh token', async () => {
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=refresh-${randomUUID()}`])
+      .expect(401);
+  });
+
+  it('returns 401 for expired refresh token without triggering reuse response', async () => {
+    const refreshToken = `refresh-${randomUUID()}`;
+    const expiredSession = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+    await prismaService.client.session.update({
+      where: { id: expiredSession.id },
+      data: {
+        status: 'EXPIRED',
+        noActiveAt: new Date(),
+        noActiveReason: 'EXPIRED',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const sessions = await prismaService.client.session.findMany({
+      where: { userId },
+    });
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]?.status).toBe('EXPIRED');
+  });
+
+  it('returns 401 for revoked refresh token without triggering reuse response', async () => {
+    const refreshToken = `refresh-${randomUUID()}`;
+    const revokedSession = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+    await prismaService.client.session.update({
+      where: { id: revokedSession.id },
+      data: {
+        status: 'REVOKED',
+        noActiveAt: new Date(),
+        noActiveReason: 'MANUAL_REVOKE',
+      },
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const sessions = await prismaService.client.session.findMany({
+      where: { userId },
+    });
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]?.status).toBe('REVOKED');
+    expect(sessions[0]?.noActiveReason).toBe('MANUAL_REVOKE');
+  });
+
+  it('debug mode keeps user sessions untouched on reuse', async () => {
+    process.env.REUSE_DETECTION_MODE = 'debug';
+    const refreshToken = `refresh-${randomUUID()}`;
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const sessions = await prismaService.client.session.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'asc' },
+    });
+    expect(sessions).toHaveLength(2);
+    expect(sessions[0]?.status).toBe('USED');
+    expect(sessions[1]?.status).toBe('ACTIVE');
+  });
+
+  it('isolation mode revokes only active chain sessions on reuse', async () => {
+    process.env.REUSE_DETECTION_MODE = 'isolation';
+    const refreshToken = `refresh-${randomUUID()}`;
+    const chainSession = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+    const unrelatedSession = await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken: `refresh-${randomUUID()}`,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const chainRows = await prismaService.client.session.findMany({
+      where: { userId, sessionId: chainSession.sessionId },
+    });
+    const unrelatedRow = await prismaService.client.session.findUnique({
+      where: { id: unrelatedSession.id },
+    });
+    expect(chainRows.some((item) => item.status === 'REVOKED')).toBe(true);
+    expect(unrelatedRow?.status).toBe('ACTIVE');
+  });
+
+  it('quarantine mode revokes all user sessions on reuse', async () => {
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
+    const refreshToken = `refresh-${randomUUID()}`;
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken: `refresh-${randomUUID()}`,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const activeSessions = await prismaService.client.session.findMany({
+      where: { userId, status: 'ACTIVE' },
+    });
+    expect(activeSessions).toHaveLength(0);
+  });
+
+  it('lockdown mode revokes all user sessions with LOCKDOWN reason on reuse', async () => {
+    process.env.REUSE_DETECTION_MODE = 'lockdown';
+    const refreshToken = `refresh-${randomUUID()}`;
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken,
+    });
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken: `refresh-${randomUUID()}`,
+    });
+
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(201);
+    await request(app.getHttpServer())
+      .post('/api/session/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE}=${refreshToken}`])
+      .expect(401);
+
+    const activeSessions = await prismaService.client.session.findMany({
+      where: { userId, status: 'ACTIVE' },
+    });
+    expect(activeSessions).toHaveLength(0);
+
+    const revokedSessions = await prismaService.client.session.findMany({
+      where: { userId, status: 'REVOKED' },
+    });
+    expect(revokedSessions.length).toBeGreaterThan(0);
+    expect(
+      revokedSessions.every((session) => session.noActiveReason === 'LOCKDOWN'),
+    ).toBe(true);
   });
 
   async function createActiveSession(params: {

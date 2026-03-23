@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import type { Response } from 'express';
 import type {
   ClientType,
@@ -17,6 +17,7 @@ import {
 } from '../shared/cookie.constants';
 import { generateToken, hashToken } from '../shared/token.utils';
 import { PrismaService } from '../prisma/prisma.service';
+import { getAlertMode } from './alertness';
 
 type SessionWithUser = Session & { user: User };
 
@@ -43,6 +44,8 @@ type TokenSource = 'cookie' | 'bearer';
 
 @Injectable()
 export class SessionService {
+  private readonly reuseDetectionLogger = new Logger('ReuseDetection');
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async findByAccessTokenHash(hash: string): Promise<SessionWithUser | null> {
@@ -107,6 +110,16 @@ export class SessionService {
 
     const usedSession = await this.markAsUsed(refreshTokenHash);
     if (!usedSession) {
+      const nonActiveSession =
+        await this.findByRefreshTokenHash(refreshTokenHash);
+      if (!nonActiveSession) {
+        throw new UnauthorizedException();
+      }
+
+      if (nonActiveSession.status === 'USED') {
+        await this.handleReuseDetection(nonActiveSession);
+      }
+
       throw new UnauthorizedException();
     }
 
@@ -237,6 +250,32 @@ export class SessionService {
     }
     if (clientType === 'EXPO' && source !== 'bearer') {
       throw new UnauthorizedException();
+    }
+  }
+
+  async handleReuseDetection(session: Session): Promise<void> {
+    const mode = getAlertMode();
+
+    this.reuseDetectionLogger.warn(
+      `Reuse detected: sessionId=${session.sessionId}, userId=${session.userId}, mode=${mode}`,
+    );
+
+    switch (mode) {
+      case 'debug':
+        return;
+      case 'isolation':
+        await this.revokeChain(
+          session.sessionId,
+          session.userId,
+          'REUSE_DETECTED',
+        );
+        return;
+      case 'quarantine':
+        await this.revokeAllUserSessions(session.userId, 'REUSE_DETECTED');
+        return;
+      case 'lockdown':
+        await this.revokeAllUserSessions(session.userId, 'LOCKDOWN');
+        return;
     }
   }
 }

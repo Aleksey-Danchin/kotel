@@ -13,3 +13,6 @@
 
 ## Step 09: Refresh rotation happy path
 - Backend tests in this repo run on Vitest (`npm test` / `npx vitest run ...` inside `kris-backend-test`); using `npx jest` may install ad-hoc Jest and fail on TypeScript specs.
+
+## Step 10: Reuse detection and alertness modes
+- `scripts/prettier.sh` is not present in this repo; use `npm --prefix apps/backend run format` for backend formatting in step execution.

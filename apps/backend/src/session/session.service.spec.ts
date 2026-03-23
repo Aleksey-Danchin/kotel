@@ -22,6 +22,7 @@ describe('SessionService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
     service = new SessionService(mockPrismaService as any);
   });
 
@@ -261,6 +262,173 @@ describe('SessionService', () => {
       } as any),
     ).rejects.toMatchObject({ status: 401 });
     expect(markAsUsedSpy).not.toHaveBeenCalled();
+  });
+
+  it('refreshSession handles unknown token when markAsUsed returns null', async () => {
+    vi.spyOn(service, 'findByRefreshTokenHash')
+      .mockResolvedValueOnce({
+        id: 'session-1',
+        userId: 'user-1',
+        clientType: 'WEB',
+        fingerprint: 'https://kotel.localhost',
+      } as any)
+      .mockResolvedValueOnce(null);
+    vi.spyOn(service, 'markAsUsed').mockResolvedValueOnce(null);
+    const handleReuseSpy = vi.spyOn(service, 'handleReuseDetection');
+
+    await expect(
+      service.refreshSession('refresh-token', 'cookie', {
+        cookie: vi.fn(),
+      } as any),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(handleReuseSpy).not.toHaveBeenCalled();
+  });
+
+  it('refreshSession triggers reuse detection for USED token', async () => {
+    process.env.REUSE_DETECTION_MODE = 'debug';
+    const usedSession = {
+      id: 'session-1',
+      userId: 'user-1',
+      sessionId: 'chain-1',
+      clientType: 'WEB',
+      status: 'USED',
+      fingerprint: 'https://kotel.localhost',
+    };
+    vi.spyOn(service, 'findByRefreshTokenHash')
+      .mockResolvedValueOnce({
+        ...usedSession,
+        status: 'ACTIVE',
+      } as any)
+      .mockResolvedValueOnce(usedSession as any);
+    vi.spyOn(service, 'markAsUsed').mockResolvedValueOnce(null);
+    const handleReuseSpy = vi.spyOn(service, 'handleReuseDetection');
+
+    await expect(
+      service.refreshSession('refresh-token', 'cookie', {
+        cookie: vi.fn(),
+      } as any),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(handleReuseSpy).toHaveBeenCalledWith(usedSession);
+  });
+
+  it('refreshSession does not trigger reuse detection for EXPIRED or REVOKED tokens', async () => {
+    const findByRefreshTokenHashSpy = vi.spyOn(
+      service,
+      'findByRefreshTokenHash',
+    );
+    const markAsUsedSpy = vi.spyOn(service, 'markAsUsed');
+    const handleReuseSpy = vi.spyOn(service, 'handleReuseDetection');
+
+    findByRefreshTokenHashSpy
+      .mockResolvedValueOnce({
+        id: 'session-active',
+        userId: 'user-1',
+        clientType: 'WEB',
+        status: 'ACTIVE',
+        fingerprint: 'https://kotel.localhost',
+      } as any)
+      .mockResolvedValueOnce({
+        id: 'session-expired',
+        userId: 'user-1',
+        clientType: 'WEB',
+        status: 'EXPIRED',
+        fingerprint: 'https://kotel.localhost',
+      } as any)
+      .mockResolvedValueOnce({
+        id: 'session-active-2',
+        userId: 'user-1',
+        clientType: 'WEB',
+        status: 'ACTIVE',
+        fingerprint: 'https://kotel.localhost',
+      } as any)
+      .mockResolvedValueOnce({
+        id: 'session-revoked',
+        userId: 'user-1',
+        clientType: 'WEB',
+        status: 'REVOKED',
+        fingerprint: 'https://kotel.localhost',
+      } as any);
+    markAsUsedSpy.mockResolvedValue(null);
+
+    await expect(
+      service.refreshSession('refresh-token-1', 'cookie', {
+        cookie: vi.fn(),
+      } as any),
+    ).rejects.toMatchObject({ status: 401 });
+    await expect(
+      service.refreshSession('refresh-token-2', 'cookie', {
+        cookie: vi.fn(),
+      } as any),
+    ).rejects.toMatchObject({ status: 401 });
+    expect(handleReuseSpy).not.toHaveBeenCalled();
+  });
+
+  it('handleReuseDetection in debug mode only logs', async () => {
+    process.env.REUSE_DETECTION_MODE = 'debug';
+    const revokeChainSpy = vi.spyOn(service, 'revokeChain');
+    const revokeAllSpy = vi.spyOn(service, 'revokeAllUserSessions');
+
+    await service.handleReuseDetection({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+    } as any);
+
+    expect(revokeChainSpy).not.toHaveBeenCalled();
+    expect(revokeAllSpy).not.toHaveBeenCalled();
+  });
+
+  it('handleReuseDetection in isolation mode revokes chain', async () => {
+    process.env.REUSE_DETECTION_MODE = 'isolation';
+    const revokeChainSpy = vi
+      .spyOn(service, 'revokeChain')
+      .mockResolvedValue(1);
+    const revokeAllSpy = vi.spyOn(service, 'revokeAllUserSessions');
+
+    await service.handleReuseDetection({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+    } as any);
+
+    expect(revokeChainSpy).toHaveBeenCalledWith(
+      'chain-1',
+      'user-1',
+      'REUSE_DETECTED',
+    );
+    expect(revokeAllSpy).not.toHaveBeenCalled();
+  });
+
+  it('handleReuseDetection in quarantine mode revokes all user sessions with REUSE_DETECTED', async () => {
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
+    const revokeChainSpy = vi.spyOn(service, 'revokeChain');
+    const revokeAllSpy = vi
+      .spyOn(service, 'revokeAllUserSessions')
+      .mockResolvedValue(2);
+
+    await service.handleReuseDetection({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+    } as any);
+
+    expect(revokeChainSpy).not.toHaveBeenCalled();
+    expect(revokeAllSpy).toHaveBeenCalledWith('user-1', 'REUSE_DETECTED');
+  });
+
+  it('handleReuseDetection in lockdown mode revokes all user sessions with LOCKDOWN', async () => {
+    process.env.REUSE_DETECTION_MODE = 'lockdown';
+    const revokeAllSpy = vi
+      .spyOn(service, 'revokeAllUserSessions')
+      .mockResolvedValue(2);
+
+    await service.handleReuseDetection({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+    } as any);
+
+    expect(revokeAllSpy).toHaveBeenCalledWith('user-1', 'LOCKDOWN');
   });
 
   it('revokeChain revokes all ACTIVE sessions with matching sessionId', async () => {

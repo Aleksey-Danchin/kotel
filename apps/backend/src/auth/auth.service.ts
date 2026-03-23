@@ -22,11 +22,13 @@ import {
   getRefreshTokenTtlSeconds,
 } from '../shared/cookie.constants';
 import { generateToken, hashToken } from '../shared/token.utils';
+import { SessionService } from '../session/session.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly sessionService: SessionService,
     private readonly codeStore: CodeStore,
   ) {}
 
@@ -100,19 +102,15 @@ export class AuthService {
     );
     const fingerprint = new URL(storedEntry.redirectUri).origin;
 
-    await this.prismaService.client.session.create({
-      data: {
-        accessTokenHash,
-        refreshTokenHash,
-        sessionId,
-        userId: storedEntry.userId,
-        clientType: storedEntry.clientType,
-        fingerprint,
-        status: 'ACTIVE',
-        prevSessionId: null,
-        accessTokenExpiresAt,
-        refreshTokenExpiresAt,
-      },
+    await this.sessionService.createSession({
+      userId: storedEntry.userId,
+      clientType: storedEntry.clientType,
+      fingerprint,
+      sessionId,
+      accessTokenHash,
+      refreshTokenHash,
+      accessTokenExpiresAt,
+      refreshTokenExpiresAt,
     });
 
     if (storedEntry.clientType === 'WEB') {

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-23T11:51:20.502Z",
-  "updatedAt": "2026-03-23T13:26:16.131Z",
+  "updatedAt": "2026-03-23T13:32:17.920Z",
   "steps": [
     {
       "order": 1,
@@ -390,10 +390,10 @@
     {
       "order": 6,
       "file": "06-auth-token-exchange-pkce.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "bc2a3dc",
       "startedAt": "2026-03-23T13:22:14.740Z",
-      "completedAt": null,
+      "completedAt": "2026-03-23T13:26:47.446Z",
       "error": null,
       "retryUsed": false,
       "retryCount": 0,
@@ -494,12 +494,106 @@
     {
       "order": 7,
       "file": "07-session-service-fingerprint.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-23T13:27:23.629Z",
       "completedAt": null,
       "error": null,
-      "retryUsed": false
+      "retryUsed": false,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/model/domain changes requiring documentation updates"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: findByAccessTokenHash возвращает session+user или null",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: findByRefreshTokenHash возвращает session",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: markAsUsed атомарно ACTIVE->USED или null",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: revokeChain отзывает ACTIVE по sessionId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: revokeAllUserSessions отзывает ACTIVE пользователя",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: revokeSession отзывает одну сессию",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: cleanupExpiredSessions помечает EXPIRED",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: createSession создает корректную запись",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 8,

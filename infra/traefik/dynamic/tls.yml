@@ -1,4 +1,9 @@
 tls:
+  certificates:
+    - certFile: /certs/kotel.localhost.pem
+      keyFile: /certs/kotel.localhost-key.pem
+    - certFile: /certs/katel.localhost.pem
+      keyFile: /certs/katel.localhost-key.pem
   stores:
     default:
       defaultCertificate:

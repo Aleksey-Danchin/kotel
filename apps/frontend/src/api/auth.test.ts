@@ -3,13 +3,15 @@ import {
   __resetAuthForTests,
   addServer,
   removeServer,
+  restoreServerSessions,
 } from "./auth";
 import {
+  getPersistedServerUrls,
   resetServersStore,
   serversAtom,
   serversStore,
 } from "../state/servers";
-import { getServerClient } from "./create-server-client";
+import { getServerClient, removeServerClient } from "./create-server-client";
 
 vi.mock("./create-server-client", () => ({
   getServerClient: vi.fn(),
@@ -35,6 +37,24 @@ function createStorageMock() {
   };
 }
 
+function createLocalStorageMock() {
+  const data = new Map<string, string>();
+  return {
+    getItem(key: string): string | null {
+      return data.get(key) ?? null;
+    },
+    setItem(key: string, value: string): void {
+      data.set(key, value);
+    },
+    removeItem(key: string): void {
+      data.delete(key);
+    },
+    clear(): void {
+      data.clear();
+    },
+  };
+}
+
 describe("oauth auth api", () => {
   const listeners: ListenerRegistry = {};
   let openMock: ReturnType<typeof vi.fn>;
@@ -48,6 +68,7 @@ describe("oauth auth api", () => {
 
     const storage = createStorageMock();
     vi.stubGlobal("sessionStorage", storage);
+    vi.stubGlobal("localStorage", createLocalStorageMock());
     __resetAuthForTests();
 
     const popup = { closed: false } as Window;
@@ -202,5 +223,36 @@ describe("oauth auth api", () => {
         credentials: "include",
       }),
     );
+  });
+
+  it("rehydrates persisted servers after reload", async () => {
+    localStorage.setItem(
+      "kotel.servers",
+      JSON.stringify(["https://kotel.localhost", "https://katel.localhost"]),
+    );
+
+    clientGetMock
+      .mockResolvedValueOnce({
+        data: {
+          sessionId: "sess-1",
+          user: {
+            id: "u-1",
+            fullname: "User One",
+            login: "user-one",
+            role: "admin",
+          },
+        },
+      })
+      .mockRejectedValueOnce({ response: { status: 401 } });
+
+    await restoreServerSessions();
+
+    const servers = serversStore.get(serversAtom);
+    expect(servers.has("https://kotel.localhost")).toBe(true);
+    expect(servers.has("https://katel.localhost")).toBe(false);
+    expect(vi.mocked(removeServerClient)).toHaveBeenCalledWith(
+      "https://katel.localhost",
+    );
+    expect(getPersistedServerUrls()).toEqual(["https://kotel.localhost"]);
   });
 });

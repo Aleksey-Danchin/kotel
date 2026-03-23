@@ -131,7 +131,7 @@ services:
       start_period: 20s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.frontend.rule=Host(`kotel.localhost`)
+      - traefik.http.routers.frontend.rule=Host(`kotel.localhost`) || Host(`katel.localhost`)
       - traefik.http.routers.frontend.entrypoints=websecure
       - traefik.http.routers.frontend.tls=true
       - traefik.http.routers.frontend.priority=1

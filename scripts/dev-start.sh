@@ -22,23 +22,30 @@ fi
 
 MKCERT_CAROOT="$(mkcert -CAROOT)"
 CERT_DIR="${MKCERT_CAROOT}/kotel"
-CERT_FILE="${CERT_DIR}/kotel.localhost.pem"
-KEY_FILE="${CERT_DIR}/kotel.localhost-key.pem"
+mkdir -p "${CERT_DIR}"
 
-generate_cert=0
-if [[ ! -f "${CERT_FILE}" || ! -f "${KEY_FILE}" ]]; then
-  generate_cert=1
-elif ! openssl x509 -checkend 86400 -noout -in "${CERT_FILE}" >/dev/null 2>&1; then
-  generate_cert=1
-fi
+ensure_cert() {
+  local domain="$1"
+  local cert_file="${CERT_DIR}/${domain}.pem"
+  local key_file="${CERT_DIR}/${domain}-key.pem"
 
-if [[ "${generate_cert}" -eq 1 ]]; then
-  mkdir -p "${CERT_DIR}"
-  mkcert -cert-file "${CERT_FILE}" -key-file "${KEY_FILE}" kotel.localhost
-  echo "SSL certificate generated."
-else
-  echo "SSL certificate is valid."
-fi
+  local generate_cert=0
+  if [[ ! -f "${cert_file}" || ! -f "${key_file}" ]]; then
+    generate_cert=1
+  elif ! openssl x509 -checkend 86400 -noout -in "${cert_file}" >/dev/null 2>&1; then
+    generate_cert=1
+  fi
+
+  if [[ "${generate_cert}" -eq 1 ]]; then
+    mkcert -cert-file "${cert_file}" -key-file "${key_file}" "${domain}"
+    echo "SSL certificate generated for ${domain}."
+  else
+    echo "SSL certificate is valid for ${domain}."
+  fi
+}
+
+ensure_cert "kotel.localhost"
+ensure_cert "katel.localhost"
 
 export MKCERT_CAROOT
 

@@ -1,4 +1,5 @@
 import {
+  getPersistedServerUrls,
   removeServerSession,
   setServerSession,
 } from "../state/servers";
@@ -228,6 +229,48 @@ export async function removeServer(serverUrl: string): Promise<void> {
 
 export function initAuthMessageListener(): void {
   ensureMessageListener();
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  if (!("response" in error)) {
+    return false;
+  }
+
+  const response = (error as { response?: { status?: number } }).response;
+  return response?.status === 401;
+}
+
+export async function restoreServerSessions(): Promise<void> {
+  const serverUrls = getPersistedServerUrls();
+  if (serverUrls.length === 0) {
+    return;
+  }
+
+  await Promise.all(
+    serverUrls.map(async (serverUrl) => {
+      try {
+        const client = getServerClient(serverUrl);
+        const statusResponse = await client.get<SessionStatusResponse>(
+          "/api/session/status",
+        );
+        const payload = statusResponse.data;
+        setServerSession({
+          serverUrl,
+          sessionId: payload.sessionId,
+          user: payload.user,
+        });
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          removeServerSession(serverUrl);
+          removeServerClient(serverUrl);
+        }
+      }
+    }),
+  );
 }
 
 export function __resetAuthForTests(): void {

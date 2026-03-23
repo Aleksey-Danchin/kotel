@@ -28,7 +28,10 @@ No tests for these modules.
 - ROOT creates USER → success.
 - ADMIN creates USER → success.
 - ADMIN creates ADMIN → 403.
-- Nobody creates ROOT → 403.
+- Nobody creates ROOT → validation error (400).
+<CORRECTION by="step-executor" reason="contract already forbids ROOT in create dto">
+`createUserSchema` does not allow role `ROOT`, so this path fails at DTO validation with 400 before role-authorization logic.
+</CORRECTION>
 - Delete USER as ROOT → success.
 - Delete ROOT → 403.
 - Delete self → 403.
@@ -52,7 +55,10 @@ No tests for these modules.
 
 ### Rate limiter tests (`rate-limiter.spec.ts`)
 - First attempt → allowed.
-- 3 attempts → still allowed, no captcha.
+- 3 attempts → captcha required.
+<CORRECTION by="step-executor" reason="current implementation threshold behavior">
+`RateLimiter.checkLimits()` enables captcha when active IP attempts are `>= ipCaptchaThreshold - 1` (default: 3), so the 3rd failed attempt already requires captcha.
+</CORRECTION>
 - 4th attempt → captchaRequired true.
 - 7th attempt → blocked (429 reason).
 - 10 attempts for same username → blocked.

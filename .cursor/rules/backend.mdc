@@ -1,6 +1,7 @@
 ---
 description: Backend (NestJS + Prisma + Zod) conventions for apps/backend.
-globs: ["apps/backend/**"]
+globs:
+  - "apps/backend/**"
 alwaysApply: false
 ---
 

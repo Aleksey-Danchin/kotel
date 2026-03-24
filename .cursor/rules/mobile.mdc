@@ -1,6 +1,7 @@
 ---
 description: Mobile (Expo Router + SecureStore) conventions for apps/mobile.
-globs: ["apps/mobile/**"]
+globs:
+  - "apps/mobile/**"
 alwaysApply: false
 ---
 

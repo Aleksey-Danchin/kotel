@@ -1,6 +1,7 @@
 ---
 description: Infrastructure (Traefik + Docker Compose) conventions for infra/.
-globs: ["infra/**"]
+globs:
+  - "infra/**"
 alwaysApply: false
 ---
 

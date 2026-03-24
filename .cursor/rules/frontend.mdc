@@ -1,6 +1,7 @@
 ---
 description: Frontend (React + TanStack Router + Jotai) conventions for apps/frontend.
-globs: ["apps/frontend/**"]
+globs:
+  - "apps/frontend/**"
 alwaysApply: false
 ---
 
@@ -11,11 +12,11 @@ alwaysApply: false
 - TanStack Router route files live in `src/routes/`.
 - Jotai holds multi-server session state in `serversAtom` (`src/state/servers.ts`).
 - HTTP uses axios + axios-auth-refresh with per-server clients from `getServerClient(serverUrl)`.
-- SharedWorker (`src/workers/shared-refresh-worker.ts`) coordinates refresh and websocket behavior across tabs.
+- SharedWorker (`src/workers/shared-refresh-worker.ts`) coordinates refresh deduplication across tabs.
 
 ## Key Constraints
 - Import shared contracts only via `@contracts/*`.
-- Use `createServerClient` / `getServerClient` flows for API calls; avoid ad-hoc axios instances in UI components.
+- Use `getServerClient(serverUrl)` for API calls; avoid ad-hoc axios instances in UI components.
 - Refresh strategy is reactive (401 interceptor), not proactive timer-based.
 - SharedWorker must deduplicate in-flight refresh per `serverUrl` for concurrent tabs.
 - E2E uses Playwright with tests in `apps/frontend/e2e/`.

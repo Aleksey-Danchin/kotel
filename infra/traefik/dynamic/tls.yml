@@ -1,0 +1,13 @@
+tls:
+  certificates:
+    - certFile: /certs/kotel1.localhost.pem
+      keyFile: /certs/kotel1.localhost-key.pem
+    - certFile: /certs/kotel2.localhost.pem
+      keyFile: /certs/kotel2.localhost-key.pem
+    - certFile: /certs/lan-host.pem
+      keyFile: /certs/lan-host-key.pem
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/lan-host.pem
+        keyFile: /certs/lan-host-key.pem

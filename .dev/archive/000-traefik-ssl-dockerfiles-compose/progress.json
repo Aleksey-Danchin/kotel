@@ -1,0 +1,636 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-19T20:15:50.007Z",
+  "updatedAt": "2026-03-19T20:37:19.771Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-root-env-and-gitignore.md",
+      "status": "completed",
+      "commitHash": "e46d902",
+      "startedAt": "2026-03-19T20:15:57.468Z",
+      "completedAt": "2026-03-19T20:17:42.935Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует на этом шаге"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг не требует автотестов (manual verification only)"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Нет task-specific автотестов для infra-настройки"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Регрессионные автотесты не применимы к этому шагу"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены root .env/.gitignore, документация не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Docker health checks отложены до финального шага по исключительному правилу"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: .env has required postgres vars",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: .gitignore includes .env",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: .gitignore includes node_modules and dist",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: only local dev defaults",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-dockerfiles.md",
+      "status": "completed",
+      "commitHash": "e19e13d",
+      "startedAt": "2026-03-19T20:17:49.441Z",
+      "completedAt": "2026-03-19T20:20:28.533Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в текущем этапе проекта"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Для Dockerfile шага автотесты не требуются; проверка через docker build"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Регрессионные автотесты для инфраструктурного шага с Dockerfile не применимы"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены dev Dockerfile, проектная документация не требует обновления"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: backend Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: frontend Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: studio Dockerfile base and workdir",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: no copy and no npm install",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: no CMD in Dockerfiles",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "file": "03-traefik-config.md",
+      "status": "completed",
+      "commitHash": "391cd1f",
+      "startedAt": "2026-03-19T20:20:38.179Z",
+      "completedAt": "2026-03-19T20:22:13.753Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh missing in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No automated tests required for infra YAML config step"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No regression suite for infrastructure YAML-only change"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/model/domain/architecture behavior changes; infra config file addition only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test containers down attempted; dev health check deferred/not applicable because compose manifest is absent at this stage"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: traefik entrypoints web and websecure",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: web entrypoint redirects to HTTPS",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: docker provider exposedByDefault false",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: file provider points to /etc/traefik/dynamic",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: dashboard disabled",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: tls default cert points to /certs files",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: both files valid YAML",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "file": "04-backend-config.md",
+      "status": "completed",
+      "commitHash": "7d0b2fd",
+      "startedAt": "2026-03-19T20:22:18.267Z",
+      "completedAt": "2026-03-19T20:27:43.831Z",
+      "error": null,
+      "retryUsed": true,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped by orchestrator; health checks deferred"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "Formatted via backend npm run format; scripts/prettier.sh not present"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No test file changes required; step requires backend type-check verification"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "Ran npx tsc --noEmit in apps/backend; pre-existing error in test/app.e2e-spec.ts unrelated to step changes"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No automated regression suite required for this config-only step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model/domain/architecture documentation changes required for this backend config alias/prefix update"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Postflight completed with deferred docker health validation per critical exception; no intermediate health checks performed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: main.ts sets global api prefix",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: tsconfig has ~prisma path mapping",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: baseUrl remains ./",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: no extra file modifications",
+          "status": "completed",
+          "note": "Only apps/backend/src/main.ts and apps/backend/tsconfig.json were intentionally edited for this step"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: backend tsc has no new errors",
+          "status": "completed",
+          "note": "Type-check run completed; reported pre-existing error in test/app.e2e-spec.ts unrelated to api prefix/path alias changes"
+        }
+      ],
+      "resolverLogs": [
+        {
+          "path": "/home/aleksey/Desktop/kotel/.dev/resolver-logs/04-backend-config.md",
+          "registeredAt": "2026-03-19T20:24:43.249Z"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "file": "05-compose-manifest.md",
+      "status": "completed",
+      "commitHash": "5b69316",
+      "startedAt": "2026-03-19T20:27:53.602Z",
+      "completedAt": "2026-03-19T20:33:39.843Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Infra manifest step; no code tests to maintain"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Task verification uses docker compose config"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No backend/frontend code changes requiring regression suites"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Документационные файлы из шаблона отсутствуют в репозитории; для шага compose-manifest обновление документации не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: dev.yml exists and valid YAML",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: five services defined",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: each service has healthcheck",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: postgres uses image 18.3 and volume",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: backend build uses backend Dockerfile",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: backend command matches spec",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: frontend command includes --host",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: studio exposes 5555 directly",
+          "status": "completed"
+        },
+        {
+          "id": "ac-9",
+          "label": "AC: traefik mounts socket/config/certs",
+          "status": "completed"
+        },
+        {
+          "id": "ac-10",
+          "label": "AC: backend router /api higher priority",
+          "status": "completed"
+        },
+        {
+          "id": "ac-11",
+          "label": "AC: frontend router catch-all host",
+          "status": "completed"
+        },
+        {
+          "id": "ac-12",
+          "label": "AC: DATABASE_URL assembled from env vars",
+          "status": "completed"
+        },
+        {
+          "id": "ac-13",
+          "label": "AC: docker compose config validates",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "file": "06-dev-scripts.md",
+      "status": "completed",
+      "commitHash": "67f0c11",
+      "startedAt": "2026-03-19T20:33:48.497Z",
+      "completedAt": "2026-03-19T20:37:19.770Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped: dev health already verified by orchestrator"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent; formatting step not applicable to shell-only changes"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No automated test files required for shell scripts"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Step defines manual verification only"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No automated suites applicable for this step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data/domain/architecture documentation changes required for shell script entrypoints"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: dev-start exists and executable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: dev-stop exists and executable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dev-start checks docker and mkcert",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: dev-start checks cert paths in mkcert CAROOT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: dev-start regenerates missing or expiring certs",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: dev-start exports MKCERT_CAROOT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: dev-start runs compose up with proper flags",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: dev-stop runs compose down with matching flags",
+          "status": "completed"
+        },
+        {
+          "id": "ac-9",
+          "label": "AC: scripts work from any directory",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

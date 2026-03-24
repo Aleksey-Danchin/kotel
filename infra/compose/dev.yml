@@ -1,0 +1,252 @@
+name: kotel
+
+services:
+  postgres:
+    image: postgres:18.3
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - kotel-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  postgres-2:
+    image: postgres:18.3
+    container_name: kotel-postgres-2
+    environment:
+      POSTGRES_DB: ${POSTGRES2_DB:-kotel2}
+      POSTGRES_USER: ${POSTGRES2_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES2_PASSWORD:-postgres}
+    volumes:
+      - postgres2-data:/var/lib/postgresql
+    networks:
+      - kotel-net
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES2_USER:-postgres} -d ${POSTGRES2_DB:-kotel2}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.backend.dev
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - PORT=3000
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN:-kotel1.localhost}
+      - REUSE_DETECTION_MODE=${REUSE_DETECTION_MODE:-quarantine}
+      - RECOMMENDED_CLIENT_URL=${RECOMMENDED_CLIENT_URL:-https://kotel1.localhost}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    networks:
+      - kotel-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`kotel1.localhost`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend.entrypoints=websecure
+      - traefik.http.routers.backend.tls=true
+      - traefik.http.routers.backend.priority=100
+      - traefik.http.routers.backend-lan-api.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-lan-api.entrypoints=api1
+      - traefik.http.routers.backend-lan-api.tls=true
+      - traefik.http.routers.backend-lan-api.priority=100
+      - traefik.http.routers.backend-lan-api-http.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-lan-api-http.entrypoints=api1
+      - traefik.http.routers.backend-lan-api-http.priority=90
+      - traefik.http.services.backend.loadbalancer.server.port=3000
+
+  backend-2:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.backend.dev
+    container_name: kotel-backend-2
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES2_USER:-postgres}:${POSTGRES2_PASSWORD:-postgres}@postgres-2:5432/${POSTGRES2_DB:-kotel2}
+      - PORT=3000
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN_2:-kotel2.localhost}
+      - REUSE_DETECTION_MODE=${REUSE_DETECTION_MODE:-quarantine}
+      - RECOMMENDED_CLIENT_URL=${RECOMMENDED_CLIENT_URL_2:-https://kotel1.localhost}
+    networks:
+      - kotel-net
+    depends_on:
+      postgres-2:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend-2-api.rule=Host(`kotel2.localhost`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend-2-api.entrypoints=websecure
+      - traefik.http.routers.backend-2-api.tls=true
+      - traefik.http.routers.backend-2-api.priority=100
+      - traefik.http.routers.backend-2-wellknown.rule=Host(`kotel2.localhost`) && PathPrefix(`/.well-known`)
+      - traefik.http.routers.backend-2-wellknown.entrypoints=websecure
+      - traefik.http.routers.backend-2-wellknown.tls=true
+      - traefik.http.routers.backend-2-wellknown.priority=100
+      - traefik.http.routers.backend-2-lan-api.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-2-lan-api.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-api.tls=true
+      - traefik.http.routers.backend-2-lan-api.priority=100
+      - traefik.http.routers.backend-2-lan-api-http.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-2-lan-api-http.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-api-http.priority=90
+      - traefik.http.routers.backend-2-lan-wellknown.rule=PathPrefix(`/.well-known`)
+      - traefik.http.routers.backend-2-lan-wellknown.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-wellknown.tls=true
+      - traefik.http.routers.backend-2-lan-wellknown.priority=100
+      - traefik.http.routers.backend-2-lan-wellknown-http.rule=PathPrefix(`/.well-known`)
+      - traefik.http.routers.backend-2-lan-wellknown-http.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-wellknown-http.priority=90
+      - traefik.http.services.backend-2.loadbalancer.server.port=3000
+
+  frontend:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.frontend.dev
+    command: npx vite --host
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/frontend
+    networks:
+      - kotel-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5173 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend.rule=Host(`kotel1.localhost`) || Host(`kotel2.localhost`)
+      - traefik.http.routers.frontend.entrypoints=websecure
+      - traefik.http.routers.frontend.tls=true
+      - traefik.http.routers.frontend.priority=1
+      - traefik.http.services.frontend.loadbalancer.server.port=5173
+
+  mobile:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.mobile.dev
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/mobile
+    environment:
+      - EXPO_PUBLIC_API_BASE_URL=${EXPO_PUBLIC_API_BASE_URL:?EXPO_PUBLIC_API_BASE_URL is required}
+      - EXPO_PUBLIC_API_HOST_HEADER=${EXPO_PUBLIC_API_HOST_HEADER:-}
+      - REACT_NATIVE_PACKAGER_HOSTNAME=${HOST_IP:?HOST_IP is required}
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - EXPO_PACKAGER_PROXY_URL=http://${HOST_IP:?HOST_IP is required}:8081
+    stdin_open: true
+    tty: true
+    ports:
+      - "8081:8081"
+      - "19000:19000"
+      - "19001:19001"
+      - "19002:19002"
+    networks:
+      - kotel-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/status | grep -q running || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    labels:
+      - traefik.enable=false
+
+  studio:
+    build:
+      context: ${PROJECT_ROOT:?PROJECT_ROOT is required}
+      dockerfile: infra/docker/Dockerfile.studio.dev
+    command: sh -c "npx prisma migrate deploy && npx prisma studio --browser none --port 5555"
+    volumes:
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/apps:/apps
+    working_dir: /apps/prisma
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    ports:
+      - "5555:5555"
+    networks:
+      - kotel-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5555 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    labels:
+      - traefik.enable=false
+
+  traefik:
+    image: traefik:v3
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ${PROJECT_ROOT:?PROJECT_ROOT is required}/infra/traefik/dynamic:/etc/traefik/dynamic:ro
+      - ${MKCERT_CAROOT:-${HOME}/.local/share/mkcert}/kotel:/certs:ro
+    networks:
+      - kotel-net
+    depends_on:
+      backend:
+        condition: service_healthy
+      backend-2:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget --spider -q http://localhost:8082/ping || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  postgres2-data:
+
+networks:
+  kotel-net:

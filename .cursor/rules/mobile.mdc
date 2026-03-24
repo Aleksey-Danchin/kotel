@@ -1,0 +1,30 @@
+---
+description: Mobile (Expo Router + SecureStore) conventions for apps/mobile.
+globs:
+  - "apps/mobile/**"
+alwaysApply: false
+---
+
+# Mobile Conventions
+
+## Stack
+- Expo + Expo Router; screens in `app/`.
+- HTTP uses axios + axios-auth-refresh; server clients in `src/api/create-server-client.ts`.
+- Tokens persist in `expo-secure-store`.
+- OAuth browser flow uses `expo-web-browser` and deep links via `expo-linking`.
+- PKCE helpers use `expo-crypto`.
+
+## Key Constraints
+- OAuth login uses `WebBrowser.openAuthSessionAsync`; `app/auth/callback.tsx` is a redirect stub.
+- App deep-link callback is `kotel://auth/callback` (scheme `kotel` in `app.json`).
+- SecureStore keys are scoped per server URL (`accessToken:<serverUrl>`, `refreshToken:<serverUrl>`).
+- API auth uses `Authorization: Bearer <accessToken>` headers (no cookie-based auth on mobile).
+- `toMobileNetworkUrl(serverUrl)` may downgrade `https://` to `http://` for IPv4 LAN/dev use; no downgrade for production hostnames.
+- Expo E2E automation is out of scope; follow manual testing in `apps/mobile/README.md`.
+
+## Documentation
+- Mobile OAuth flow: `docs/auth/oauth-flow.md`
+- Token storage (Expo): `docs/auth/tokens.md`
+- Known limitation (HTTP downgrade): `docs/auth/overview.md`
+- Manual test runbook: `apps/mobile/README.md`
+- Stack overview: `docs/STACK.md`

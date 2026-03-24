@@ -8,11 +8,12 @@
 
 Исключён **stateless JWT** — когда сервер доверяет токену только по подписи без проверки в БД. Такой токен нельзя отозвать мгновенно.
 
-Оба токена — stateful CUID. Клиент не читает токены напрямую (они в httpOnly cookie).
+Оба токена — stateful случайные строки (`randomBytes(32).toString('hex')`, 64 hex-символа).
+Клиент не читает web-токены напрямую (они в httpOnly cookie).
 
 ```
-accessToken:  CUID, 15 минут  — httpOnly cookie, Path=/api/
-refreshToken: CUID, 30 дней   — httpOnly cookie, Path=/api/session/refresh
+accessToken:  random hex string, 15 минут  — httpOnly cookie, Path=/api/
+refreshToken: random hex string, 30 дней   — httpOnly cookie, Path=/api/session/refresh
 ```
 
 Токены обновляются реактивно через 401-interceptor — проактивный планировщик не нужен. `expiresAt` сервер может возвращать опционально для нужд UI.
@@ -50,22 +51,14 @@ expired  — истёк refreshTokenExpiresAt
 revoked  — отозвана явно: logout, атака, администратор
 ```
 
-**Инфраструктурный обход истёкших сессий**
+**Очистка истёкших сессий**
 
-```yaml
-maintenance:
-  expired_sessions_cleanup: "0 0 * * *"
-  timezone: "Europe/Moscow"
-```
+```text
+В коде cleanup запускается:
+- при старте backend (`onModuleInit`)
+- далее по интервалу 1 час (`setInterval`)
 
-```sql
-UPDATE sessions
-SET
-  status        = 'expired',
-  noActiveAt    = NOW(),
-  noActiveReason = 'expired'
-WHERE status = 'active'
-  AND refreshTokenExpiresAt < NOW()
+Критерий: status = ACTIVE и refreshTokenExpiresAt < now
 ```
 
 ---
@@ -130,7 +123,7 @@ const { accessToken, refreshToken, sessionId } = await response.json()
 GET /api/session/status
   credentials: include (web) / Authorization: Bearer (expo)
 
-→ 200 { sessionId }   — сессия живая
+→ 200 { sessionId, user }   — сессия живая
 → 401                 — токен истёк → refresh → повторить
 ```
 
@@ -138,7 +131,7 @@ GET /api/session/status
 
 ```
 redirect_uri начинается с https://  → clientType = "web"
-redirect_uri начинается с kotel:// → clientType = "expo"
+иначе (в текущем коде)             → clientType = "expo"
 ```
 
 ### Проверка канала доставки

@@ -6,9 +6,13 @@
 
 ### Базовый уровень — fingerprint сессии
 
-При выдаче токена сервер записывает `redirect_uri` как часть сессии. Запросы с несовпадающим Origin логируются как аномалия и переводят сессию в режим настороженности. Для state-changing эндпоинтов (refresh, logout) несовпадение Origin должно приводить к отклонению запроса.
+При выдаче токена сервер сохраняет `fingerprint = origin(redirect_uri)` в сессии.
+На защищенных маршрутах:
+- если `Origin/Referer` совпадает с fingerprint или отсутствует — запрос продолжается;
+- если не совпадает и это `GET` — пишется warning в лог;
+- если не совпадает и это non-`GET` — запрос отклоняется (`403`).
 
-### Продвинутый уровень — DPoP (RFC 9449)
+### Продвинутый уровень — DPoP (RFC 9449, planned)
 
 Криптографическая привязка токена к конкретному браузеру/клиенту. Украденный токен без приватного ключа бесполезен.
 
@@ -20,15 +24,14 @@ const keyPair = await crypto.subtle.generateKey(
 )
 ```
 
-Сервер при каждом запросе проверяет: токен валиден + подпись соответствует публичному ключу привязанному к этому токену.
-
-> DPoP рекомендуется отложить на более поздний этап разработки.
+Сейчас в коде DPoP не реализован. Это отложенное улучшение.
 
 ---
 
 ## Режим настороженности
 
-Определяет поведение сервера при срабатывании Reuse Detection. Настраивается администратором.
+Определяет поведение сервера при `Reuse Detection` и `Channel mismatch`.
+Настраивается через env `REUSE_DETECTION_MODE`.
 
 ```
 Отладка    — только логируем инцидент
@@ -37,13 +40,10 @@ const keyPair = await crypto.subtle.generateKey(
 Локдаун    — всё как в Карантине + блокировка аккаунта
 ```
 
-**Конфиг:**
+**Конфиг (текущий):**
 
-```yaml
-security:
-  reuse_detection_mode: quarantine
-  notify_admin: true
-  notify_user: true
+```bash
+REUSE_DETECTION_MODE=quarantine
 ```
 
 ---
@@ -52,16 +52,12 @@ security:
 
 Защита от брутфорса при вводе пароля. Два независимых счётчика работают одновременно.
 
-```yaml
-security:
-  rate_limiting:
-    window: 15m
-    ip_captcha_threshold: 4
-    ip_block_threshold: 7
-    ip_block_duration: 15m
-    username_block_threshold: 10
-    username_block_duration: 15m
-    captcha_delay: 5s
+```text
+RATE_LIMIT_WINDOW_SECONDS=900                # default 15m
+RATE_LIMIT_IP_CAPTCHA_THRESHOLD=4
+RATE_LIMIT_IP_BLOCK_THRESHOLD=7
+RATE_LIMIT_USERNAME_BLOCK_THRESHOLD=10
+captcha delay: 5s (фиксировано в коде)
 ```
 
 При попытках 4-6 сервер также возвращает `captchaRequired: true` в `401`, чтобы клиент мог показать CAPTCHA-челлендж.

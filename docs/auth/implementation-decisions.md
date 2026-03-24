@@ -50,7 +50,7 @@
 
 ### 8) Login page delivery: static HTML from backend
 
-**Решение:** страница логина обслуживается backend-ом как статический HTML (NestJS `ServeStaticModule`), MVP без стилизации.  
+**Решение:** страница логина обслуживается backend-ом как HTML-файл из `src/auth/login-page/login.html` (чтение файла в `AuthController`), MVP без стилизации.  
 **Связано с:** разделом [Маршруты API](./oauth-flow.md#маршруты-api).  
 **Почему:** минимизирует сложность и ускоряет поставку OAuth entrypoint.
 
@@ -82,6 +82,6 @@
 
 ### 13) Two-server dev environment
 
-**Решение:** локальная разработка поддерживает два сервера одновременно: `kotel.localhost` и `katel.localhost`, каждый со своим PostgreSQL и backend, при общем Traefik и одном frontend.  
+**Решение:** локальная разработка поддерживает два сервера одновременно: `kotel1.localhost` и `kotel2.localhost`, каждый со своим PostgreSQL и backend, при общем Traefik и одном frontend.  
 **Связано с:** разделом [Деплой сервера](./clients.md#деплой-сервера).  
 **Почему:** позволяет проверять мультисерверные пользовательские сценарии в реальном dev-контуре.

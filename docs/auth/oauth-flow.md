@@ -15,7 +15,7 @@
 4. serverA редиректит popup обратно на клиент с code
 5. Callback страница клиента передаёт code через postMessage
 6. Клиент проверяет state, обменивает code на токены
-7. Сервер устанавливает токены в httpOnly cookie
+7. Сервер для `WEB` выставляет httpOnly cookie, для `EXPO` возвращает токены в JSON
 ```
 
 **Пример открытия popup с PKCE + state:**
@@ -137,16 +137,21 @@ import * as Crypto from "expo-crypto"
 
 ## Маршруты API
 
-Все эндпоинты под единым префиксом `/api/`. Middleware проверки accessToken применяется ко всему `/api/*` кроме публичных маршрутов.
+Почти все эндпоинты под префиксом `/api/`. Исключение: `GET /.well-known/client` (без `/api`).
+Проверка accessToken выполняется глобальным guard-ом для непубличных маршрутов.
 
 ```
 Публичные (без accessToken):
   GET  /api/auth/login
+  POST /api/auth/login
   POST /api/auth/token
+  POST /api/session/refresh
+  GET  /api/setup/status
+  POST /api/setup/init
+  GET  /.well-known/client
 
 Приватные (требуют accessToken):
   GET  /api/session/status
-  POST /api/session/refresh
   POST /api/session/logout
   GET  /api/admin/users
   POST /api/admin/users

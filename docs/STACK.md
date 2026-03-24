@@ -116,6 +116,8 @@ kotel/
 Общие Zod-контракты импортируются через `@contracts/*`, что дает единые request/response схемы без runtime-сцепления приложений.  
 Детали концепции и потоков: [auth overview](./auth/overview.md) и [auth clients](./auth/clients.md).
 
+Примечание по текущему состоянию: часть web E2E и unit-тестов все еще использует legacy URL-ы `https://kotel.localhost` / `https://katel.localhost` в тестовых данных, тогда как dev-инфраструктура в `infra/compose/dev.yml` маршрутизирует `kotel1.localhost` / `kotel2.localhost`.
+
 ## 6) Тестовые окружения
 
 - **Unit/integration:** Vitest. Backend-тесты запускаются в Docker-окружении из `infra/compose/test.yml`. Базовое обязательное окружение для сессий: `TEST_SESSION_COOKIE_DOMAIN`.

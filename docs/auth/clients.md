@@ -10,7 +10,7 @@
 - HTTP клиент: `axios` + `axios-auth-refresh`
 - Авторизация через popup окно с PKCE + state
 - Хранение токенов: httpOnly cookie
-- SharedWorker координирует refresh между вкладками и держит единое WebSocket подключение
+- SharedWorker координирует refresh между вкладками (дедупликация `POST /api/session/refresh`)
 - Параллельные независимые сессии к N серверам
 
 ### Expo (mobile)
@@ -26,9 +26,9 @@
 
 ```javascript
 sessions: {
-  "https://serverA.com": { sessionId: "cuid_abc", user: { ... } },
-  "https://serverB.com": { sessionId: "cuid_xyz", user: { ... } },
-  "https://serverC.com": { sessionId: "cuid_qwe", user: { ... } }
+  "https://serverA.com": { sessionId: "550e8400-e29b-41d4-a716-446655440000", user: { ... } },
+  "https://serverB.com": { sessionId: "b6b61fe4-6bb5-4934-8f08-71f9d23891f1", user: { ... } },
+  "https://serverC.com": { sessionId: "0ef39a9e-fc84-4cd0-a5a9-9f1f67d4f125", user: { ... } }
 }
 ```
 
@@ -53,17 +53,14 @@ GET https://serverA.com/.well-known/client
 
 **HTTPS обязателен** — `SameSite=None; Secure` cookie не работает на HTTP.
 
-**First-run validation** — сервер при старте проверяет секреты. Если `SECRET_KEY` не изменён — не стартует.
+**First-run setup** — инициализация выполняется через API:
 
-```yaml
-services:
-  messenger:
-    image: yourmessenger/server:latest
-    environment:
-      - SECRET_KEY=
+```text
+GET  /api/setup/status  -> { available: boolean }
+POST /api/setup/init    -> создаёт первого пользователя с ролью ROOT (одноразово)
 ```
 
-Администратор — обычный пользователь с ролью `admin`.
+Администраторская модель в коде: `USER`, `ADMIN`, `ROOT`.
 
 **Dev окружение**
 
@@ -71,5 +68,6 @@ services:
 
 ```bash
 mkcert -install
-mkcert kotel.localhost
+mkcert kotel1.localhost
+mkcert kotel2.localhost
 ```

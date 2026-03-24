@@ -26,6 +26,7 @@ async function addServerViaOAuth(
   await expect.poll(() => popup.isClosed()).toBe(true);
 }
 
+// → docs/scenarios/web-setup/001-setup-init.md
 test("setup page supports init lockout and OAuth login", async ({ page }) => {
   await page.goto("/setup");
   await expect(

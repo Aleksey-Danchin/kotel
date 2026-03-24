@@ -18,11 +18,20 @@
         <button type="submit">Submit</button>
       </form>
       <p id="error" role="alert"></p>
+      <p id="status"></p>
+      <p id="continue" style="display: none">
+        Continue in app:
+        <a id="continue-link" href="#">Open callback</a>
+      </p>
     </main>
 
     <script>
       const form = document.getElementById('login-form');
       const errorElement = document.getElementById('error');
+      const statusElement = document.getElementById('status');
+      const continueContainer = document.getElementById('continue');
+      const continueLink = document.getElementById('continue-link');
+      const submitButton = form.querySelector('button[type="submit"]');
 
       const params = new URLSearchParams(window.location.search);
       const redirectUri = params.get('redirect_uri');
@@ -33,6 +42,9 @@
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         errorElement.textContent = '';
+        statusElement.textContent = 'Signing in...';
+        continueContainer.style.display = 'none';
+        submitButton.disabled = true;
 
         const formData = new FormData(form);
         const login = formData.get('login');
@@ -56,17 +68,31 @@
 
           if (!response.ok) {
             errorElement.textContent = payload.message ?? 'Login failed';
+            statusElement.textContent = '';
+            submitButton.disabled = false;
             return;
           }
 
           if (payload.redirect) {
-            window.location.href = payload.redirect;
+            continueLink.href = payload.redirect;
+            continueContainer.style.display = 'block';
+            statusElement.textContent = 'Redirecting to app...';
+            window.location.assign(payload.redirect);
+            setTimeout(() => {
+              statusElement.textContent =
+                'If app did not open automatically, tap "Open callback".';
+              submitButton.disabled = false;
+            }, 1200);
             return;
           }
 
           errorElement.textContent = 'Login failed';
+          statusElement.textContent = '';
+          submitButton.disabled = false;
         } catch (error) {
           errorElement.textContent = 'Request failed';
+          statusElement.textContent = '';
+          submitButton.disabled = false;
         }
       });
     </script>

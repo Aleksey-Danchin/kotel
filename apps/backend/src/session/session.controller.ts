@@ -30,13 +30,14 @@ export class SessionController {
   @Get('status')
   getStatus(@Req() request: AuthenticatedRequest): {
     sessionId: string;
-    user: { id: string; fullname: string; role: string };
+    user: { id: string; fullname: string; login: string; role: string };
   } {
     return {
       sessionId: request.session.sessionId,
       user: {
         id: request.user.id,
         fullname: request.user.fullname,
+        login: request.user.login,
         role: request.user.role,
       },
     };

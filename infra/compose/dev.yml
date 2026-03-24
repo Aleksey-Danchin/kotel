@@ -79,6 +79,9 @@ services:
       - traefik.http.routers.backend-lan-api.entrypoints=api1
       - traefik.http.routers.backend-lan-api.tls=true
       - traefik.http.routers.backend-lan-api.priority=100
+      - traefik.http.routers.backend-lan-api-http.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-lan-api-http.entrypoints=api1
+      - traefik.http.routers.backend-lan-api-http.priority=90
       - traefik.http.services.backend.loadbalancer.server.port=3000
 
   backend-2:
@@ -121,10 +124,16 @@ services:
       - traefik.http.routers.backend-2-lan-api.entrypoints=api2
       - traefik.http.routers.backend-2-lan-api.tls=true
       - traefik.http.routers.backend-2-lan-api.priority=100
+      - traefik.http.routers.backend-2-lan-api-http.rule=PathPrefix(`/api`)
+      - traefik.http.routers.backend-2-lan-api-http.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-api-http.priority=90
       - traefik.http.routers.backend-2-lan-wellknown.rule=PathPrefix(`/.well-known`)
       - traefik.http.routers.backend-2-lan-wellknown.entrypoints=api2
       - traefik.http.routers.backend-2-lan-wellknown.tls=true
       - traefik.http.routers.backend-2-lan-wellknown.priority=100
+      - traefik.http.routers.backend-2-lan-wellknown-http.rule=PathPrefix(`/.well-known`)
+      - traefik.http.routers.backend-2-lan-wellknown-http.entrypoints=api2
+      - traefik.http.routers.backend-2-lan-wellknown-http.priority=90
       - traefik.http.services.backend-2.loadbalancer.server.port=3000
 
   frontend:

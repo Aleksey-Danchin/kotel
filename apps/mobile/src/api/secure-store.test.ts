@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  saveTokens,
+} from "@/src/api/secure-store";
+
 const secureStoreMock = vi.hoisted(() => ({
   setItemAsync: vi.fn(),
   getItemAsync: vi.fn(),
@@ -7,13 +14,6 @@ const secureStoreMock = vi.hoisted(() => ({
 }));
 
 vi.mock("expo-secure-store", () => secureStoreMock);
-
-import {
-  clearTokens,
-  getAccessToken,
-  getRefreshToken,
-  saveTokens,
-} from "@/src/api/secure-store";
 
 describe("secure-store token helpers", () => {
   beforeEach(() => {
@@ -24,16 +24,20 @@ describe("secure-store token helpers", () => {
     await saveTokens("https://kotel.localhost", "access", "refresh");
 
     expect(secureStoreMock.setItemAsync).toHaveBeenCalledTimes(2);
+    const firstKey = secureStoreMock.setItemAsync.mock.calls[0]?.[0];
+    const secondKey = secureStoreMock.setItemAsync.mock.calls[1]?.[0];
     expect(secureStoreMock.setItemAsync).toHaveBeenNthCalledWith(
       1,
-      "https://kotel.localhost_accessToken",
+      firstKey,
       "access",
     );
     expect(secureStoreMock.setItemAsync).toHaveBeenNthCalledWith(
       2,
-      "https://kotel.localhost_refreshToken",
+      secondKey,
       "refresh",
     );
+    expect(firstKey).toMatch(/^server_[0-9a-f]+_accessToken$/);
+    expect(secondKey).toMatch(/^server_[0-9a-f]+_refreshToken$/);
   });
 
   it("reads tokens from secure store using matching keys", async () => {
@@ -45,27 +49,35 @@ describe("secure-store token helpers", () => {
 
     expect(accessToken).toBe("access-value");
     expect(refreshToken).toBe("refresh-value");
+    const firstKey = secureStoreMock.getItemAsync.mock.calls[0]?.[0];
+    const secondKey = secureStoreMock.getItemAsync.mock.calls[1]?.[0];
     expect(secureStoreMock.getItemAsync).toHaveBeenNthCalledWith(
       1,
-      "https://kotel.localhost_accessToken",
+      firstKey,
     );
     expect(secureStoreMock.getItemAsync).toHaveBeenNthCalledWith(
       2,
-      "https://kotel.localhost_refreshToken",
+      secondKey,
     );
+    expect(firstKey).toMatch(/^server_[0-9a-f]+_accessToken$/);
+    expect(secondKey).toMatch(/^server_[0-9a-f]+_refreshToken$/);
   });
 
   it("clears both tokens for a server", async () => {
     await clearTokens("https://kotel.localhost");
 
     expect(secureStoreMock.deleteItemAsync).toHaveBeenCalledTimes(2);
+    const firstKey = secureStoreMock.deleteItemAsync.mock.calls[0]?.[0];
+    const secondKey = secureStoreMock.deleteItemAsync.mock.calls[1]?.[0];
     expect(secureStoreMock.deleteItemAsync).toHaveBeenNthCalledWith(
       1,
-      "https://kotel.localhost_accessToken",
+      firstKey,
     );
     expect(secureStoreMock.deleteItemAsync).toHaveBeenNthCalledWith(
       2,
-      "https://kotel.localhost_refreshToken",
+      secondKey,
     );
+    expect(firstKey).toMatch(/^server_[0-9a-f]+_accessToken$/);
+    expect(secondKey).toMatch(/^server_[0-9a-f]+_refreshToken$/);
   });
 });

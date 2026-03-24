@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import {
   FlatList,
   Pressable,
@@ -30,6 +31,14 @@ type TokenPreview = {
   refresh: string | null;
 };
 
+const SESSIONS_STORE_KEY = "mobile_sessions_v1";
+const ACTIVE_SERVER_STORE_KEY = "mobile_active_server_v1";
+
+type PersistedSessionState = {
+  sessions: MobileServerSession[];
+  activeServerUrl: string | null;
+};
+
 function truncateToken(value: string | null): string {
   if (!value) {
     return "нет токена";
@@ -39,21 +48,155 @@ function truncateToken(value: string | null): string {
 }
 
 function normalizeServerUrl(value: string): string {
-  return value.trim();
+  const raw = value.trim();
+  if (!raw) {
+    return raw;
+  }
+
+  const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`;
+  const parsed = new URL(withScheme);
+  const isIpv4Host = /^(\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
+
+  // For LAN convenience: "192.168.x.x" becomes https://192.168.x.x:3001
+  // and API path is added later by request methods.
+  if (isIpv4Host && !parsed.port) {
+    parsed.port = "3001";
+  }
+
+  if (parsed.pathname === "/api" || parsed.pathname === "/api/") {
+    parsed.pathname = "/";
+  }
+
+  return parsed.toString().replace(/\/$/, "");
 }
 
 export default function SessionTestScreen() {
   const [serversMap, setServersMap] = useAtom(serversAtom);
-  const [, setActiveServerUrl] = useAtom(activeServerUrlAtom);
+  const [activeServerUrl, setActiveServerUrl] = useAtom(activeServerUrlAtom);
   const servers = useMemo(() => Array.from(serversMap.values()), [serversMap]);
   const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isBusyByServer, setIsBusyByServer] = useState<Record<string, boolean>>({});
   const [statusByServer, setStatusByServer] = useState<
     Record<string, MobileSessionStatusResponse | null>
   >({});
   const [tokensByServer, setTokensByServer] = useState<Record<string, TokenPreview>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function hydrateState() {
+      try {
+        const [rawSessions, rawActiveServer] = await Promise.all([
+          SecureStore.getItemAsync(SESSIONS_STORE_KEY),
+          SecureStore.getItemAsync(ACTIVE_SERVER_STORE_KEY),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (rawSessions) {
+          const parsed = JSON.parse(rawSessions) as PersistedSessionState["sessions"];
+          if (Array.isArray(parsed)) {
+            const nextMap = new Map<string, MobileServerSession>();
+            for (const session of parsed) {
+              if (session && typeof session.serverUrl === "string") {
+                nextMap.set(session.serverUrl, session);
+              }
+            }
+            setServersMap(nextMap);
+          }
+        }
+
+        if (rawActiveServer) {
+          setActiveServerUrl(rawActiveServer);
+        }
+      } catch (hydrateError) {
+        console.error("[SessionTest:hydrate] failed", hydrateError);
+      } finally {
+        if (isMounted) {
+          setIsHydrated(true);
+        }
+      }
+    }
+
+    void hydrateState();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [setActiveServerUrl, setServersMap]);
+
+  useEffect(() => {
+    if (!isHydrated) {
+      return;
+    }
+
+    const persistState = async () => {
+      try {
+        await SecureStore.setItemAsync(
+          SESSIONS_STORE_KEY,
+          JSON.stringify(Array.from(serversMap.values())),
+        );
+        await SecureStore.setItemAsync(
+          ACTIVE_SERVER_STORE_KEY,
+          activeServerUrl ?? "",
+        );
+      } catch (persistError) {
+        console.error("[SessionTest:persist] failed", persistError);
+      }
+    };
+
+    void persistState();
+  }, [activeServerUrl, isHydrated, serversMap]);
+
+  useEffect(() => {
+    if (!isHydrated || serversMap.size === 0) {
+      return;
+    }
+
+    let cancelled = false;
+    const urlsToRefresh = Array.from(serversMap.keys());
+
+    const backfillSessions = async () => {
+      for (const targetServerUrl of urlsToRefresh) {
+        try {
+          const status = await getMobileSessionStatus(targetServerUrl);
+          if (cancelled) {
+            return;
+          }
+          setServersMap((current) => {
+            const existing = current.get(targetServerUrl);
+            if (!existing) {
+              return current;
+            }
+            const next = new Map(current);
+            next.set(targetServerUrl, {
+              ...existing,
+              sessionId: status.sessionId,
+              user: {
+                id: status.user.id,
+                fullname: status.user.fullname,
+                role: status.user.role,
+              },
+            });
+            return next;
+          });
+        } catch {
+          // Keep existing persisted data if background refresh failed.
+        }
+      }
+    };
+
+    void backfillSessions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isHydrated, serversMap, setServersMap]);
 
   async function onAddServer() {
     const normalizedServerUrl = normalizeServerUrl(serverUrl);
@@ -72,7 +215,6 @@ export default function SessionTestScreen() {
         user: {
           id: status.user.id,
           fullname: status.user.fullname,
-          login: "",
           role: status.user.role,
         },
       };
@@ -148,7 +290,6 @@ export default function SessionTestScreen() {
           user: {
             id: status.user.id,
             fullname: status.user.fullname,
-            login: status.user.login ?? existing.user.login,
             role: status.user.role,
           },
         });
@@ -198,7 +339,7 @@ export default function SessionTestScreen() {
       <ThemedView style={styles.serverCard}>
         <ThemedText type="defaultSemiBold">{item.serverUrl}</ThemedText>
         <ThemedText>
-          {item.user.fullname} ({item.user.login || "no-login"}) - {item.user.role}
+          {item.user.fullname} - {item.user.role}
         </ThemedText>
         <ThemedText style={styles.metaText}>sessionId: {item.sessionId}</ThemedText>
         {status ? (
@@ -274,7 +415,7 @@ export default function SessionTestScreen() {
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
-          placeholder="https://kotel.localhost"
+          placeholder="192.168.31.186 (or full URL)"
           style={styles.input}
           value={serverUrl}
           onChangeText={setServerUrl}
@@ -300,14 +441,15 @@ export default function SessionTestScreen() {
         renderItem={renderServer}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={<ThemedText>Серверы не подключены.</ThemedText>}
+        ListFooterComponent={
+          <ThemedView style={styles.rawStateCard}>
+            <ThemedText type="defaultSemiBold">Raw state</ThemedText>
+            <ThemedText style={styles.rawStateText}>
+              {JSON.stringify(Array.from(serversMap.entries()), null, 2)}
+            </ThemedText>
+          </ThemedView>
+        }
       />
-
-      <ThemedView style={styles.rawStateCard}>
-        <ThemedText type="defaultSemiBold">Raw state</ThemedText>
-        <ThemedText style={styles.rawStateText}>
-          {JSON.stringify(Array.from(serversMap.entries()), null, 2)}
-        </ThemedText>
-      </ThemedView>
     </ThemedView>
   );
 }

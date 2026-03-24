@@ -3,7 +3,6 @@ import { atom } from "jotai";
 export type MobileServerUser = {
   id: string;
   fullname: string;
-  login: string;
   role: string;
 };
 

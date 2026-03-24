@@ -1,9 +1,10 @@
 import * as Crypto from "expo-crypto";
+import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
 import { saveTokens } from "@/src/api/secure-store";
 
-const REDIRECT_URI = "kotel://auth/callback";
+const REDIRECT_URI = Linking.createURL("auth/callback");
 const CODE_CHALLENGE_METHOD = "S256";
 const PKCE_VERIFIER_BYTES = 32;
 
@@ -71,6 +72,15 @@ function assertAbsoluteUrl(serverUrl: string): string {
   return parsed.toString().replace(/\/$/, "");
 }
 
+function toMobileNetworkUrl(serverUrl: string): string {
+  const parsed = new URL(serverUrl);
+  const isIpv4Host = /^(\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
+  if (isIpv4Host && parsed.protocol === "https:") {
+    parsed.protocol = "http:";
+  }
+  return parsed.toString().replace(/\/$/, "");
+}
+
 function assertValue(
   value: string | undefined,
   name: string,
@@ -90,7 +100,8 @@ async function exchangeCodeForTokens(
   code: string,
   codeVerifier: string,
 ): Promise<TokenExchangeResponse> {
-  const response = await fetch(`${serverUrl}/api/auth/token`, {
+  const networkUrl = toMobileNetworkUrl(serverUrl);
+  const response = await fetch(`${networkUrl}/api/auth/token`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -122,7 +133,8 @@ async function getSessionStatus(
   serverUrl: string,
   accessToken: string,
 ): Promise<SessionStatusResponse> {
-  const response = await fetch(`${serverUrl}/api/session/status`, {
+  const networkUrl = toMobileNetworkUrl(serverUrl);
+  const response = await fetch(`${networkUrl}/api/session/status`, {
     method: "GET",
     headers: {
       Accept: "application/json",

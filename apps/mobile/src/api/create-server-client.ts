@@ -14,6 +14,15 @@ import {
 
 const serverClients = new Map<string, AxiosInstance>();
 
+function toMobileNetworkUrl(serverUrl: string): string {
+  const parsed = new URL(serverUrl);
+  const isIpv4Host = /^(\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
+  if (isIpv4Host && parsed.protocol === "https:") {
+    parsed.protocol = "http:";
+  }
+  return parsed.toString().replace(/\/$/, "");
+}
+
 type RefreshResponseBody = {
   accessToken: string;
   refreshToken: string;
@@ -25,8 +34,10 @@ export function getServerClient(serverUrl: string): AxiosInstance {
     return existingClient;
   }
 
+  const networkUrl = toMobileNetworkUrl(serverUrl);
+
   const client = axios.create({
-    baseURL: serverUrl,
+    baseURL: networkUrl,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -54,7 +65,7 @@ export function getServerClient(serverUrl: string): AxiosInstance {
 
     try {
       const response = await axios.post<RefreshResponseBody>(
-        `${serverUrl}/api/session/refresh`,
+        `${networkUrl}/api/session/refresh`,
         {},
         {
           headers: {

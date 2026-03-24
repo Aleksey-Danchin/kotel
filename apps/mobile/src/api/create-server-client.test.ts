@@ -90,6 +90,36 @@ describe("create-server-client", () => {
     expect(clearTokens).not.toHaveBeenCalled();
     expect(client).toBeDefined();
   });
+
+  it("uses http transport for https IP server url", async () => {
+    vi.mocked(getRefreshToken).mockResolvedValue("refresh-1");
+    vi.spyOn(axios, "post").mockResolvedValue({
+      data: { accessToken: "new-access", refreshToken: "new-refresh" },
+    });
+
+    const client = getServerClient("https://192.168.31.186:3001");
+    const refreshLogic = getRefreshLogic();
+    const failedRequest = {
+      response: {
+        config: {
+          headers: {},
+        },
+      },
+    } as AxiosErrorRequest;
+
+    await refreshLogic(failedRequest);
+
+    expect(axios.post).toHaveBeenCalledWith(
+      "http://192.168.31.186:3001/api/session/refresh",
+      {},
+      {
+        headers: {
+          Authorization: "Bearer refresh-1",
+        },
+      },
+    );
+    expect(client.defaults.baseURL).toBe("http://192.168.31.186:3001");
+  });
 });
 
 function getRequestHandler(client: AxiosInstance) {

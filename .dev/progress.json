@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T11:13:20.558Z",
+  "updatedAt": "2026-03-24T11:15:20.090Z",
   "steps": [
     {
       "order": 1,
@@ -487,10 +487,10 @@
     {
       "order": 6,
       "file": "06-shared-worker-tests.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "9787a03",
       "startedAt": "2026-03-24T11:10:46.436Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T11:13:31.964Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -576,12 +576,86 @@
     {
       "order": 7,
       "file": "07-mobile-store-tests.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T11:13:41.194Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "in_progress"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "scripts/prettier.sh отсутствует; форматирование не потребовалось для нового файла"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения затрагивают только unit-тесты mobile state, документация не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Создан mobile servers.test.ts",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Реализованы и проходят 10 кейсов",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Каждый тест использует изолированный createStore",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Тесты запускаются существующим Vitest config",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 8,

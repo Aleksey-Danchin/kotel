@@ -118,5 +118,5 @@ kotel/
 
 ## 6) Тестовые окружения
 
-- **Unit/integration:** Vitest. Backend-тесты запускаются в Docker-окружении из `infra/compose/test.yml`. Базовое обязательное окружение для сессий: `TEST_SESSION_COOKIE_DOMAIN`. Также в текущем состоянии test compose еще использует `TEST_IDLE_TIMEOUT` (параметр отмечен как устаревающий и подлежит удалению в отдельном шаге).
+- **Unit/integration:** Vitest. Backend-тесты запускаются в Docker-окружении из `infra/compose/test.yml`. Базовое обязательное окружение для сессий: `TEST_SESSION_COOKIE_DOMAIN`.
 - **E2E:** Playwright. Запускается против полного dev-стека (`infra/compose/dev.yml`), тесты находятся в `apps/frontend/e2e/`.

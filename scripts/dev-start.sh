@@ -56,22 +56,36 @@ if [[ -f "${PROJECT_ROOT}/.env" ]]; then
   set +a
 fi
 
-if [[ -z "${HOST_IP:-}" ]]; then
-  HOST_IP="$(ip route get 1.1.1.1 2>/dev/null | awk '{for (i=1; i<=NF; i++) if ($i == "src") {print $(i+1); exit}}')"
-fi
+is_valid_ipv4() {
+  local ip="$1"
+  [[ "${ip}" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || return 1
+  awk -F. '
+    NF != 4 { exit 1 }
+    {
+      for (i = 1; i <= 4; i++) {
+        if ($i < 0 || $i > 255) {
+          exit 1
+        }
+      }
+    }
+  ' <<<"${ip}" >/dev/null 2>&1
+}
 
 if [[ -z "${HOST_IP:-}" ]]; then
-  HOST_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+  echo "Error: HOST_IP is required for Expo LAN and must be set in .env or env." >&2
+  echo "Hint: run with explicit LAN IP, e.g. HOST_IP=192.168.1.42 scripts/dev-start.sh" >&2
+  exit 1
 fi
 
-if [[ -z "${HOST_IP:-}" ]]; then
-  echo "Error: unable to detect HOST_IP for mobile API routing." >&2
+if ! is_valid_ipv4 "${HOST_IP}"; then
+  echo "Error: HOST_IP='${HOST_IP}' is not a valid IPv4 address." >&2
+  echo "Hint: run with explicit LAN IP, e.g. HOST_IP=192.168.1.42 scripts/dev-start.sh" >&2
   exit 1
 fi
 
 export HOST_IP
-export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-http://${HOST_IP}:3000}"
-export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-}"
+export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-https://${HOST_IP}/api}"
+export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-kotel.localhost}"
 
 docker compose \
   --project-directory "${PROJECT_ROOT}" \

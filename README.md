@@ -21,9 +21,15 @@
 
 - `scripts/dev-start.sh` starts core services in background, then attaches the terminal to the mobile Expo CLI.
 - Expo runs in LAN mode (`expo start --lan`) so QR code and hotkeys remain visible in the same terminal.
-- `scripts/dev-start.sh` auto-detects `HOST_IP` and exports mobile runtime envs:
+- `HOST_IP` is required for mobile LAN mode and should be set in `.env` (or passed in shell env before run).
+- `scripts/dev-start.sh` uses `HOST_IP` and exports mobile runtime envs:
   - `EXPO_PUBLIC_API_BASE_URL=https://<HOST_IP>/api`
   - `EXPO_PUBLIC_API_HOST_HEADER=kotel.localhost`
+- Quick override for one run:
+  - `HOST_IP=192.168.1.42 scripts/dev-start.sh`
+- LAN QR checklist for real device:
+  - phone and host are on the same Wi-Fi (no guest/client isolation);
+  - host incoming ports are reachable: `8081`, `19000`, `19001`, `19002`.
 - To exit attached Expo, press `Ctrl+C`.
 - To stop all dev containers, run `scripts/dev-stop.sh`.
 

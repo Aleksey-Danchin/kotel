@@ -23,9 +23,20 @@ Stopping:
 
 ## Environment And Networking
 
-- Current scope target: **Android emulator** only.
-- `HOST_IP` must resolve from host machine to route emulator API requests through Traefik.
+- Current scope target: **Android emulator** and **Android phone (Expo Go) via LAN QR**.
+- `HOST_IP` must resolve from host machine to route emulator/phone API requests through Traefik.
 - Mobile client expects backend API at `https://<HOST_IP>/api` with host header `kotel.localhost`.
+- Set `HOST_IP` explicitly in project `.env` for stable LAN QR behavior.
+- `scripts/dev-start.sh` reads `HOST_IP` from env; quick one-run override:
+
+```bash
+HOST_IP=192.168.1.42 scripts/dev-start.sh
+```
+
+- LAN QR prerequisites for phone:
+  - host and phone are on the same Wi-Fi SSID;
+  - Wi-Fi client isolation is disabled;
+  - host firewall allows inbound `8081`, `19000`, `19001`, `19002`.
 - If API requests fail, confirm:
   - dev stack is running (`scripts/dev-start.sh`);
   - emulator and host can reach `<HOST_IP>`;

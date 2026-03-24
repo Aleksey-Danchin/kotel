@@ -29,7 +29,5 @@ alwaysApply: true
 
 - Backend session runtime requires:
   - `SESSION_COOKIE_DOMAIN` (non-empty string)
-  - `IDLE_TIMEOUT` (positive integer, seconds)
 - Test environment values must be supplied through:
   - `TEST_SESSION_COOKIE_DOMAIN` -> mapped to backend `SESSION_COOKIE_DOMAIN`
-  - `TEST_IDLE_TIMEOUT` -> mapped to backend `IDLE_TIMEOUT`

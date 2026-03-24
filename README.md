@@ -12,10 +12,8 @@
 - Avoid cross-app relative imports like `../../backend/...` from frontend code.
 - Required session env vars:
   - `SESSION_COOKIE_DOMAIN` - required for backend cookie domain.
-  - `IDLE_TIMEOUT` - required positive integer in seconds.
 - Test stack deterministic env inputs:
   - `TEST_SESSION_COOKIE_DOMAIN` (mapped to backend `SESSION_COOKIE_DOMAIN` in `infra/compose/test.yml`).
-  - `TEST_IDLE_TIMEOUT` (mapped to backend `IDLE_TIMEOUT` in `infra/compose/test.yml`).
 
 ## Dev Start Behavior
 

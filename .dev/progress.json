@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T10:53:54.058Z",
+  "updatedAt": "2026-03-24T10:58:32.549Z",
   "steps": [
     {
       "order": 1,
@@ -194,10 +194,10 @@
     {
       "order": 3,
       "file": "03-scoped-cursor-rules.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "6036793",
       "startedAt": "2026-03-24T10:52:13.729Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T10:54:19.456Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -286,12 +286,98 @@
     {
       "order": 4,
       "file": "04-remove-idle-timeout.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T10:54:26.868Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not found in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "No source logic changes; existing backend tests reused"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "pre-existing-failure",
+          "note": "docker exec kris-backend-test npm test failed with 29 unauthorized/integration failures unrelated to IDLE_TIMEOUT removal; task-specific session suite passes"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No changes to API/data-model/domain/architecture docs required"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: IDLE_TIMEOUT удален из .env",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: TEST_IDLE_TIMEOUT удален из .env",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dev compose не содержит IDLE_TIMEOUT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: test compose не содержит IDLE_TIMEOUT",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: README очищен от IDLE_TIMEOUT упоминаний",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: backend стартует без IDLE_TIMEOUT",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

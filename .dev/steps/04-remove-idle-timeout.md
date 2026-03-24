@@ -19,6 +19,10 @@ refactor, infra
 - `infra/compose/test.yml` — remove `IDLE_TIMEOUT` from service `environment` section
 - `README.md` — remove all references to `IDLE_TIMEOUT` and `TEST_IDLE_TIMEOUT`
 
+<CORRECTION by="step-executor" reason="verification scenario scope">
+Additional config usage discovered in `scripts/test-start.sh`: it exports and validates `TEST_IDLE_TIMEOUT`. To satisfy repository-wide verification ("zero results outside `.dev/` and `docs/`"), remove `TEST_IDLE_TIMEOUT` handling from this script as well.
+</CORRECTION>
+
 ## Dependencies
 
 None.

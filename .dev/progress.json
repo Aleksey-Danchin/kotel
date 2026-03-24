@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T11:17:49.285Z",
+  "updatedAt": "2026-03-24T11:22:30.897Z",
   "steps": [
     {
       "order": 1,
@@ -660,10 +660,10 @@
     {
       "order": 8,
       "file": "08-user-scenario-docs.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "70d9fe5",
       "startedAt": "2026-03-24T11:15:47.872Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T11:18:18.923Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -756,12 +756,93 @@
     {
       "order": 9,
       "file": "09-road-map.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T11:18:25.374Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Документационный шаг, изменения тестов не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Документационный шаг: запуск task-specific тестов не требуется"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Документационный шаг: регрессионный прогон не требуется"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "in_progress"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Создан docs/ROAD_MAP.md",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Присутствуют все 5 разделов",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Раздел тестов перечисляет реально существующие файлы",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Раздел ограничений включает пункты из overview и заметки rate limit/DPoP",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Описание основано на исходниках без выдумок",
+          "status": "completed"
+        }
+      ]
     }
   ]
 }

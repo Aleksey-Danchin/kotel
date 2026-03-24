@@ -106,7 +106,11 @@ export class SessionService {
       throw new UnauthorizedException();
     }
 
-    this.verifyClientType(source, existingSession.clientType);
+    await this.verifyClientType(
+      source,
+      existingSession.clientType,
+      existingSession,
+    );
 
     const usedSession = await this.markAsUsed(refreshTokenHash);
     if (!usedSession) {
@@ -244,11 +248,17 @@ export class SessionService {
     return result.count;
   }
 
-  private verifyClientType(source: TokenSource, clientType: ClientType): void {
-    if (clientType === 'WEB' && source !== 'cookie') {
-      throw new UnauthorizedException();
-    }
-    if (clientType === 'EXPO' && source !== 'bearer') {
+  private async verifyClientType(
+    source: TokenSource,
+    clientType: ClientType,
+    session: Session,
+  ): Promise<void> {
+    const mismatch =
+      (clientType === 'WEB' && source !== 'cookie') ||
+      (clientType === 'EXPO' && source !== 'bearer');
+
+    if (mismatch) {
+      await this.handleChannelMismatch(session);
       throw new UnauthorizedException();
     }
   }
@@ -272,6 +282,32 @@ export class SessionService {
         return;
       case 'quarantine':
         await this.revokeAllUserSessions(session.userId, 'REUSE_DETECTED');
+        return;
+      case 'lockdown':
+        await this.revokeAllUserSessions(session.userId, 'LOCKDOWN');
+        return;
+    }
+  }
+
+  async handleChannelMismatch(session: Session): Promise<void> {
+    const mode = getAlertMode();
+
+    this.reuseDetectionLogger.warn(
+      `Channel mismatch detected: sessionId=${session.sessionId}, userId=${session.userId}, clientType=${session.clientType}, mode=${mode}`,
+    );
+
+    switch (mode) {
+      case 'debug':
+        return;
+      case 'isolation':
+        await this.revokeChain(
+          session.sessionId,
+          session.userId,
+          'CHANNEL_MISMATCH',
+        );
+        return;
+      case 'quarantine':
+        await this.revokeAllUserSessions(session.userId, 'CHANNEL_MISMATCH');
         return;
       case 'lockdown':
         await this.revokeAllUserSessions(session.userId, 'LOCKDOWN');

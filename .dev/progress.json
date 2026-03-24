@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T10:58:32.549Z",
+  "updatedAt": "2026-03-24T11:09:51.259Z",
   "steps": [
     {
       "order": 1,
@@ -286,10 +286,10 @@
     {
       "order": 4,
       "file": "04-remove-idle-timeout.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "cb2b2a9",
       "startedAt": "2026-03-24T10:54:26.868Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T10:59:42.110Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -382,12 +382,107 @@
     {
       "order": 5,
       "file": "05-channel-mismatch-alertness.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T10:59:48.373Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "pre-existing-failure",
+          "note": "Полный backend regression (npm test) падает на множестве несвязанных integration-спеков; task-specific для шага проходят"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения не затрагивают публичные API/модель домена в docs/*.md"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Prisma enum содержит CHANNEL_MISMATCH и миграцию",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Добавлен SessionService.handleChannelMismatch",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Mismatch вызывает обработку и 401",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Проверка работает в guard и refreshSession",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: debug mode только логирует",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: quarantine mode ревокает с CHANNEL_MISMATCH",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: Существующие тесты проходят",
+          "status": "pre-existing-failure",
+          "note": "Полный backend regression нестабилен из-за несвязанных интеграционных сценариев и конкурентного состояния БД"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: Добавлены новые тесты channel mismatch",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

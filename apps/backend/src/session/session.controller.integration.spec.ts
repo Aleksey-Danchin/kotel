@@ -317,16 +317,29 @@ describe('SessionController refresh integration', () => {
       fingerprint: 'https://kotel.localhost',
       refreshToken,
     });
+    await createActiveSession({
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      refreshToken: `refresh-${randomUUID()}`,
+    });
 
     await request(app.getHttpServer())
       .post('/api/session/refresh')
       .set('Authorization', `Bearer ${refreshToken}`)
       .expect(401);
 
-    const session = await prismaService.client.session.findUnique({
-      where: { refreshTokenHash: hashToken(refreshToken) },
+    const sessions = await prismaService.client.session.findMany({
+      where: { userId },
     });
-    expect(session?.status).toBe('ACTIVE');
+    expect(sessions).toHaveLength(2);
+    expect(sessions.every((session) => session.status === 'REVOKED')).toBe(
+      true,
+    );
+    expect(
+      sessions.every(
+        (session) => session.noActiveReason === 'CHANNEL_MISMATCH',
+      ),
+    ).toBe(true);
   });
 
   it('returns 401 for already-used refresh token', async () => {

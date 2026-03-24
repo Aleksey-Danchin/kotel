@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import type { Session } from '~prisma/client/client';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import type { AuthenticatedRequest } from './session-request';
 import { SessionService } from './session.service';
@@ -48,8 +49,8 @@ export class SessionGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    this.verifyClientType(source, session.clientType);
     this.verifyOrigin(request, session.fingerprint);
+    await this.verifyClientType(source, session);
 
     const authenticatedRequest = request as AuthenticatedRequest;
     authenticatedRequest.user = session.user;
@@ -101,11 +102,16 @@ export class SessionGuard implements CanActivate {
     return token.trim() || null;
   }
 
-  private verifyClientType(source: Source, clientType: 'WEB' | 'EXPO'): void {
-    if (clientType === 'WEB' && source !== 'cookie') {
-      throw new UnauthorizedException();
-    }
-    if (clientType === 'EXPO' && source !== 'bearer') {
+  private async verifyClientType(
+    source: Source,
+    session: Session,
+  ): Promise<void> {
+    const mismatch =
+      (session.clientType === 'WEB' && source !== 'cookie') ||
+      (session.clientType === 'EXPO' && source !== 'bearer');
+
+    if (mismatch) {
+      await this.sessionService.handleChannelMismatch(session);
       throw new UnauthorizedException();
     }
   }

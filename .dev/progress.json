@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T10:49:22.933Z",
+  "updatedAt": "2026-03-24T10:51:44.223Z",
   "steps": [
     {
       "order": 1,
       "file": "01-split-auth-docs.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "b0e9ec5",
       "startedAt": "2026-03-24T10:43:32.170Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T10:49:57.863Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -103,12 +103,93 @@
     {
       "order": 2,
       "file": "02-stack-doc.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T10:50:06.205Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "scripts/prettier.sh отсутствует, выполнен npx prettier --write docs/STACK.md"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг документационный, изменения только в docs/STACK.md"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Автотесты не требуются для документации"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Регрессионный прогон не применим к docs-only шагу"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Создан docs/STACK.md",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Есть все 6 обязательных разделов",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Стек и библиотеки соответствуют исходникам",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Нет описания будущих фич",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Есть ссылки на auth overview и clients",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 3,

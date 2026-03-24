@@ -4,19 +4,19 @@ overview: Перевести dev-маршрутизацию под Expo LAN на
 todos:
   - id: add-ip-san-cert
     content: Добавить генерацию и подключение TLS сертификата с SAN для HOST_IP без удаления старых cert
-    status: in_progress
+    status: completed
   - id: add-traefik-ip-entrypoints
     content: Добавить entrypoints и routers Traefik для IP:3001/IP:3002 с /api и /.well-known для второго backend
-    status: pending
+    status: completed
   - id: align-env-policy
     content: Проверить и выровнять HOST_IP, EXPO_PUBLIC_API_BASE_URL и cookie-domain переменные под новую LAN политику
-    status: pending
+    status: completed
   - id: rename-secondary-services
     content: Переименовать backend2/postgres2 в backend-2/postgres-2 с обновлением всех compose ссылок
-    status: pending
+    status: completed
   - id: docs-and-smoke
     content: Обновить README и выполнить smoke-проверку новых маршрутов и Expo LAN
-    status: pending
+    status: completed
 isProject: false
 ---
 

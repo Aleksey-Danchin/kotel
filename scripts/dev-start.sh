@@ -44,8 +44,8 @@ ensure_cert() {
   fi
 }
 
-ensure_cert "kotel.localhost"
-ensure_cert "katel.localhost"
+ensure_cert "kotel1.localhost"
+ensure_cert "kotel2.localhost"
 
 export MKCERT_CAROOT
 
@@ -83,21 +83,45 @@ if ! is_valid_ipv4 "${HOST_IP}"; then
   exit 1
 fi
 
+ensure_cert_for_host_ip() {
+  local cert_file="${CERT_DIR}/lan-host.pem"
+  local key_file="${CERT_DIR}/lan-host-key.pem"
+  local generate_cert=0
+
+  if [[ ! -f "${cert_file}" || ! -f "${key_file}" ]]; then
+    generate_cert=1
+  elif ! openssl x509 -checkend 86400 -noout -in "${cert_file}" >/dev/null 2>&1; then
+    generate_cert=1
+  elif ! openssl x509 -in "${cert_file}" -noout -text 2>/dev/null | grep -q "IP Address:${HOST_IP}"; then
+    generate_cert=1
+  fi
+
+  if [[ "${generate_cert}" -eq 1 ]]; then
+    mkcert -cert-file "${cert_file}" -key-file "${key_file}" "${HOST_IP}"
+    echo "SSL certificate generated for host IP ${HOST_IP}."
+  else
+    echo "SSL certificate is valid for host IP ${HOST_IP}."
+  fi
+}
+
+ensure_cert_for_host_ip
+
 export HOST_IP
-export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-https://${HOST_IP}/api}"
-export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-kotel.localhost}"
+export EXPO_PUBLIC_API_BASE_URL="${EXPO_PUBLIC_API_BASE_URL:-https://${HOST_IP}:3001/api}"
+export EXPO_PUBLIC_API_HOST_HEADER="${EXPO_PUBLIC_API_HOST_HEADER:-kotel1.localhost}"
 
 docker compose \
   --project-directory "${PROJECT_ROOT}" \
   -f "${PROJECT_ROOT}/infra/compose/dev.yml" \
-  up -d --build postgres backend frontend studio traefik
+  up -d --build postgres postgres-2 backend backend-2 frontend studio traefik
 
 POSTGRES_PORT_DISPLAY="5432"
 POSTGRES_PORT_DISPLAY="${POSTGRES_PORT:-${POSTGRES_PORT_DISPLAY}}"
 
 echo "Kotel dev environment started."
-echo "  Frontend: https://kotel.localhost"
-echo "  Backend:  https://kotel.localhost/api"
+echo "  Frontend: https://kotel1.localhost"
+echo "  Backend:  https://${HOST_IP}:3001/api"
+echo "  Backend2: https://${HOST_IP}:3002/api"
 echo "  Studio:   http://localhost:5555"
 echo "  Mobile:   attached Expo CLI (LAN mode)"
 echo "  Mobile API base URL: ${EXPO_PUBLIC_API_BASE_URL}"

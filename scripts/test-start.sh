@@ -24,8 +24,8 @@ fi
 
 MKCERT_CAROOT="$(mkcert -CAROOT)"
 CERT_DIR="${MKCERT_CAROOT}/kotel"
-CERT_FILE="${CERT_DIR}/kotel.localhost.pem"
-KEY_FILE="${CERT_DIR}/kotel.localhost-key.pem"
+CERT_FILE="${CERT_DIR}/kotel1.localhost.pem"
+KEY_FILE="${CERT_DIR}/kotel1.localhost-key.pem"
 
 generate_cert=0
 if [[ ! -f "${CERT_FILE}" || ! -f "${KEY_FILE}" ]]; then
@@ -36,14 +36,14 @@ fi
 
 if [[ "${generate_cert}" -eq 1 ]]; then
   mkdir -p "${CERT_DIR}"
-  mkcert -cert-file "${CERT_FILE}" -key-file "${KEY_FILE}" kotel.localhost
+  mkcert -cert-file "${CERT_FILE}" -key-file "${KEY_FILE}" kotel1.localhost
   echo "SSL certificate generated."
 else
   echo "SSL certificate is valid."
 fi
 
 export MKCERT_CAROOT
-export TEST_SESSION_COOKIE_DOMAIN="${TEST_SESSION_COOKIE_DOMAIN:-kotel.localhost}"
+export TEST_SESSION_COOKIE_DOMAIN="${TEST_SESSION_COOKIE_DOMAIN:-kotel1.localhost}"
 export TEST_IDLE_TIMEOUT="${TEST_IDLE_TIMEOUT:-3600}"
 
 if [[ -z "${TEST_SESSION_COOKIE_DOMAIN}" ]]; then
@@ -97,6 +97,6 @@ wait_for_healthy frontend-test
 wait_for_healthy traefik-test
 
 echo "Kotel test environment started and bootstrapped."
-echo "  Backend (TLS via Traefik): https://kotel.localhost:${TEST_HTTPS_PORT:-8443}/api"
-echo "  Frontend (TLS via Traefik): https://kotel.localhost:${TEST_HTTPS_PORT:-8443}"
+echo "  Backend (TLS via Traefik): https://kotel1.localhost:${TEST_HTTPS_PORT:-8443}/api"
+echo "  Frontend (TLS via Traefik): https://kotel1.localhost:${TEST_HTTPS_PORT:-8443}"
 echo "  Postgres: localhost:${TEST_POSTGRES_PORT:-55432}"

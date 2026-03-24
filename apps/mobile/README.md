@@ -14,8 +14,8 @@ Expected behavior:
 - Starts core services (`postgres`, `backend`, `frontend`, `studio`, `traefik`) in Docker.
 - Attaches the current terminal to Expo CLI (`mobile`) in LAN mode.
 - Prints mobile runtime networking values:
-  - `EXPO_PUBLIC_API_BASE_URL=https://<HOST_IP>/api`
-  - `EXPO_PUBLIC_API_HOST_HEADER=kotel.localhost`
+  - `EXPO_PUBLIC_API_BASE_URL=https://<HOST_IP>:3001/api`
+  - `EXPO_PUBLIC_API_HOST_HEADER=kotel1.localhost`
 
 Stopping:
 - `Ctrl+C` stops only attached Expo process in the current terminal.
@@ -25,7 +25,8 @@ Stopping:
 
 - Current scope target: **Android emulator** and **Android phone (Expo Go) via LAN QR**.
 - `HOST_IP` must resolve from host machine to route emulator/phone API requests through Traefik.
-- Mobile client expects backend API at `https://<HOST_IP>/api` with host header `kotel.localhost`.
+- Mobile client expects backend API at `https://<HOST_IP>:3001/api` with host header `kotel1.localhost`.
+- Alternative second backend endpoint over LAN: `https://<HOST_IP>:3002/api` (and `/.well-known` on `:3002`).
 - Set `HOST_IP` explicitly in project `.env` for stable LAN QR behavior.
 - `scripts/dev-start.sh` reads `HOST_IP` from env; quick one-run override:
 
@@ -36,7 +37,7 @@ HOST_IP=192.168.1.42 scripts/dev-start.sh
 - LAN QR prerequisites for phone:
   - host and phone are on the same Wi-Fi SSID;
   - Wi-Fi client isolation is disabled;
-  - host firewall allows inbound `8081`, `19000`, `19001`, `19002`.
+  - host firewall allows inbound `8081`, `19000`, `19001`, `19002`, `3001`, `3002`.
 - If API requests fail, confirm:
   - dev stack is running (`scripts/dev-start.sh`);
   - emulator and host can reach `<HOST_IP>`;

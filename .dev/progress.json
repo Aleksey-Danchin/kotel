@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T10:51:44.223Z",
+  "updatedAt": "2026-03-24T10:53:54.058Z",
   "steps": [
     {
       "order": 1,
@@ -103,10 +103,10 @@
     {
       "order": 2,
       "file": "02-stack-doc.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "efb31fb",
       "startedAt": "2026-03-24T10:50:06.205Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T10:52:07.726Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -194,12 +194,94 @@
     {
       "order": 3,
       "file": "03-scoped-cursor-rules.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-24T10:52:13.729Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг требует только инспекцию markdown-правил, автотесты не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Task-specific automated tests not applicable"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Regression suites not applicable for docs/rules-only change"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены scoped Cursor rules; проектная документация не затронута"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: Созданы 4 scoped правила",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Frontmatter содержит globs и alwaysApply false",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: В каждом правиле есть Documentation ссылки",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: testing.mdc не изменен",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Ограничения соответствуют коду",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

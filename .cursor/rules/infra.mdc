@@ -1,0 +1,22 @@
+---
+description: Infrastructure (Traefik + Docker Compose) conventions for infra/.
+globs: ["infra/**"]
+alwaysApply: false
+---
+
+# Infrastructure Conventions
+
+## Stack
+- Traefik v3 reverse proxy; static config in `infra/traefik/traefik.yml`, dynamic TLS in `infra/traefik/dynamic/tls.yml`.
+- Docker Compose stacks: `infra/compose/dev.yml` and `infra/compose/test.yml`.
+- Dev TLS uses mkcert certificates for `*.localhost`; services are expected behind HTTPS.
+
+## Key Constraints
+- New dev services must be added to `infra/compose/dev.yml` with appropriate Traefik routing labels.
+- Update `infra/traefik/dynamic/tls.yml` when introducing new TLS hostnames.
+- Test compose should mirror required runtime env with `TEST_*` mapped values.
+- Backend session config requires `SESSION_COOKIE_DOMAIN`; in tests it is mapped from `TEST_SESSION_COOKIE_DOMAIN`.
+- Keep `.env` `PROJECT_ROOT` aligned with repository root for compose mounts.
+
+## Documentation
+- Stack overview and compose topology: `docs/STACK.md`

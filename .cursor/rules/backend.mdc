@@ -1,0 +1,26 @@
+---
+description: Backend (NestJS + Prisma + Zod) conventions for apps/backend.
+globs: ["apps/backend/**"]
+alwaysApply: false
+---
+
+# Backend Conventions
+
+## Stack
+- NestJS with modules/controllers/services.
+- Prisma client is imported via `~prisma/client/client`; avoid direct imports from `@prisma/client`.
+- Zod is used for request/response contracts; avoid introducing `class-validator` and `class-transformer`.
+- Shared contracts live in `apps/backend/src/contracts/` and are consumed via `@contracts/*`.
+
+## Key Constraints
+- For new public API shapes shared with frontend/mobile, add or update Zod schemas in `src/contracts/`.
+- Protected routes rely on `SessionGuard` configured through `APP_GUARD`; mark open routes with `@Public()`.
+- Token operations must use `generateToken()` and `hashToken()` from `src/shared/token.utils.ts`.
+- Cookie setup must use `getAccessTokenCookieOptions()` and `getRefreshTokenCookieOptions()` from `src/shared/cookie.constants.ts`.
+- Use environment variables (`process.env.*`) for configuration; do not add `@nestjs/config`.
+- For refresh-token rotation, keep the atomic `UPDATE ... WHERE status='ACTIVE' RETURNING` pattern via `prisma.$queryRaw`.
+
+## Documentation
+- Auth architecture: `docs/auth/oauth-flow.md`, `docs/auth/tokens.md`, `docs/auth/sessions.md`, `docs/auth/security.md`
+- Implementation decisions: `docs/auth/implementation-decisions.md`
+- Stack overview: `docs/STACK.md`

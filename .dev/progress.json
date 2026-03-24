@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-24T10:39:42.959Z",
-  "updatedAt": "2026-03-24T11:22:30.897Z",
+  "updatedAt": "2026-03-24T11:25:02.442Z",
   "steps": [
     {
       "order": 1,
@@ -756,10 +756,10 @@
     {
       "order": 9,
       "file": "09-road-map.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "81e207e",
       "startedAt": "2026-03-24T11:18:25.374Z",
-      "completedAt": null,
+      "completedAt": "2026-03-24T11:22:39.977Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -815,7 +815,7 @@
         {
           "id": "postflight",
           "label": "Post-flight: cleanup & health check",
-          "status": "in_progress"
+          "status": "completed"
         },
         {
           "id": "ac-1",

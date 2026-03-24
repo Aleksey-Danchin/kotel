@@ -248,12 +248,19 @@ describe('SessionService', () => {
   });
 
   it('refreshSession throws 401 on channel mismatch', async () => {
-    vi.spyOn(service, 'findByRefreshTokenHash').mockResolvedValueOnce({
+    const existingSession = {
       id: 'session-1',
       userId: 'user-1',
+      sessionId: 'chain-1',
       clientType: 'WEB',
       fingerprint: 'https://kotel.localhost',
+    };
+    vi.spyOn(service, 'findByRefreshTokenHash').mockResolvedValueOnce({
+      ...existingSession,
     } as any);
+    const channelMismatchSpy = vi
+      .spyOn(service, 'handleChannelMismatch')
+      .mockResolvedValueOnce();
     const markAsUsedSpy = vi.spyOn(service, 'markAsUsed');
 
     await expect(
@@ -261,6 +268,7 @@ describe('SessionService', () => {
         cookie: vi.fn(),
       } as any),
     ).rejects.toMatchObject({ status: 401 });
+    expect(channelMismatchSpy).toHaveBeenCalledWith(existingSession);
     expect(markAsUsedSpy).not.toHaveBeenCalled();
   });
 
@@ -426,6 +434,78 @@ describe('SessionService', () => {
       id: 'session-1',
       sessionId: 'chain-1',
       userId: 'user-1',
+    } as any);
+
+    expect(revokeAllSpy).toHaveBeenCalledWith('user-1', 'LOCKDOWN');
+  });
+
+  it('handleChannelMismatch in debug mode only logs', async () => {
+    process.env.REUSE_DETECTION_MODE = 'debug';
+    const revokeChainSpy = vi.spyOn(service, 'revokeChain');
+    const revokeAllSpy = vi.spyOn(service, 'revokeAllUserSessions');
+
+    await service.handleChannelMismatch({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+    } as any);
+
+    expect(revokeChainSpy).not.toHaveBeenCalled();
+    expect(revokeAllSpy).not.toHaveBeenCalled();
+  });
+
+  it('handleChannelMismatch in isolation mode revokes chain with CHANNEL_MISMATCH', async () => {
+    process.env.REUSE_DETECTION_MODE = 'isolation';
+    const revokeChainSpy = vi
+      .spyOn(service, 'revokeChain')
+      .mockResolvedValue(1);
+    const revokeAllSpy = vi.spyOn(service, 'revokeAllUserSessions');
+
+    await service.handleChannelMismatch({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+    } as any);
+
+    expect(revokeChainSpy).toHaveBeenCalledWith(
+      'chain-1',
+      'user-1',
+      'CHANNEL_MISMATCH',
+    );
+    expect(revokeAllSpy).not.toHaveBeenCalled();
+  });
+
+  it('handleChannelMismatch in quarantine mode revokes all sessions with CHANNEL_MISMATCH', async () => {
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
+    const revokeChainSpy = vi.spyOn(service, 'revokeChain');
+    const revokeAllSpy = vi
+      .spyOn(service, 'revokeAllUserSessions')
+      .mockResolvedValue(2);
+
+    await service.handleChannelMismatch({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'WEB',
+    } as any);
+
+    expect(revokeChainSpy).not.toHaveBeenCalled();
+    expect(revokeAllSpy).toHaveBeenCalledWith('user-1', 'CHANNEL_MISMATCH');
+  });
+
+  it('handleChannelMismatch in lockdown mode revokes all sessions with LOCKDOWN', async () => {
+    process.env.REUSE_DETECTION_MODE = 'lockdown';
+    const revokeAllSpy = vi
+      .spyOn(service, 'revokeAllUserSessions')
+      .mockResolvedValue(2);
+
+    await service.handleChannelMismatch({
+      id: 'session-1',
+      sessionId: 'chain-1',
+      userId: 'user-1',
+      clientType: 'WEB',
     } as any);
 
     expect(revokeAllSpy).toHaveBeenCalledWith('user-1', 'LOCKDOWN');

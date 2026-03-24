@@ -12,6 +12,7 @@ describe('SessionGuard integration', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
   let userId: string;
+  const originalReuseDetectionMode = process.env.REUSE_DETECTION_MODE;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -36,9 +37,15 @@ describe('SessionGuard integration', () => {
 
   beforeEach(async () => {
     await prismaService.client.session.deleteMany({ where: { userId } });
+    process.env.REUSE_DETECTION_MODE = 'quarantine';
   });
 
   afterAll(async () => {
+    if (originalReuseDetectionMode === undefined) {
+      delete process.env.REUSE_DETECTION_MODE;
+    } else {
+      process.env.REUSE_DETECTION_MODE = originalReuseDetectionMode;
+    }
     await app.close();
   });
 
@@ -82,14 +89,63 @@ describe('SessionGuard integration', () => {
     await request(app.getHttpServer()).get('/api/auth/login').expect(200);
   });
 
+  it('returns 401 and revokes sessions on WEB bearer channel mismatch', async () => {
+    const mismatchUser = await prismaService.client.user.create({
+      data: {
+        fullname: 'Mismatch Guard User',
+        login: `guard-mismatch-${randomUUID()}`,
+        passwordHash: 'hash',
+        role: 'USER',
+      },
+      select: { id: true },
+    });
+    const accessToken = `web-access-${randomUUID()}`;
+    const firstSession = await createSession({
+      userId: mismatchUser.id,
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      accessToken,
+    });
+    await createSession({
+      userId: mismatchUser.id,
+      clientType: 'WEB',
+      fingerprint: 'https://kotel.localhost',
+      accessToken: `web-access-${randomUUID()}`,
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/users')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(401);
+
+    const sessions = await prismaService.client.session.findMany({
+      where: { userId: mismatchUser.id },
+    });
+    expect(sessions.every((session) => session.status === 'REVOKED')).toBe(
+      true,
+    );
+    expect(
+      sessions.every(
+        (session) => session.noActiveReason === 'CHANNEL_MISMATCH',
+      ),
+    ).toBe(true);
+    expect(sessions.some((session) => session.id === firstSession.id)).toBe(
+      true,
+    );
+    await prismaService.client.session.deleteMany({
+      where: { userId: mismatchUser.id },
+    });
+    await prismaService.client.user.delete({ where: { id: mismatchUser.id } });
+  });
+
   async function createSession(params: {
     userId: string;
     clientType: 'WEB' | 'EXPO';
     fingerprint: string;
     accessToken: string;
-  }): Promise<void> {
+  }) {
     const now = Date.now();
-    await prismaService.client.session.create({
+    return prismaService.client.session.create({
       data: {
         userId: params.userId,
         clientType: params.clientType,

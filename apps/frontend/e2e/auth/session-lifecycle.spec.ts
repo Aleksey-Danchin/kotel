@@ -46,6 +46,7 @@ async function addServerViaOAuth(page: Page): Promise<void> {
   await expect.poll(() => popup.isClosed()).toBe(true);
 }
 
+// → docs/scenarios/web-session/001-session-lifecycle.md
 test("session lifecycle: refresh, logout, and logout all devices", async ({
   browser,
   page,

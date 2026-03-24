@@ -14,6 +14,7 @@ describe('SessionGuard', () => {
   const sessionService = {
     findByAccessTokenHash: vi.fn(),
     markExpired: vi.fn(),
+    handleChannelMismatch: vi.fn(),
   };
 
   let guard: SessionGuard;
@@ -88,9 +89,8 @@ describe('SessionGuard', () => {
   });
 
   it('throws 401 on WEB session with bearer token', async () => {
-    sessionService.findByAccessTokenHash.mockResolvedValue(
-      buildSession({ clientType: 'WEB' }),
-    );
+    const session = buildSession({ clientType: 'WEB' });
+    sessionService.findByAccessTokenHash.mockResolvedValue(session);
     const context = createContext({
       headers: { authorization: 'Bearer token' },
       cookies: {},
@@ -99,12 +99,12 @@ describe('SessionGuard', () => {
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+    expect(sessionService.handleChannelMismatch).toHaveBeenCalledWith(session);
   });
 
   it('throws 401 on EXPO session with cookie token', async () => {
-    sessionService.findByAccessTokenHash.mockResolvedValue(
-      buildSession({ clientType: 'EXPO' }),
-    );
+    const session = buildSession({ clientType: 'EXPO' });
+    sessionService.findByAccessTokenHash.mockResolvedValue(session);
     const context = createContext({
       headers: {},
       cookies: { accessToken: 'token' },
@@ -113,6 +113,7 @@ describe('SessionGuard', () => {
     await expect(guard.canActivate(context)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+    expect(sessionService.handleChannelMismatch).toHaveBeenCalledWith(session);
   });
 
   it('throws 403 for state-changing request on origin mismatch', async () => {

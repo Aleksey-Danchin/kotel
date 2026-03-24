@@ -53,10 +53,38 @@ function isRefreshRequestMessage(data: unknown): data is RefreshRequestMessage {
   return message.type === "refresh" && typeof message.serverUrl === "string";
 }
 
-const context = self as unknown as SharedWorkerGlobalScope;
+export async function handlePortMessage(
+  port: MessagePort,
+  data: unknown,
+): Promise<void> {
+  if (!isRefreshRequestMessage(data)) {
+    return;
+  }
 
-context.onconnect = (event: MessageEvent) => {
-  const port = event.ports[0];
+  const { serverUrl } = data;
+
+  if (refreshing.has(serverUrl)) {
+    const existingResult = await refreshing.get(serverUrl);
+    postToPort(port, {
+      type: existingResult ? "refreshed" : "refresh_failed",
+      serverUrl,
+    });
+    return;
+  }
+
+  const refreshPromise = doRefresh(serverUrl);
+  refreshing.set(serverUrl, refreshPromise);
+
+  const isOk = await refreshPromise;
+  refreshing.delete(serverUrl);
+
+  broadcast({
+    type: isOk ? "refreshed" : "refresh_failed",
+    serverUrl,
+  });
+}
+
+export function initPort(port: MessagePort): void {
   if (!port) {
     return;
   }
@@ -65,30 +93,19 @@ context.onconnect = (event: MessageEvent) => {
   port.start();
 
   port.addEventListener("message", async (messageEvent: MessageEvent) => {
-    if (!isRefreshRequestMessage(messageEvent.data)) {
-      return;
-    }
-
-    const { serverUrl } = messageEvent.data;
-
-    if (refreshing.has(serverUrl)) {
-      const existingResult = await refreshing.get(serverUrl);
-      postToPort(port, {
-        type: existingResult ? "refreshed" : "refresh_failed",
-        serverUrl,
-      });
-      return;
-    }
-
-    const refreshPromise = doRefresh(serverUrl);
-    refreshing.set(serverUrl, refreshPromise);
-
-    const isOk = await refreshPromise;
-    refreshing.delete(serverUrl);
-
-    broadcast({
-      type: isOk ? "refreshed" : "refresh_failed",
-      serverUrl,
-    });
+    await handlePortMessage(port, messageEvent.data);
   });
-};
+}
+
+const sharedWorkerSelf = globalThis.self as SharedWorkerGlobalScope | undefined;
+if (sharedWorkerSelf) {
+  sharedWorkerSelf.onconnect = (event: MessageEvent) => {
+    const port = event.ports[0];
+    if (!port) {
+      return;
+    }
+    initPort(port);
+  };
+}
+
+export { doRefresh };

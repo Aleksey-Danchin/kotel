@@ -59,6 +59,7 @@ async function addServerViaOAuth(
   await expect.poll(() => popup.isClosed()).toBe(true);
 }
 
+// → docs/scenarios/web-auth/001-add-server-oauth.md
 test("OAuth popup flow supports multi-server and invalid credentials", async ({
   page,
 }) => {

@@ -1,26 +1,33 @@
-import { httpClient } from "@/src/api/http-client";
-import { SESSION_API_PATHS } from "@contracts/session";
-import type { SigninDto } from "@contracts/session";
+import { getServerClient } from "@/src/api/create-server-client";
 
-export type SessionUser = {
-  id: string;
-  login: string;
-  fullname: string;
-  createdAt: string;
-  updatedAt: string;
+export type MobileSessionStatusResponse = {
+  sessionId: string;
+  user: {
+    id: string;
+    fullname: string;
+    login?: string;
+    role: string;
+  };
 };
 
-export async function signin(input: SigninDto): Promise<SessionUser> {
-  const response = await httpClient.post<SessionUser>(SESSION_API_PATHS.signin, input);
+export async function getMobileSessionStatus(
+  serverUrl: string,
+): Promise<MobileSessionStatusResponse> {
+  const response = await getServerClient(serverUrl).get<MobileSessionStatusResponse>(
+    "/api/session/status",
+  );
   return response.data;
 }
 
-export async function signout(): Promise<{ ok: true }> {
-  const response = await httpClient.post<{ ok: true }>(SESSION_API_PATHS.signout);
-  return response.data;
+export async function forceMobileSessionRefresh(
+  serverUrl: string,
+): Promise<void> {
+  await getServerClient(serverUrl).post("/api/session/refresh");
 }
 
-export async function check(): Promise<SessionUser | null> {
-  const response = await httpClient.get<SessionUser | null>(SESSION_API_PATHS.check);
-  return response.data;
+export async function logoutMobileSession(
+  serverUrl: string,
+  allDevices = false,
+): Promise<void> {
+  await getServerClient(serverUrl).post("/api/session/logout", { allDevices });
 }

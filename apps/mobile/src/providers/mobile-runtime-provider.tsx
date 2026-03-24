@@ -1,8 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as JotaiProvider } from "jotai";
-import { ReactNode, useEffect, useState } from "react";
-
-import { apiConfig } from "@/src/config/api-config";
+import { ReactNode, useState } from "react";
 
 type MobileRuntimeProviderProps = {
   children: ReactNode;
@@ -22,10 +20,6 @@ export function MobileRuntimeProvider({
         },
       }),
   );
-
-  useEffect(() => {
-    console.info(`[mobile] API base URL: ${apiConfig.baseUrl}`);
-  }, []);
 
   return (
     <JotaiProvider>

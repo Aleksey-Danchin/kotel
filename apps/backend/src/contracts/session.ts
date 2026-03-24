@@ -1,7 +1,15 @@
-export type { SigninDto } from '../session/session.contract';
+import { z } from 'zod';
+
+export const logoutSchema = z
+  .object({
+    allDevices: z.boolean().default(false),
+  })
+  .strict();
+
+export type LogoutDto = z.infer<typeof logoutSchema>;
 
 export const SESSION_API_PATHS = {
-  signin: '/api/session/signin',
-  signout: '/api/session/signout',
-  check: '/api/session/check',
+  status: '/api/session/status',
+  refresh: '/api/session/refresh',
+  logout: '/api/session/logout',
 } as const;

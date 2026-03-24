@@ -1,9 +1,16 @@
+enum UserRole {
+  USER
+  ADMIN
+  ROOT
+}
+
 model User {
-    id           String    @id @default(cuid())
-    fullname     String
-    login        String    @unique
-    passwordHash String
-    createdAt    DateTime  @default(now())
-    updatedAt    DateTime  @updatedAt
-    sessions     Session[]
+  id           String    @id @default(cuid())
+  fullname     String
+  login        String    @unique
+  passwordHash String
+  role         UserRole  @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
 }

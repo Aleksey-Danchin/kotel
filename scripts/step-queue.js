@@ -73,7 +73,7 @@ function discoverSteps(stepsDir) {
       startedAt: null,
       completedAt: null,
       error: null,
-      retryUsed: false,
+      retryCount: 0,
     };
   });
 }
@@ -223,7 +223,7 @@ function cmdStart(args) {
   step.status = 'in_progress';
   step.startedAt = new Date().toISOString();
   step.error = null;
-  step.retryUsed = false;
+  step.retryCount = 0;
   saveProgress(progressPath, data);
   reply({ ok: true, order: step.order, status: step.status });
 }
@@ -309,39 +309,12 @@ function cmdStatus(args) {
   reply({ ok: true, steps, ...counters(data) });
 }
 
-function cmdResolverLog(args) {
-  const progressPath = resolveProgressPath(args);
-  const data = loadProgress(progressPath, args);
-  const order = parseInt(args[0], 10);
-
-  if (isNaN(order)) fail('Usage: resolver-log <order> --path <absolute-path>');
-  const step = findStep(data, order);
-  if (!step) fail(`Step ${order} not found`);
-
-  if (step.status !== 'in_progress') {
-    fail(`Cannot add resolver log for step ${order}: current status is '${step.status}', expected 'in_progress'`);
-  }
-
-  const pathIdx = args.indexOf('--path');
-  const logPath = pathIdx !== -1 ? args[pathIdx + 1] : null;
-  if (!logPath) fail('Usage: resolver-log <order> --path <absolute-path>');
-
-  if (!step.resolverLogs) step.resolverLogs = [];
-  step.resolverLogs.push({
-    path: logPath,
-    registeredAt: new Date().toISOString(),
-  });
-
-  saveProgress(progressPath, data);
-  reply({ ok: true, order: step.order, resolverLogPath: logPath });
-}
-
 function cmdRetryMark(args) {
   const progressPath = resolveProgressPath(args);
   const data = loadProgress(progressPath, args);
   const order = parseInt(args[0], 10);
 
-  if (isNaN(order)) fail('Usage: retry-mark <order>');
+  if (isNaN(order)) fail('Usage: retry-mark <order> [--max <N>]');
   const step = findStep(data, order);
   if (!step) fail(`Step ${order} not found`);
 
@@ -349,10 +322,20 @@ function cmdRetryMark(args) {
     fail(`Cannot mark retry for step ${order}: current status is '${step.status}', expected 'in_progress'`);
   }
 
-  const alreadyUsed = !!step.retryUsed;
-  step.retryUsed = true;
+  const maxIdx = args.indexOf('--max');
+  const maxRetries = maxIdx !== -1 && args[maxIdx + 1] ? parseInt(args[maxIdx + 1], 10) : 2;
+
+  const currentCount = step.retryCount || (step.retryUsed ? 1 : 0);
+
+  if (currentCount >= maxRetries) {
+    reply({ ok: true, order: step.order, retryCount: currentCount, maxRetries, exhausted: true });
+    return;
+  }
+
+  step.retryCount = currentCount + 1;
+  delete step.retryUsed;
   saveProgress(progressPath, data);
-  reply({ ok: true, order: step.order, alreadyUsed });
+  reply({ ok: true, order: step.order, retryCount: step.retryCount, maxRetries, exhausted: false });
 }
 
 function cmdValidate(args) {
@@ -424,7 +407,7 @@ function cmdReset(args) {
   step.startedAt = null;
   step.completedAt = null;
   step.error = null;
-  step.retryUsed = false;
+  step.retryCount = 0;
   delete step.progress;
   delete step.resolverLogs;
 
@@ -523,14 +506,13 @@ function main() {
       case 'skip': return cmdSkip(args);
       case 'status': return cmdStatus(args);
       case 'validate': return cmdValidate(args);
-      case 'resolver-log': return cmdResolverLog(args);
       case 'retry-mark': return cmdRetryMark(args);
       case 'reset': return cmdReset(args);
       case 'progress-init': return cmdProgressInit(args);
       case 'progress-update': return cmdProgressUpdate(args);
       case 'progress-get': return cmdProgressGet(args);
       default:
-        fail(`Unknown command: '${command}'. Available: init, next, start, complete, fail, skip, status, validate, resolver-log, retry-mark, reset, progress-init, progress-update, progress-get`);
+        fail(`Unknown command: '${command}'. Available: init, next, start, complete, fail, skip, status, validate, retry-mark, reset, progress-init, progress-update, progress-get`);
     }
   } catch (e) {
     if (e.message && !e._handled) {

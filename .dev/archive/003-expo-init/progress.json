@@ -1,0 +1,471 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-20T13:07:19.655Z",
+  "updatedAt": "2026-03-20T13:27:10.703Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-add-mobile-dev-container-and-attached-start.md",
+      "status": "completed",
+      "commitHash": "def54b5",
+      "startedAt": "2026-03-20T13:07:26.366Z",
+      "completedAt": "2026-03-20T13:12:58.556Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Инфраструктурный шаг: новые/обновленные автотесты не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Инфраструктурный шаг: регрессионные автотесты не применимы"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: mobile service in dev compose",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: mobile Dockerfile added",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dev-start attaches to mobile",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Expo QR and hotkeys visible",
+          "status": "completed",
+          "note": "Expo CLI вывод и attach подтверждены; QR/hotkeys отображаются в интерактивном TTY"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: dev-stop still stops stack",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-prepare-mobile-runtime-and-networking.md",
+      "status": "completed",
+      "commitHash": "d476d4c",
+      "startedAt": "2026-03-20T13:13:06.068Z",
+      "completedAt": "2026-03-20T13:17:14.604Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "Used npx prettier on edited source files; shell formatter unavailable in environment"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Step declares manual-only testing; no automated test maintenance required"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "No task-specific automated tests required by specification"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No new automated tests introduced in this manual-only step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/model/domain architecture docs changed by runtime wiring step"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: mobile deps include axios react-query jotai",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: root layout wrapped with providers",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: central mobile API env config",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: HTTP client with host-IP HTTPS and host header",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: tabs prepared for users and session-test",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "file": "03-implement-mobile-users-tab.md",
+      "status": "completed",
+      "commitHash": "80fb559",
+      "startedAt": "2026-03-20T13:17:23.370Z",
+      "completedAt": "2026-03-20T13:21:39.331Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "No mobile automated test harness is configured for apps/mobile"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Step specifies manual-only verification; automated task-specific tests are not configured"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No mobile regression suite configured in repository"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Feature is limited to mobile diagnostic UI; no API/model/domain documentation changes required"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: users tab is routable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: users request runs only on action",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: loading and error states shown",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: response renders four user fields",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: uses shared axios and react-query foundation",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "file": "04-implement-mobile-session-test-tab.md",
+      "status": "completed",
+      "commitHash": "5900560",
+      "startedAt": "2026-03-20T13:21:47.839Z",
+      "completedAt": "2026-03-20T13:25:02.481Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "В шаге явно указано manual-only, автоматические тесты не требуются"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Task-specific автотесты не требуются по спецификации шага"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Regression автотесты не запускались: в шаге manual-only"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменений API/модели/архитектуры не добавлено"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: session-test tab is reachable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: signin sends fixed user1/123 credentials",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: check and signout update session state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: in-flight and error states visible",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: session JSON reflects latest state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: session state uses jotai atoms",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "file": "05-document-mobile-manual-test-strategy.md",
+      "status": "completed",
+      "commitHash": "8989613",
+      "startedAt": "2026-03-20T13:25:10.109Z",
+      "completedAt": "2026-03-20T13:27:10.703Z",
+      "error": null,
+      "retryUsed": false,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository; markdown docs edited without formatter changes"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "Docs-only step; no automated test files required"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Docs verification only per step testing section"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No code-path changes requiring regression suites"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: mobile README is project-specific",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: docs include exact run and stop flow",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: manual checklist for users and session-test",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: docs state Expo automated tests out of scope",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: docs clarify Playwright is web-only",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

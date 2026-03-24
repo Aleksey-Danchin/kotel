@@ -54,8 +54,7 @@ All step state is managed through the queue script. You call it via Shell and pa
 | `node scripts/step-queue.js status` | Show all steps with their statuses (for diagnostics). |
 | `node scripts/step-queue.js skip <order>` | Skip a step (mark as skipped). |
 | `node scripts/step-queue.js reset <order>` | Reset a step to pending (from completed, failed, skipped, or in_progress). Clears all state including progress. |
-| `node scripts/step-queue.js resolver-log <order> --path <abs-path>` | Register a resolver log file path for a step (appends to `resolverLogs` array in progress). |
-| `node scripts/step-queue.js retry-mark <order>` | Atomically mark retry as used for a step. Returns `alreadyUsed: true` if retry was already consumed. |
+| `node scripts/step-queue.js retry-mark <order> [--max N]` | Atomically increment retry counter for a step. Default max is 2. Returns `{ retryCount, maxRetries, exhausted }`. |
 | `node scripts/step-queue.js progress-init <order> --ac "label" ...` | Initialize default phase items and AC items for a step. Idempotent if progress already exists. |
 | `node scripts/step-queue.js progress-get <order>` | Get progress items for a step (for diagnostics). |
 
@@ -63,13 +62,13 @@ All step state is managed through the queue script. You call it via Shell and pa
 
 ### Phase 0: Global Pre-flight (once per run)
 
-1. **Dev environment health check.** Verify that all 5 dev containers are Up and healthy:
+1. **Dev environment health check.** Verify that all 6 dev containers are Up and healthy:
 
 ```bash
-docker compose -f infra/compose/docker-compose.dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kris-(traefik|postgres|backend|frontend|prisma-studio)' | grep -v '\-test'
+docker compose -f infra/compose/dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kotel-(traefik|postgres|backend|frontend|studio|mobile)-'
 ```
 
-All 5 must be `Up` and `(healthy)`. If any are not — emit error and stop.
+All 6 must be `Up` and `(healthy)`. If any are not — emit error and stop.
 
 2. **Initialize queue state:**
 
@@ -87,7 +86,10 @@ Execute steps in a loop:
 Loop:
   1. next = Shell("node scripts/step-queue.js next")
   2. If next.step is null → go to Phase 2 (Completion)
-  3. Pre-step dev health check → if unhealthy, stop
+  3. Pre-step dev health check:
+     - Run the health check command. If all 6 containers are healthy → continue.
+     - If `transitionalFromPreviousStep` is true → reset the flag. Invoke extraordinary-resolver to attempt to fix health (write an Error Report with container status, no step-imp context). If RESOLVED → continue. If UNRESOLVED → tell step-imp about the degraded state in its launch prompt: "Dev containers [list] are currently unhealthy (transitional from previous step). Proceed — your work should restore health." Continue to step 4.
+     - If unhealthy (no transitional flag) → invoke extraordinary-resolver (write an Error Report with container status). If RESOLVED → continue. If UNRESOLVED → stop.
   4. Shell("node scripts/step-queue.js start <order>")
   5. Pre-initialize progress tracking (see "Defense 1" below)
   6. Launch step-imp subagent (see "Defense 2" below for fallback)
@@ -97,13 +99,13 @@ Loop:
      - If it starts with `RESULT: BLOCKED` → extract the category and route:
        • `BLOCKED infra` → go to Phase 1.5 (Extraordinary Resolution)
        • `BLOCKED implementation` → go to Phase 1.6 (Implementation Retry)
-       • `BLOCKED spec` → fail step with error "spec conflict", stop
-       • `BLOCKED dependency` → fail step with error "missing dependency", stop
+       • `BLOCKED spec` → go to Phase 1.5 (Extraordinary Resolution)
+       • `BLOCKED dependency` → go to Phase 1.5 (Extraordinary Resolution)
        • No category or unrecognized → treat as `BLOCKED infra` (let resolver diagnose)
      - If not a RESULT line → treat as `BLOCKED infra`
   8. Post-step dev health check:
      - If unhealthy → attempt to restart the unhealthy container(s) yourself (docker restart <container>, wait for healthy up to 60s)
-     - If still unhealthy after restart → fail step, stop
+     - If still unhealthy after restart → invoke extraordinary-resolver (Phase 1.5). If RESOLVED → continue. If UNRESOLVED → check transitional completion (Phase 1.5 step d). If transitional → commit and set flag. If not → fail step, stop.
      - If healthy → continue
   9. Progress integrity check (see "Defense 3" below)
   10. Git commit:
@@ -154,6 +156,8 @@ Execute the development step from this file:
 
 **Step order:** <order>
 
+**Cross-step context:** `.dev/context.md` (read if exists — contains discoveries from previous steps)
+
 **Instructions:**
 - Dev environment health verified by orchestrator. Skip Phase 0 pre-flight.
 - Perform all phases required by the step (implementation, tests, verification).
@@ -188,33 +192,29 @@ After step-imp reports SUCCESS and dev health is confirmed, verify that progress
    - In the error context passed to the new step-imp, include:
      - Which AC items are still not in a final status (list their ids and current statuses).
      - That the previous step-imp reported SUCCESS prematurely.
-   - If Phase 1.6 is exhausted (retry already used), **then** fail the step and stop:
+   - If Phase 1.6 is exhausted (all retries consumed), **then** fail the step and stop:
      ```bash
-     node scripts/step-queue.js fail <order> --error "progress integrity check failed: step-imp did not complete all AC items, implementation retry exhausted"
+     node scripts/step-queue.js fail <order> --error "progress integrity check failed: step-imp did not complete all AC items, implementation retries exhausted"
      ```
 
 **Commit message contract:** Always use `git commit -m "step-<NN>: <Title> (<step-filename>)"` where `<NN>` is the zero-padded step order, `<Title>` is extracted from the step file's first heading (e.g., `# Step 01: Implement Blossom pairing algorithm` → title is `Implement Blossom pairing algorithm`), and `<step-filename>` is the file name from the queue. Example: `step-01: Implement Blossom pairing algorithm (01-blossom-algorithm.md)`. The validate command matches commits by checking if the message includes the step filename, so it must always be present.
 
 **Resume semantics:** If `next` returns a step with status `in_progress`, it means a previous run was interrupted. Re-run `step-imp` for that step — the executor will check existing progress via `progress-get` and continue from where it left off.
 
-### Phase 1.5: Extraordinary Resolution (infra)
+### Phase 1.5: Extraordinary Resolution
 
-When `step-imp` exits with `BLOCKED infra`, invoke the `extraordinary-resolver` subagent.
+When `step-imp` exits with any `BLOCKED` category (`infra`, `implementation`, `spec`, `dependency`), invoke the `extraordinary-resolver` subagent. The resolver is the **universal safety net** — it is always called before giving up on a step, regardless of the BLOCKED category.
 
 #### Procedure
 
-1. **Determine the log file path** for the resolver. Use an absolute path:
+1. **Determine the step context file path.** It is the sibling of the step file with `-context.md` suffix:
    ```
-   <project-root>/.dev/resolver-logs/<step-filename>.md
+   <project-root>/.dev/steps/<step-filename-without-ext>-context.md
    ```
-   Create the `.dev/resolver-logs/` directory if it doesn't exist.
+   For example: `01-update-auth-design-doc.md` → `01-update-auth-design-doc-context.md`.
+   The file may already exist (created by step-imp). If not, create it.
 
-2. **Register the log file** in progress.json:
-   ```bash
-   node scripts/step-queue.js resolver-log <order> --path <absolute-log-path>
-   ```
-
-3. **Write the Error Report** as the first section of the log file (or append if the file already exists from a previous resolver call). Collect all context and write it in this format:
+2. **Append the Error Report** to the step context file. Collect all context and write it in this format:
 
    ```markdown
    ---
@@ -246,62 +246,93 @@ When `step-imp` exits with `BLOCKED infra`, invoke the `extraordinary-resolver` 
    <last 50 lines of relevant container logs>
    ```
 
-4. **Launch `extraordinary-resolver`** subagent with a single argument: the **absolute path to the log file**. Do not pass error context in the prompt — the resolver reads everything from the file.
+3. **Launch `extraordinary-resolver`** subagent with a single argument: the **absolute path to the step context file**. Do not pass error context in the prompt — the resolver reads everything from the file.
 
-5. **Interpret the resolver's return value** (a single word: `RESOLVED` or `UNRESOLVED`):
+4. **Interpret the resolver's return value** (a single word: `RESOLVED` or `UNRESOLVED`):
    - If `RESOLVED`:
      a. **Resume the same `step-imp` instance** (do not create a new one). Include in the resume message:
         - Confirmation that the environment problem has been fixed.
-        - The absolute path to the resolver log file (so step-imp can read what changed if needed).
+        - The absolute path to the step context file (so step-imp can read what the resolver changed).
         - The step's order number (for progress-update calls).
         - Instruction to continue work from where it left off.
      b. Go back to step 7 of the Loop to interpret the new step-imp result.
    - If `UNRESOLVED`:
-     a. **Read the resolver log file** to check the resolver's classification.
+     a. **Read the step context file** to check the resolver's classification.
      b. If the resolver classified the problem as **application logic** (outside its scope):
         - This means step-imp misclassified — the real problem is in the code, not infra.
         - Go to **Phase 1.6 (Implementation Retry)** instead of failing.
-     c. Otherwise (genuine infra problem that couldn't be fixed):
-        - Record the failure: `Shell("node scripts/step-queue.js fail <order> --error 'extraordinary-resolver: UNRESOLVED'")`.
-        - Emit error referencing the resolver log file absolute path (the user can read it for details).
-        - Stop processing further steps.
+     c. If the resolver classified the problem as **transitional** (environment degraded between sequential steps):
+        - Go to step (d) below (transitional completion check).
+     d. **Check for transitional completion** — the step's work may be done despite the environment issue:
+        - Run `node scripts/step-queue.js progress-get <order>` and check if **every** `ac-*` item has a final status (`completed` or `cancelled`).
+        - If ALL ACs are in a final state → **transitional completion**:
+          - The step did its job, but the dev environment is in a known degraded state (e.g., schema migration applied but backend code not yet updated — that's the next step's job).
+          - Skip the post-step health check (step 8) and proceed directly to step 9 (progress integrity) and step 10 (git commit).
+          - Set `transitionalFromPreviousStep = true` so the next iteration's pre-step health check is relaxed (see step 3).
+        - If NOT all ACs are in a final state → **genuine failure**:
+          - Record the failure: `Shell("node scripts/step-queue.js fail <order> --error 'extraordinary-resolver: UNRESOLVED'")`.
+          - Emit error referencing the step context file absolute path (the user can read it for details).
+          - Stop processing further steps.
 
-**Note:** The resolver log file is primarily for step-imp, other subagents, and the user. You only need to read it when the resolver returns UNRESOLVED — to check whether the classification was "application logic" (triggers fallback to Phase 1.6).
+#### Feedback: Append Outcome to Step Context File
+
+After processing the resolver's return value (RESOLVED or UNRESOLVED) and deciding what to do, **append an outcome entry** to the step context file. This gives the resolver (and the user) a complete audit trail.
+
+```markdown
+---
+
+## Outcome — <ISO timestamp>
+
+**Resolver result**: RESOLVED / UNRESOLVED
+**Classification**: <resolver's classification, if UNRESOLVED>
+**steps-man decision**: <what you decided — resumed step-imp / transitional commit / implementation retry / failed step>
+**Rationale**: <one sentence — why this decision>
+```
+
+This is especially important for the transitional completion path — the resolver classified the problem as `transitional` and returned UNRESOLVED, but steps-man committed the step anyway because all ACs were met. Without this entry, the log would look like the resolver failed, when in fact the pipeline continued successfully.
 
 ### Phase 1.6: Implementation Retry
 
-When `step-imp` exits with `BLOCKED implementation` (or when resolver reclassifies a `BLOCKED infra` as application logic), give step-imp **one fresh attempt** with clean context.
+When `step-imp` exits with `BLOCKED implementation` (or when resolver reclassifies a problem as application logic), give step-imp another attempt — **resuming the existing instance first**, falling back to a new one if resume is impossible.
 
 #### Guard
 
-The retry may only be used **once per step**. The retry state is persisted in `progress.json` via the `retry-mark` command, so it survives steps-man restarts.
+Up to **2 retries per step** (configurable via `--max`). The retry state is persisted in `progress.json` via the `retry-mark` command, so it survives steps-man restarts.
 
-1. Call `Shell("node scripts/step-queue.js retry-mark <order>")`.
-2. If the response contains `"alreadyUsed": true` — retry was already consumed. **Escalate to extraordinary-resolver:**
-   - Check if the resolver has already been invoked for this step (check whether a resolver log file exists at `.dev/resolver-logs/<step-filename>.md`, or check `resolverLogs` in progress).
+1. Call `Shell("node scripts/step-queue.js retry-mark <order> --max 2")`.
+2. If the response contains `"exhausted": true` — all retries consumed. **Escalate to extraordinary-resolver:**
+   - Check if the resolver has already been invoked for this step (check whether the step context file at `.dev/steps/<step-filename-without-ext>-context.md` contains `## Invocation` sections).
    - If resolver **has NOT been invoked** → go to **Phase 1.5 (Extraordinary Resolution)**. This gives the resolver a chance to diagnose a hidden infra/config issue behind repeated implementation failures.
-   - If resolver **was already invoked** → both retry and resolver are exhausted. Fail the step:
+   - If resolver **was already invoked** → both retries and resolver are exhausted. Fail the step:
      ```bash
-     node scripts/step-queue.js fail <order> --error "implementation retry and extraordinary-resolver exhausted"
+     node scripts/step-queue.js fail <order> --error "implementation retries and extraordinary-resolver exhausted"
      ```
      Emit error with the step filename and the error details from step-imp. Stop processing further steps.
-3. If `"alreadyUsed": false` — proceed to the Procedure below.
+3. If `"exhausted": false` — proceed to the Procedure below.
 
 #### Procedure
 
 1. **Collect the error context** from the previous step-imp's output:
    - The completion report (what was done, what failed, which tests, what was tried)
    - The current progress: `Shell("node scripts/step-queue.js progress-get <order>")`
+   - The step context file at `.dev/steps/<step-filename-without-ext>-context.md` (contains full history from step-imp, resolver, and steps-man)
 
-2. **Launch a NEW step-imp instance** (do not resume the previous one). Include in the prompt:
-   - The step's absolutePath and order number
-   - Instruction: "Dev environment health verified by orchestrator. Skip Phase 0 pre-flight."
-   - The full error context from the previous attempt
-   - Instruction: "A previous step-imp attempt completed the implementation but could not make it work. The code is already in the working tree. Focus on diagnosing and fixing the specific problem described above. Check existing progress via `progress-get` — continue from where the previous attempt left off."
+2. **Try to RESUME the existing step-imp instance first.** The previous instance already has full codebase context, partial implementation state, and understanding of the problem. Include in the resume message:
+   - Confirmation that the problem has been investigated (and fixed if resolver was involved).
+   - The error context and guidance on what to try differently.
+   - Instruction to continue work from where it left off.
 
-3. **Interpret the new step-imp result** — go back to step 7 of the Loop.
+3. **If resume fails** (the Task call returns an error — agent expired, context limit reached, subagent-type unavailable):
+   - **Launch a NEW step-imp instance.** Include in the prompt:
+     - The step's absolutePath and order number
+     - Instruction: "Dev environment health verified by orchestrator. Skip Phase 0 pre-flight."
+     - Path to step context file (`.dev/steps/<step-filename-without-ext>-context.md`) — "Read this file first. It contains the full history of work on this step: previous step-imp entries, resolver invocations, and steps-man decisions."
+     - Path to cross-step context file (`.dev/context.md`) — "Read this file for cross-step discoveries and conventions."
+     - Instruction: "A previous step-imp attempt could not complete the step. The code is already in the working tree. Focus on diagnosing and fixing the specific problem described in the step context file. Check existing progress via `progress-get` — continue from where the previous attempt left off."
 
-A fresh instance gets a clean context window, can re-read the code with fresh eyes, and may approach the problem differently. The implementation is already in the working tree, so it doesn't need to rewrite everything.
+4. **Interpret the step-imp result** — go back to step 7 of the Loop.
+
+Resume-first preserves the agent's accumulated context (codebase understanding, partial fixes, debugging state). A new instance is the fallback — it gets structured context from the step context file instead of raw text in the prompt.
 
 ### Phase 2: Completion
 
@@ -324,13 +355,17 @@ When the queue script returns `{"ok": false, ...}` or an unexpected response:
 
 ### step-imp failures
 
-When `step-imp` reports BLOCKED, route based on the category (see Phase 1 Step 7):
+When `step-imp` reports BLOCKED, **every category** is routed through extraordinary-resolver before giving up. There are no instant-kill categories.
 
-- `BLOCKED infra` → **Phase 1.5** (resolver). If resolver returns UNRESOLVED with "application logic" classification → **Phase 1.6** (retry). If resolver returns UNRESOLVED otherwise → fail step, stop.
-- `BLOCKED implementation` → **Phase 1.6** (retry). If retry also fails → **Phase 1.5** (resolver, if not yet invoked). If resolver also fails or was already invoked → fail step, stop.
-- `BLOCKED spec` / `BLOCKED dependency` → fail step immediately, report to user.
+- `BLOCKED infra` → **Phase 1.5** (resolver). If UNRESOLVED + application_logic → **Phase 1.6** (retry). If UNRESOLVED + all ACs done → transitional commit. Otherwise → fail.
+- `BLOCKED implementation` → **Phase 1.6** (retry). If retry also fails → **Phase 1.5** (resolver). If resolver also fails → fail.
+- `BLOCKED spec` → **Phase 1.5** (resolver). If UNRESOLVED + application_logic → **Phase 1.6** (retry). If UNRESOLVED + all ACs done → transitional commit. Otherwise → fail.
+- `BLOCKED dependency` → **Phase 1.5** (resolver). If UNRESOLVED + all ACs done → transitional commit. Otherwise → fail.
 
-The **full escalation chain** for non-infra failures: step-imp → retry (fresh step-imp) → extraordinary-resolver → stop. The resolver is always the last safety net before giving up.
+The **full escalation chain**: step-imp → extraordinary-resolver → (if applicable) implementation retry → stop. The resolver is **always** invoked before giving up on any step, regardless of the BLOCKED category. This ensures that:
+1. Infrastructure issues are diagnosed even when step-imp misclassifies the problem.
+2. Transitional states (e.g., schema migrated but code update is in the next step) are handled gracefully — the step's work is committed and the pipeline continues.
+3. The pipeline can run for long sequences of steps without human intervention.
 
 Do **not** attempt to fix the step's code yourself — delegate to resolver (infra) or a fresh step-imp instance (implementation).
 

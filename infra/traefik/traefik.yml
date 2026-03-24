@@ -8,6 +8,10 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+  api1:
+    address: ":3001"
+  api2:
+    address: ":3002"
   ping:
     address: ":8082"
 

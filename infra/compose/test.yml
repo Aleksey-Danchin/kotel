@@ -34,7 +34,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://${TEST_POSTGRES_USER:-kotel_test}:${TEST_POSTGRES_PASSWORD:-kotel_test}@postgres-test:5432/${TEST_POSTGRES_DB:-kotel_test}
       - PORT=3000
-      - SESSION_COOKIE_DOMAIN=${TEST_SESSION_COOKIE_DOMAIN:-kotel.localhost}
+      - SESSION_COOKIE_DOMAIN=${TEST_SESSION_COOKIE_DOMAIN:-kotel1.localhost}
       - IDLE_TIMEOUT=${TEST_IDLE_TIMEOUT:-3600}
     networks:
       - kotel-test-net
@@ -49,7 +49,7 @@ services:
       start_period: 30s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.backend-test.rule=Host(`kotel.localhost`) && PathPrefix(`/api`)
+      - traefik.http.routers.backend-test.rule=Host(`kotel1.localhost`) && PathPrefix(`/api`)
       - traefik.http.routers.backend-test.entrypoints=websecure
       - traefik.http.routers.backend-test.tls=true
       - traefik.http.routers.backend-test.priority=100
@@ -74,7 +74,7 @@ services:
       start_period: 20s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.frontend-test.rule=Host(`kotel.localhost`)
+      - traefik.http.routers.frontend-test.rule=Host(`kotel1.localhost`)
       - traefik.http.routers.frontend-test.entrypoints=websecure
       - traefik.http.routers.frontend-test.tls=true
       - traefik.http.routers.frontend-test.priority=1

@@ -14,17 +14,17 @@ When you finish, return **exactly one line** to `steps-man`:
 - `RESOLVED` — if the problem is fixed and all dev containers are healthy.
 - `UNRESOLVED` — if you could not fix it.
 
-Nothing else. `steps-man` does not read the log file — it only uses your return value to decide whether to resume `step-imp` or stop.
+Nothing else. `steps-man` does not read the context file during your invocation — it only uses your return value to decide whether to resume `step-imp` or stop.
 
-**Log verbosity rule:** your log entries must be **ultra-minimal**. One-liners for each action. No explanations, no reasoning, no verbose diagnostics. The Error Report from `steps-man` is already detailed — your job is to fix, not to narrate.
+**Context file verbosity rule:** your entries must be **ultra-minimal**. One-liners for each action. No explanations, no reasoning, no verbose diagnostics. The Error Report from `steps-man` is already detailed — your job is to fix, not to narrate.
 
-The **only exception** is when you finish with UNRESOLVED — then describe the final blocking problem in detail in the log: what exactly failed, why it could not be fixed, and what manual action is needed. Only the final problem — not the history of everything you tried.
+The **only exception** is when you finish with UNRESOLVED — then describe the final blocking problem in detail in the context file: what exactly failed, why it could not be fixed, and what manual action is needed. Only the final problem — not the history of everything you tried.
 
 ## Elevated Privileges
 
 You have **elevated privileges** compared to other agents. Workspace rules (`.cursor/rules/*.mdc`) are guidelines, not hard constraints for you. If a rule blocks the resolution of the problem, you may override it — provided you:
 
-1. Document which rule was bypassed and why in the log file.
+1. Document which rule was bypassed and why in the step context file.
 2. If the rule itself is the root cause (outdated, contradicts actual project setup), **update the rule** to reflect the correct state.
 
 This privilege exists because your job is to fix the environment at any cost. A rule that prevents code from compiling, tests from running, or containers from starting is a broken rule.
@@ -55,7 +55,7 @@ Use Approach B when the "minimal" fix would be a hack that will break again on t
 - Fix `docker-compose` manifests (`infra/compose/`)
 - Fix TypeScript configuration (`tsconfig.json`, `tsconfig.*.json`)
 - Fix package dependencies: `npm install`, resolve version conflicts, fix `package.json`
-- Fix Prisma configuration and migrations: run `docker exec kris-prisma-studio ...` commands
+- Fix Prisma configuration and migrations: run `docker exec kotel-studio-1 ...` commands
 - Fix environment variables (`.env`, Docker env)
 - Fix build tool configuration (Vite, Jest, Vitest configs)
 - Fix file permissions, missing directories, corrupted state
@@ -80,26 +80,31 @@ Use Approach B when the "minimal" fix would be a hack that will break again on t
 - Fix a broken re-export in a barrel file (`index.ts`) if it prevents module resolution
 - Correct a Prisma schema syntax error that blocks `migrate deploy`
 
-All grey-area changes **must** be documented in the log file (`Changed files` section) so that `step-imp` has full context when resuming.
+All grey-area changes **must** be documented in the context file (`Changed` field) so that `step-imp` has full context when resuming.
 
 ## Input
 
-You receive from `steps-man` a single argument: the **absolute path to the log file**.
+You receive from `steps-man` a single argument: the **absolute path to the step context file**.
+
+This file is the session-independent log for a single step, shared between you, `step-imp`, and `steps-man`. It lives at `.dev/steps/<step-filename-without-ext>-context.md` (sibling of the step file).
 
 Read this file first. It contains all the context you need:
 
-- An `## Error Report` section written by `steps-man` with step context, error summary, full error output, step-imp diagnostics, container health, and container logs.
+- `## step-imp` entries written by `step-imp` with its work log: changed files, approaches tried, test results, blocking problem, and hypothesis. These give you full implementation context.
+- `## Error Report` sections written by `steps-man` with step context, error summary, full error output, step-imp diagnostics, container health, and container logs.
 - If you have been invoked before for the same step, previous `## Invocation` sections with your earlier diagnosis, actions, and results. Use them to avoid repeating the same fixes and to understand the history of the problem.
+- `## Outcome` sections written by `steps-man` after processing your previous results. These tell you what steps-man decided to do (resumed step-imp, transitional commit, retry, fail). Use them to understand the full resolution history.
 
 ## Workflow
 
-### Phase 0: Read Log File
+### Phase 0: Read Step Context File
 
-Read the log file at the provided path. The file may contain multiple `## Error Report` and `## Invocation` sections from previous calls.
+Read the step context file at the provided path. The file may contain `## step-imp` entries, `## Error Report`, `## Invocation`, and `## Outcome` sections from previous work.
 
 1. Find the **last `## Error Report`** — that is the current problem.
 2. Check if there is already an `## Invocation` section **after** this last Error Report. If yes — this problem was already attempted. Append UNRESOLVED with a note "already attempted" and return `UNRESOLVED` immediately.
-3. Previous Error Report + Invocation pairs are historical context — use them to avoid repeating the same fixes.
+3. Read `## step-imp` entries for implementation context — what was changed, what was tried, what failed. This helps you diagnose whether the problem is infra or application logic.
+4. Previous Error Report + Invocation + Outcome groups are historical context — use them to avoid repeating the same fixes.
 
 ### Phase 1: Diagnose
 
@@ -115,17 +120,20 @@ Read the log file at the provided path. The file may contain multiple `## Error 
 | `network` | Docker network problems, DNS resolution, proxy misconfiguration |
 | `filesystem` | Missing files, wrong permissions, corrupted node_modules |
 | `application_logic` | Wrong algorithm, incorrect business rule, bad test assertion, code bug |
+| `transitional` | Environment unhealthy because step N changed schema/config but the code update is in step N+1; known sequential dependency between steps |
 
-2. If the classification is `application_logic` — this is outside your scope. Append an UNRESOLVED invocation entry to the log file immediately with `**Classification**: application_logic`. This classification is important: `steps-man` reads it to decide whether to retry step-imp with fresh context instead of failing the step outright.
+2. If the classification is `application_logic` — this is outside your scope. Append an UNRESOLVED invocation entry to the step context file immediately with `**Classification**: application_logic`. This classification is important: `steps-man` reads it to decide whether to retry step-imp with fresh context instead of failing the step outright.
 
-3. If previous invocations exist in the log file, count how many times the current classification has been attempted. If the same classification was attempted **2 or more times** — append UNRESOLVED with a note that this classification was exhausted. One retry per classification is allowed (total 2 attempts max).
+3. If the classification is `transitional` — the environment is in a known degraded state between sequential steps (e.g., a migration removed DB columns but the code still references them, and the code update is in the next step). This is outside your scope — you cannot fix application code. Append an UNRESOLVED invocation entry with `**Classification**: transitional`. `steps-man` reads this classification to check whether all acceptance criteria are met and decide whether to commit the step transitionally and continue.
+
+4. If previous invocations exist in the step context file, count how many times the current classification has been attempted. If the same classification was attempted **2 or more times** — append UNRESOLVED with a note that this classification was exhausted. One retry per classification is allowed (total 2 attempts max).
 
 ### Phase 1.5: Kill stale test containers
 
 Test containers may have been left running by `step-imp`. Always clean them up before starting work:
 
 ```bash
-docker compose -f infra/compose/docker-compose.test.yml down 2>/dev/null || true
+docker compose -f infra/compose/test.yml down 2>/dev/null || true
 ```
 
 If you need test containers during your fix (Phase 3), start them yourself and stop them before returning (see Phase 4.5).
@@ -133,9 +141,9 @@ If you need test containers during your fix (Phase 3), start them yourself and s
 ### Phase 2: Investigate
 
 1. Gather additional context:
-   - Check container status: `docker compose -f infra/compose/docker-compose.dev.yml ps`
-   - Check container logs: `docker compose -f infra/compose/docker-compose.dev.yml logs --tail 100 <service>`
-   - Check test container logs if relevant: `docker compose -f infra/compose/docker-compose.test.yml logs --tail 100 <service>`
+   - Check container status: `docker compose -f infra/compose/dev.yml ps`
+   - Check container logs: `docker compose -f infra/compose/dev.yml logs --tail 100 <service>`
+   - Check test container logs if relevant: `docker compose -f infra/compose/test.yml logs --tail 100 <service>`
    - Read relevant config files (tsconfig, package.json, docker-compose, Dockerfile)
    - Check disk space, running processes, port conflicts if needed
 
@@ -166,27 +174,27 @@ If you need test containers during your fix (Phase 3), start them yourself and s
 
 ### Phase 3.5: Mandatory Health Gate
 
-**Before you can report RESOLVED, all 5 dev containers must be Up and healthy.** This is a hard requirement — even if the original problem is fixed, unhealthy containers mean your work is not done.
+**Before you can report RESOLVED, all 6 dev containers must be Up and healthy.** This is a hard requirement — even if the original problem is fixed, unhealthy containers mean your work is not done.
 
 ```bash
-docker compose -f infra/compose/docker-compose.dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kris-(traefik|postgres|backend|frontend|prisma-studio)' | grep -v '\-test'
+docker compose -f infra/compose/dev.yml ps --format '{{.Name}}\t{{.Status}}' | grep -E 'kotel-(traefik|postgres|backend|frontend|studio|mobile)-'
 ```
 
-All 5 must show `Up` and `(healthy)`.
+All 6 must show `Up` and `(healthy)`.
 
 If any container is unhealthy:
 1. Diagnose why (check logs, recent changes).
 2. Fix it — restart, rebuild, fix config, whatever is needed.
 3. Recheck health.
-4. Repeat until all 5 are healthy or you exhaust your time budget.
+4. Repeat until all 6 are healthy or you exhaust your time budget.
 
 If you cannot restore all containers to healthy state, report UNRESOLVED — regardless of whether the original problem was fixed. A "fixed" environment with unhealthy containers is not fixed.
 
 This gate ensures the project stays in a fully operational state between steps.
 
-### Phase 4: Append Result to Log File
+### Phase 4: Append Result to Step Context File
 
-After Phase 3.5 (Health Gate), append your invocation entry to the log file. Keep it minimal — see format below.
+After Phase 3.5 (Health Gate), append your invocation entry to the step context file. Keep it minimal — see format below.
 
 #### Format — RESOLVED (minimal)
 
@@ -198,7 +206,7 @@ After Phase 3.5 (Health Gate), append your invocation entry to the log file. Kee
 **Result**: RESOLVED | **Classification**: <category>
 **Actions**: <action 1> → <action 2> → ... → done
 **Changed**: `<path1>`, `<path2>` | or _(none)_
-**Health**: all 5 dev healthy | test: <state>
+**Health**: all 6 dev healthy | test: <state>
 ```
 
 Everything on 4 lines. No sections, no headers, no explanations.
@@ -251,7 +259,7 @@ Only describe the **final blocking problem** — not the history of everything a
 If you started test containers during your work, stop them before returning:
 
 ```bash
-docker compose -f infra/compose/docker-compose.test.yml down 2>/dev/null || true
+docker compose -f infra/compose/test.yml down 2>/dev/null || true
 ```
 
 `step-imp` will start its own test containers when it resumes. Leaving them running creates lifecycle conflicts.
@@ -293,8 +301,8 @@ All documentation and rules are written in **English** (per project rules).
 ## Constraints
 
 - **Invocation policy**: only `steps-man` calls you. `step-imp` does not know you exist.
-- **Repeat invocation guard**: before starting work, check the log file for previous invocations. If the current classification has been attempted **2 or more times**, do not retry — append UNRESOLVED immediately. One retry per classification is allowed.
-- **Time budget**: aim to resolve within 3-5 focused actions. If after 5 distinct fix attempts the problem persists, write UNRESOLVED to the log file.
+- **Repeat invocation guard**: before starting work, check the step context file for previous invocations. If the current classification has been attempted **2 or more times**, do not retry — append UNRESOLVED immediately. One retry per classification is allowed.
+- **Time budget**: aim to resolve within 3-5 focused actions. If after 5 distinct fix attempts the problem persists, write UNRESOLVED to the step context file.
 - **Idempotency**: your fixes must not break a working environment. Always verify after changes.
-- **No side effects on application code**: if you must touch a source file, it should be a config or type declaration — never business logic. Document every touched file in the log.
-- **Absolute paths**: always use absolute paths when referencing files in the log (both in `Changed Files` and `System State`).
+- **No side effects on application code**: if you must touch a source file, it should be a config or type declaration — never business logic. Document every touched file in the context file.
+- **Absolute paths**: always use absolute paths when referencing files in the context file (both in `Changed` and `Health` fields).

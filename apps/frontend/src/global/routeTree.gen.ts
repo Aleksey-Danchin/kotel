@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './../routes/~__root'
 import { Route as UsersRouteImport } from './../routes/~users'
+import { Route as SetupRouteImport } from './../routes/~setup'
 import { Route as SessionTestRouteImport } from './../routes/~session-test'
+import { Route as CallbackRouteImport } from './../routes/~callback'
 import { Route as IndexRouteImport } from './../routes/~index'
 import { Route as KeyIndexRouteImport } from './../routes/~$key/~index'
 
@@ -19,9 +21,19 @@ const UsersRoute = UsersRouteImport.update({
   path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SetupRoute = SetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SessionTestRoute = SessionTestRouteImport.update({
   id: '/session-test',
   path: '/session-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CallbackRoute = CallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,34 +49,55 @@ const KeyIndexRoute = KeyIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/session-test': typeof SessionTestRoute
+  '/setup': typeof SetupRoute
   '/users': typeof UsersRoute
   '/$key/': typeof KeyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/session-test': typeof SessionTestRoute
+  '/setup': typeof SetupRoute
   '/users': typeof UsersRoute
   '/$key': typeof KeyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/callback': typeof CallbackRoute
   '/session-test': typeof SessionTestRoute
+  '/setup': typeof SetupRoute
   '/users': typeof UsersRoute
   '/$key/': typeof KeyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/session-test' | '/users' | '/$key/'
+  fullPaths:
+    | '/'
+    | '/callback'
+    | '/session-test'
+    | '/setup'
+    | '/users'
+    | '/$key/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/session-test' | '/users' | '/$key'
-  id: '__root__' | '/' | '/session-test' | '/users' | '/$key/'
+  to: '/' | '/callback' | '/session-test' | '/setup' | '/users' | '/$key'
+  id:
+    | '__root__'
+    | '/'
+    | '/callback'
+    | '/session-test'
+    | '/setup'
+    | '/users'
+    | '/$key/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CallbackRoute: typeof CallbackRoute
   SessionTestRoute: typeof SessionTestRoute
+  SetupRoute: typeof SetupRoute
   UsersRoute: typeof UsersRoute
   KeyIndexRoute: typeof KeyIndexRoute
 }
@@ -78,11 +111,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/session-test': {
       id: '/session-test'
       path: '/session-test'
       fullPath: '/session-test'
       preLoaderRoute: typeof SessionTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/callback': {
+      id: '/callback'
+      path: '/callback'
+      fullPath: '/callback'
+      preLoaderRoute: typeof CallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,7 +151,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CallbackRoute: CallbackRoute,
   SessionTestRoute: SessionTestRoute,
+  SetupRoute: SetupRoute,
   UsersRoute: UsersRoute,
   KeyIndexRoute: KeyIndexRoute,
 }

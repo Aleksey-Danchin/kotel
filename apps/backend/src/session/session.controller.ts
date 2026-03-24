@@ -3,68 +3,164 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
   Post,
   Req,
   Res,
-  UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type { User } from '~prisma/client/client';
-import { SessionUser } from './session-user.decorator';
-import { signinSchema } from './session.contract';
+import { logoutSchema, type LogoutDto } from '@contracts/session';
+import { ZodError } from 'zod';
 import {
-  getSessionCookieOptions,
-  SESSION_COOKIE_NAME,
-} from './session.constants';
-import { SessionGuard, SessionGuardConfig } from './session.guard';
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  getAccessTokenCookieOptions,
+  getRefreshTokenCookieOptions,
+} from '../shared/cookie.constants';
+import { Public } from './public.decorator';
+import type { AuthenticatedRequest } from './session-request';
 import { SessionService } from './session.service';
+
+type TokenSource = 'cookie' | 'bearer';
 
 @Controller('session')
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
-  @Post('signin')
-  @HttpCode(200)
-  async signin(
-    @Body() body: unknown,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const parsed = signinSchema.safeParse(body);
-    if (!parsed.success) {
-      throw new BadRequestException(parsed.error.flatten());
-    }
-
-    const result = await this.sessionService.signin(parsed.data);
-    response.cookie(
-      SESSION_COOKIE_NAME,
-      result.sessionKey,
-      getSessionCookieOptions(),
-    );
-    return result.user;
+  @Get('status')
+  getStatus(@Req() request: AuthenticatedRequest): {
+    sessionId: string;
+    user: { id: string; fullname: string; login: string; role: string };
+  } {
+    return {
+      sessionId: request.session.sessionId,
+      user: {
+        id: request.user.id,
+        fullname: request.user.fullname,
+        login: request.user.login,
+        role: request.user.role,
+      },
+    };
   }
 
-  @Post('signout')
-  @HttpCode(200)
-  async signout(
+  @Public()
+  @Post('refresh')
+  refresh(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ ok: true }> {
-    await this.sessionService.signout(
-      request.cookies?.[SESSION_COOKIE_NAME] as string | undefined,
-    );
+  ): Promise<
+    | { sessionId: string }
+    | { accessToken: string; refreshToken: string; sessionId: string }
+  > {
+    const { token, source } = this.extractRefreshToken(request);
+    return this.sessionService.refreshSession(token, source, response);
+  }
 
-    response.clearCookie(SESSION_COOKIE_NAME, getSessionCookieOptions());
+  @Post('logout')
+  async logout(
+    @Req() request: AuthenticatedRequest,
+    @Res({ passthrough: true }) response: Response,
+    @Body() body: unknown,
+  ): Promise<{ ok: true }> {
+    const dto = this.parseLogoutDto(body);
+    if (dto.allDevices) {
+      await this.sessionService.revokeAllUserSessions(
+        request.user.id,
+        'LOGOUT_ALL',
+      );
+    } else {
+      await this.sessionService.revokeSession(
+        request.session.id,
+        'LOGOUT_CURRENT',
+      );
+    }
+
+    if (request.session.clientType === 'WEB') {
+      response.clearCookie(
+        ACCESS_TOKEN_COOKIE,
+        this.toClearCookieOptions(getAccessTokenCookieOptions()),
+      );
+      response.clearCookie(
+        REFRESH_TOKEN_COOKIE,
+        this.toClearCookieOptions(getRefreshTokenCookieOptions()),
+      );
+    }
+
     return { ok: true };
   }
 
-  @Get('check')
-  @UseGuards(SessionGuard)
-  @SessionGuardConfig({ strong: false })
-  check(
-    @SessionUser() sessionUser: User | null,
-    @Res({ passthrough: true }) response: Response,
-  ): void {
-    response.json(sessionUser);
+  private extractRefreshToken(request: Request): {
+    token: string;
+    source: TokenSource;
+  } {
+    const cookieToken =
+      typeof request.cookies?.refreshToken === 'string'
+        ? request.cookies.refreshToken
+        : null;
+    if (cookieToken) {
+      return { token: cookieToken, source: 'cookie' };
+    }
+
+    const bearerToken = this.extractBearerToken(request.headers.authorization);
+    if (bearerToken) {
+      return { token: bearerToken, source: 'bearer' };
+    }
+
+    throw new UnauthorizedException();
+  }
+
+  private extractBearerToken(
+    authorization: string | string[] | undefined,
+  ): string | null {
+    const header = Array.isArray(authorization)
+      ? authorization[0]
+      : authorization;
+    if (!header) {
+      return null;
+    }
+
+    const [scheme, token] = header.split(' ');
+    if (scheme !== 'Bearer' || !token) {
+      return null;
+    }
+
+    const trimmed = token.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+
+  private parseLogoutDto(body: unknown): LogoutDto {
+    try {
+      return logoutSchema.parse(body);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw new BadRequestException({
+          message: 'Validation failed',
+          errors: error.flatten(),
+        });
+      }
+      throw error;
+    }
+  }
+
+  private toClearCookieOptions(options: {
+    domain: string;
+    path: string;
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'none';
+  }): {
+    domain: string;
+    path: string;
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'none';
+  } {
+    return {
+      domain: options.domain,
+      path: options.path,
+      httpOnly: options.httpOnly,
+      secure: options.secure,
+      sameSite: options.sameSite,
+    };
   }
 }

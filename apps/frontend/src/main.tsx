@@ -5,15 +5,16 @@ import { router } from "./global/router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./global/queryClient";
 import { getRoot } from "./global/getRoot";
+import { initAuthMessageListener, restoreServerSessions } from "./api/auth";
 import "./index.css";
-import { SessionCheckMiddleware } from "./middleware/sessionCheckMiddleware";
+
+initAuthMessageListener();
+void restoreServerSessions();
 
 createRoot(getRoot()).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <SessionCheckMiddleware>
-        <RouterProvider router={router} />
-      </SessionCheckMiddleware>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   </StrictMode>,
 );

@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '~prisma': resolve(__dirname, '../prisma'),
+      '@contracts': resolve(__dirname, 'src/contracts'),
     },
   },
   test: {

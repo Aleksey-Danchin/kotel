@@ -1,15 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
 import { FlatList, Pressable, StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { UserRow } from "@/src/api/users";
 import { usersQueryOptions } from "@/src/query-options/users";
+import { activeServerUrlAtom } from "@/src/state/servers";
 
 export default function UsersScreen() {
+  const activeServerUrl = useAtomValue(activeServerUrlAtom);
   const usersQuery = useQuery({
-    ...usersQueryOptions(),
-    enabled: false,
+    ...usersQueryOptions(activeServerUrl ?? ""),
+    enabled: Boolean(activeServerUrl),
   });
 
   const users = usersQuery.data ?? [];
@@ -21,12 +24,20 @@ export default function UsersScreen() {
       <Pressable
         accessibilityRole="button"
         style={styles.loadButton}
+        disabled={!activeServerUrl}
         onPress={() => {
+          if (!activeServerUrl) {
+            return;
+          }
           void usersQuery.refetch();
         }}
       >
         <ThemedText type="defaultSemiBold">загрузить</ThemedText>
       </Pressable>
+
+      {!activeServerUrl ? (
+        <ThemedText>Добавьте сервер и выберите его активным.</ThemedText>
+      ) : null}
 
       {usersQuery.isFetching ? <ThemedText>Загрузка...</ThemedText> : null}
 

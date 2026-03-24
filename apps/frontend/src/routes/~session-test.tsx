@@ -1,109 +1,189 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAtomValue } from "jotai";
+import { useMemo, useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useAtom } from "jotai";
-import { signin, signout } from "../api/session";
-import { sessionCheckQueryOptions } from "../queryOptions/session";
-import { sessionErrorAtom, sessionUserAtom } from "../state/session";
+import { addServer } from "../api/auth";
+import { getServerClient } from "../api/create-server-client";
+import { logout } from "../api/logout";
+import { serversAtom, serversStore } from "../state/servers";
+
+interface SessionStatusResponse {
+  sessionId: string;
+  user: {
+    id: string;
+    fullname: string;
+    login: string;
+    role: string;
+  };
+}
 
 export const Route = createFileRoute("/session-test")({
   component: SessionTestPage,
 });
 
 function SessionTestPage() {
-  const [sessionUser, setSessionUser] = useAtom(sessionUserAtom);
-  const [sessionError, setSessionError] = useAtom(sessionErrorAtom);
+  const serversMap = useAtomValue(serversAtom, { store: serversStore });
+  const servers = useMemo(() => Array.from(serversMap.values()), [serversMap]);
+  const [serverUrl, setServerUrl] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [statusByServer, setStatusByServer] = useState<
+    Record<string, SessionStatusResponse | null>
+  >({});
 
-  const checkQuery = useQuery({
-    ...sessionCheckQueryOptions(),
-    enabled: false,
-  });
-
-  const signinMutation = useMutation({
-    mutationFn: signin,
-    onSuccess: (user) => {
-      setSessionUser(user);
-      setSessionError(null);
-    },
-    onError: (error) => {
-      setSessionError(error instanceof Error ? error.message : "Ошибка signin");
-    },
-  });
-
-  const signoutMutation = useMutation({
-    mutationFn: signout,
-    onSuccess: () => {
-      setSessionUser(null);
-      setSessionError(null);
-    },
-    onError: (error) => {
-      setSessionError(
-        error instanceof Error ? error.message : "Ошибка signout",
-      );
-    },
-  });
-
-  async function handleCheck() {
-    const result = await checkQuery.refetch();
-    if (result.error) {
-      setSessionError(
-        result.error instanceof Error ? result.error.message : "Ошибка check",
-      );
+  async function onAddServer(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const normalizedUrl = serverUrl.trim();
+    if (!normalizedUrl) {
+      setError("Введите адрес сервера");
       return;
     }
 
-    setSessionUser(result.data ?? null);
-    setSessionError(null);
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await addServer(normalizedUrl);
+      setServerUrl("");
+    } catch (addError) {
+      setError(addError instanceof Error ? addError.message : "Не удалось добавить сервер");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function onCheckStatus(url: string) {
+    setError(null);
+    try {
+      const client = getServerClient(url);
+      const response = await client.get<SessionStatusResponse>("/api/session/status");
+      setStatusByServer((current) => ({ ...current, [url]: response.data }));
+    } catch (statusError) {
+      setError(
+        statusError instanceof Error ? statusError.message : "Не удалось проверить статус",
+      );
+    }
+  }
+
+  async function onForceRefresh(url: string) {
+    setError(null);
+    try {
+      const client = getServerClient(url);
+      await client.post("/api/session/refresh");
+    } catch (refreshError) {
+      setError(
+        refreshError instanceof Error
+          ? refreshError.message
+          : "Не удалось принудительно обновить сессию",
+      );
+    }
+  }
+
+  async function onLogout(url: string, allDevices: boolean) {
+    setError(null);
+    try {
+      await logout(url, allDevices);
+    } catch (logoutError) {
+      setError(logoutError instanceof Error ? logoutError.message : "Не удалось выйти");
+    }
   }
 
   return (
-    <main className="p-4 flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">Session test</h1>
+    <section className="space-y-6">
+      <header>
+        <h1 className="text-2xl font-semibold">Session test</h1>
+        <p className="text-sm text-base-content/80">
+          Страница ручного тестирования OAuth и управления сессиями.
+        </p>
+      </header>
 
-      <div className="flex gap-2">
-        <button
-          className="btn btn-primary"
-          onClick={() =>
-            signinMutation.mutate({ login: "user1", password: "123" })
-          }
-          disabled={signinMutation.isPending}
-        >
-          signin
-        </button>
+      <form className="card bg-base-200 shadow-sm" onSubmit={onAddServer}>
+        <div className="card-body gap-3">
+          <h2 className="card-title text-base">Добавить сервер</h2>
+          <input
+            className="input input-bordered w-full"
+            placeholder="https://kotel.localhost"
+            type="url"
+            value={serverUrl}
+            onChange={(event) => setServerUrl(event.target.value)}
+            disabled={isSubmitting}
+          />
+          <div className="card-actions justify-end">
+            <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Подключение..." : "Add server"}
+            </button>
+          </div>
+        </div>
+      </form>
 
-        <button
-          className="btn btn-secondary"
-          onClick={() => signoutMutation.mutate()}
-          disabled={signoutMutation.isPending}
-        >
-          signout
-        </button>
+      {error ? <p className="alert alert-error">{error}</p> : null}
 
-        <button
-          className="btn btn-accent"
-          onClick={() => {
-            void handleCheck();
-          }}
-          disabled={checkQuery.isFetching}
-        >
-          check
-        </button>
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">Подключенные серверы</h2>
+        {servers.length === 0 ? (
+          <div className="alert">Серверы не подключены.</div>
+        ) : (
+          <ul className="space-y-3">
+            {servers.map((session) => {
+              const status = statusByServer[session.serverUrl];
+              return (
+                <li key={session.serverUrl} className="card bg-base-200 shadow-sm">
+                  <div className="card-body gap-3">
+                    <div>
+                      <p className="font-medium">{session.serverUrl}</p>
+                      <p className="text-sm text-base-content/80">
+                        {session.user.fullname} ({session.user.login}) - {session.user.role}
+                      </p>
+                      {status ? (
+                        <p className="text-xs text-base-content/70">
+                          sessionId: {status.sessionId}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-sm"
+                        onClick={() => void onCheckStatus(session.serverUrl)}
+                      >
+                        Check status
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-warning btn-sm"
+                        onClick={() => void onLogout(session.serverUrl, false)}
+                      >
+                        Logout
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-error btn-sm"
+                        onClick={() => void onLogout(session.serverUrl, true)}
+                      >
+                        Logout all devices
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => void onForceRefresh(session.serverUrl)}
+                      >
+                        Force refresh
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
 
-      {(signinMutation.isPending ||
-        signoutMutation.isPending ||
-        checkQuery.isFetching) && <p role="status">Запрос выполняется...</p>}
-
-      {sessionError ? <p role="alert">Ошибка: {sessionError}</p> : null}
-
-      <section className="card bg-base-200 p-4">
-        <h2 className="font-medium">Текущее состояние сессии</h2>
-        <pre
-          data-testid="session-state"
-          className="whitespace-pre-wrap break-all"
-        >
-          {JSON.stringify(sessionUser, null, 2)}
-        </pre>
+      <section className="card bg-base-200 shadow-sm">
+        <div className="card-body gap-2">
+          <h2 className="card-title text-base">Raw state</h2>
+          <pre className="max-h-80 overflow-auto rounded-lg bg-base-300 p-3 text-xs">
+            {JSON.stringify(Array.from(serversMap.entries()), null, 2)}
+          </pre>
+        </div>
       </section>
-    </main>
+    </section>
   );
 }

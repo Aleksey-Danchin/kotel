@@ -9,7 +9,40 @@
 * 🟢 You can import this file directly.
 */
 
+export const ClientType = {
+  WEB: 'WEB',
+  EXPO: 'EXPO'
+} as const
+
+export type ClientType = (typeof ClientType)[keyof typeof ClientType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const SessionStatus = {
+  ACTIVE: 'ACTIVE',
+  USED: 'USED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED'
+} as const
+
+export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus]
+
+
+export const NoActiveReason = {
+  LOGOUT_CURRENT: 'LOGOUT_CURRENT',
+  LOGOUT_ALL: 'LOGOUT_ALL',
+  REUSE_DETECTED: 'REUSE_DETECTED',
+  MANUAL_REVOKE: 'MANUAL_REVOKE',
+  LOCKDOWN: 'LOCKDOWN',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type NoActiveReason = (typeof NoActiveReason)[keyof typeof NoActiveReason]
+
+
+export const UserRole = {
+  USER: 'USER',
+  ADMIN: 'ADMIN',
+  ROOT: 'ROOT'
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]

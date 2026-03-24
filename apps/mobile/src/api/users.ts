@@ -1,4 +1,4 @@
-import { httpClient } from "@/src/api/http-client";
+import { getServerClient } from "@/src/api/create-server-client";
 
 export type UserRow = {
   id: string;
@@ -7,7 +7,8 @@ export type UserRow = {
   updatedAt: string;
 };
 
-export async function getUsers(): Promise<UserRow[]> {
-  const response = await httpClient.get<UserRow[]>("/api/users");
+export async function getUsers(serverUrl: string): Promise<UserRow[]> {
+  const response =
+    await getServerClient(serverUrl).get<UserRow[]>("/api/users");
   return response.data;
 }

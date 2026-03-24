@@ -72,11 +72,22 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 
 export const SessionScalarFieldEnum = {
-  key: 'key',
+  id: 'id',
+  accessTokenHash: 'accessTokenHash',
+  refreshTokenHash: 'refreshTokenHash',
+  sessionId: 'sessionId',
   userId: 'userId',
-  createdAt: 'createdAt',
-  lastUsedAt: 'lastUsedAt',
-  updatedAt: 'updatedAt'
+  clientType: 'clientType',
+  status: 'status',
+  fingerprint: 'fingerprint',
+  prevSessionId: 'prevSessionId',
+  accessTokenExpiresAt: 'accessTokenExpiresAt',
+  refreshTokenExpiresAt: 'refreshTokenExpiresAt',
+  refreshUsedAt: 'refreshUsedAt',
+  noActiveAt: 'noActiveAt',
+  noActiveReason: 'noActiveReason',
+  noActiveDescribe: 'noActiveDescribe',
+  createdAt: 'createdAt'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -87,6 +98,7 @@ export const UserScalarFieldEnum = {
   fullname: 'fullname',
   login: 'login',
   passwordHash: 'passwordHash',
+  role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -108,4 +120,12 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

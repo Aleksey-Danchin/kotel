@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T20:38:11.724Z",
-  "updatedAt": "2026-03-25T21:02:18.074Z",
+  "updatedAt": "2026-03-25T21:07:59.649Z",
   "steps": [
     {
       "order": 1,
@@ -100,10 +100,10 @@
     {
       "order": 2,
       "file": "02-add-startup-and-server-switch-skeletons.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "be0903e",
       "startedAt": "2026-03-25T20:49:05.070Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T21:03:38.495Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -202,12 +202,97 @@
     {
       "order": 3,
       "file": "03-refine-empty-states-and-column-visuals.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T21:03:45.822Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг не требует добавления/изменения тестов"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены визуалом designer, документация не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: no selected chat => right main area is visually empty",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: all three column headers equal visible height",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: third column has clearly visible right border",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: column backgrounds visually distinguishable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: server without chats shows 'Чатов нет'",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: empty chat shows 'Сообщений нет'",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

@@ -23,9 +23,7 @@ export function ChatMessageList({
   sessionUserId,
 }: ChatMessageListProps) {
   if (messages.length === 0) {
-    return (
-      <p className="text-sm text-base-content/60">В этом чате пока нет сообщений.</p>
-    );
+    return <p className="text-sm text-base-content/60">Сообщений нет</p>;
   }
 
   return (

@@ -8,8 +8,8 @@ export function ServicesColumnSkeleton() {
       aria-busy="true"
       aria-label="Загрузка серверов"
     >
-      <header className="shrink-0 px-2 py-2">
-        <div className="flex items-center justify-between gap-2">
+      <header className="shrink-0 min-h-12 border-b border-base-200 px-2">
+        <div className="flex h-full items-center justify-between gap-2">
           <div className="min-w-0">
             <div className="skeleton h-4 w-24 rounded" />
           </div>

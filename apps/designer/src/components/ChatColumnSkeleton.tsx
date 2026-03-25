@@ -8,8 +8,8 @@ export function ChatColumnSkeleton() {
       aria-busy="true"
       aria-label="Загрузка чата"
     >
-      <header className="shrink-0 border-b border-base-300 px-4 py-3">
-        <div className="flex items-start justify-between gap-2">
+      <header className="shrink-0 min-h-12 border-b border-base-300 px-2">
+        <div className="flex h-full items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="skeleton h-6 w-40 rounded" aria-hidden="true" />
             <div

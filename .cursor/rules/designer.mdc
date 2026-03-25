@@ -1,0 +1,42 @@
+---
+description: Designer sandbox conventions for apps/designer/.
+globs:
+  - "apps/designer/**"
+alwaysApply: false
+---
+
+# Designer Sandbox Rules
+
+## What `apps/designer` is
+- `apps/designer` is a UI/visual development sandbox cloned from `app/frontend`, used to prototype layouts, flows, and UX.
+- It is intended to contain *UI-layer behavior only*, not real backend integration.
+
+## Environments & isolation
+- `apps/designer` is **not started as part of** the regular `dev`/`test` infrastructure environments.
+- It is expected to be run **separately** (its own Vite dev server) when needed.
+- Do not wire `apps/designer` into compose stacks or runtime envs intended for the main application.
+
+## How it relates to the rest of the project
+- Backend business logic, auth, and API integrations belong elsewhere (backend app modules + shared contracts).
+- `apps/designer` must not become a second implementation of backend logic.
+- `apps/designer` is the UI source of truth for *how the UI is composed and how shared UI state is modeled*.
+
+## Mock data placement (strict)
+- All mock data (fake users, fake lists, fake statuses, etc.) must be declared **inside the body of components** (render scope) or inside event handlers/effects that belong to a component.
+- Do not keep mock objects as module-level constants.
+
+## State management (important: `jotai` is part of the design)
+- `jotai` is a first-class part of the designer “design layer”.
+- The **atom/store graph** for shared UI state is designed in `apps/designer/src/state/**` and treated as a design contract.
+- If some state is expected to be shared between pages/sections, or is expected to be persisted, it must be represented in `jotai` (not duplicated via isolated `useState`).
+- `apps/frontend` may enrich behavior later, but it should **inherit the state graph from `apps/designer`** (extend it, don’t replace/redefine the graph).
+
+## What to avoid in `apps/designer`
+- Real backend calls (no `fetch`/`axios` to backend endpoints, no OAuth token exchange, no auth refresh workers that coordinate real sessions).
+- Network side effects required for business correctness.
+- Importing runtime backend modules for logic/validation.
+
+## How to respond to requests
+- If a request asks to “implement business logic”, “add real auth flow”, “wire backend APIs”, or “create/validate real contracts” inside `apps/designer`: explain that `designer` is UI-only, and move the work to the proper backend/contract location.
+- When working on UI in `apps/designer`, follow the mock-data placement and `jotai` state graph rules above.
+

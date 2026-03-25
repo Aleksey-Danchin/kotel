@@ -15,3 +15,9 @@
 - Сообщения: `author` — id пользователя (`mock-user-*` или peer-id); исходящее: `message.author === selectedServer.user.id`.
 - Имитация загрузки треда: `CHAT_STREAM_LOAD_MS` в `routes/~$id/~index.tsx` при смене `serverUrl` или `chatId` (скелетон в теле чата).
 - В репозитории нет `scripts/prettier.sh`; проверка сборки дизайнера: `cd apps/designer && npm run build`.
+
+## Step 05: Composer autoreply and header gear
+
+- Дополнительные сообщения чата: `designerAppendedChatMessagesAtom` и `sendDesignerChatMessage` в `state/chatComposerActions.ts`; список в UI — `getMergedChatMessages` в `routes/~$id/~index.tsx`.
+- Шестерёнка в шапках: `ColumnHeaderGear` + `shouldShowColumnHeaderGear` (`new URL(serverUrl).host === window.location.host`, роль `admin|root` без учёта регистра).
+- Тесты песочницы: `cd apps/designer && npm test` (Vitest, `environment: node`); таймеры автоответа — `globalThis.setTimeout`.

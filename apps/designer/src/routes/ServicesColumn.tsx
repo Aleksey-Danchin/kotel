@@ -12,6 +12,7 @@ import {
   getTotalUnreadForServerSession,
   selectedServerAtom,
 } from "../state/store";
+import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ServerCard } from "../components/ServerCard";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
@@ -111,7 +112,10 @@ export function ServicesColumn() {
   return (
     <aside className="flex h-full min-h-0 w-full flex-col border-r border-base-200 bg-base-300 p-1">
       <header className="shrink-0 px-2 py-2">
-        <h2 className="text-sm font-semibold text-base-content">Сервера</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-base-content">Сервера</h2>
+          <ColumnHeaderGear />
+        </div>
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">

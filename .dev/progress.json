@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T19:22:46.892Z",
-  "updatedAt": "2026-03-25T19:33:52.798Z",
+  "updatedAt": "2026-03-25T19:35:32.402Z",
   "steps": [
     {
       "order": 1,
@@ -304,10 +304,10 @@
     {
       "order": 4,
       "file": "04-enrich-chat-mocks-and-render-message-stream.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "547df7e",
       "startedAt": "2026-03-25T19:32:35.027Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T19:34:07.762Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -403,12 +403,102 @@
     {
       "order": 5,
       "file": "05-add-composer-autoreply-and-header-gear-rules.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T19:34:10.207Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer UI-only; no docs/api change"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test compose down; dev ps skipped (PROJECT_ROOT)"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: composer in footer fixed while list scrolls",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Enter submit Shift+Enter newline",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: whitespace-only not submitted",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: sent message immediate",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: auto-reply ~2s duplicate text",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: gear only when server/role rule",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: gear click no nav/errors",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 6,

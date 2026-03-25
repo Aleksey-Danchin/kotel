@@ -7,10 +7,10 @@ import { ChatMessageList } from "../../components/ChatMessageList";
 import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
 import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 import {
-  getChatMessages,
-  selectedChatAtom,
-  selectedServerAtom,
-} from "../../state/store";
+  designerAppendedChatMessagesAtom,
+  getMergedChatMessages,
+} from "../../state/chatComposerActions";
+import { selectedChatAtom, selectedServerAtom } from "../../state/store";
 
 /** Детерминированная задержка имитации загрузки треда в песочнице (без сети). */
 const CHAT_STREAM_LOAD_MS = 420;
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/$id/")({
 function IdShellPage() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const selectedChat = useAtomValue(selectedChatAtom);
+  const appendedByChat = useAtomValue(designerAppendedChatMessagesAtom);
   const setLastByServer = useSetAtom(lastChatByServerIdAtom);
 
   const [streamLoading, setStreamLoading] = useState(false);
@@ -59,14 +60,12 @@ function IdShellPage() {
     return null;
   }
 
-  const messages = getChatMessages(selectedChat.id);
+  const messages = getMergedChatMessages(selectedChat.id, appendedByChat);
   const sessionUserId = selectedServer.user.id;
 
   if (streamLoading) {
     return <ChatMessageBodySkeleton />;
   }
 
-  return (
-    <ChatMessageList messages={messages} sessionUserId={sessionUserId} />
-  );
+  return <ChatMessageList messages={messages} sessionUserId={sessionUserId} />;
 }

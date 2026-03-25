@@ -1,6 +1,18 @@
-import type { FormEventHandler } from "react";
+import {
+  useCallback,
+  useState,
+  type FormEventHandler,
+  type KeyboardEventHandler,
+} from "react";
 import { useAtomValue } from "jotai";
-import { chatHeaderTitle, selectedChatAtom } from "../state/store";
+
+import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
+import { sendDesignerChatMessage } from "../state/chatComposerActions";
+import {
+  chatHeaderTitle,
+  selectedChatAtom,
+  selectedServerAtom,
+} from "../state/store";
 
 export interface ChatColumnProps {
   children: React.ReactNode;
@@ -9,28 +21,52 @@ export interface ChatColumnProps {
 /** Личный чат: в данных `title` — имя собеседника; группа/канал: `title` — название. */
 export function ChatColumn({ children }: ChatColumnProps) {
   const selectedChat = useAtomValue(selectedChatAtom);
+  const selectedServer = useAtomValue(selectedServerAtom);
+  const [draft, setDraft] = useState("");
+
+  const trySend = useCallback(() => {
+    if (!selectedChat || !selectedServer) return;
+    const text = draft;
+    if (!text.trim()) return;
+    sendDesignerChatMessage(selectedChat.id, text, selectedServer.user.id);
+    setDraft("");
+  }, [draft, selectedChat, selectedServer]);
 
   const onComposerSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
+    trySend();
+  };
+
+  const onComposerKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = (
+    event,
+  ) => {
+    if (event.key !== "Enter" || event.shiftKey) return;
+    event.preventDefault();
+    trySend();
   };
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col border-l-2 border-base-content/20 bg-base-100">
       <header className="shrink-0 border-b border-base-300 px-4 py-3">
-        {selectedChat ? (
-          <>
-            <h1 className="truncate text-lg font-semibold text-base-content">
-              {chatHeaderTitle(selectedChat)}
-            </h1>
-            {selectedChat.subtitle ? (
-              <p className="mt-0.5 truncate text-sm text-base-content/70">
-                {selectedChat.subtitle}
-              </p>
-            ) : null}
-          </>
-        ) : (
-          <span className="text-sm text-base-content/50">Выберите чат</span>
-        )}
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            {selectedChat ? (
+              <>
+                <h1 className="truncate text-lg font-semibold text-base-content">
+                  {chatHeaderTitle(selectedChat)}
+                </h1>
+                {selectedChat.subtitle ? (
+                  <p className="mt-0.5 truncate text-sm text-base-content/70">
+                    {selectedChat.subtitle}
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <span className="text-sm text-base-content/50">Выберите чат</span>
+            )}
+          </div>
+          <ColumnHeaderGear />
+        </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
@@ -47,13 +83,16 @@ export function ChatColumn({ children }: ChatColumnProps) {
               className="textarea textarea-bordered min-h-16 max-h-40 w-full resize-y"
               placeholder="Сообщение..."
               rows={2}
-              disabled={!selectedChat}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={onComposerKeyDown}
+              disabled={!selectedChat || !selectedServer}
             />
           </label>
           <button
             type="submit"
             className="btn btn-primary shrink-0"
-            disabled={!selectedChat}
+            disabled={!selectedChat || !selectedServer}
           >
             Отправить
           </button>

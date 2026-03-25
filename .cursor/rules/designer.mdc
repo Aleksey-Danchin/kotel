@@ -58,14 +58,17 @@ alwaysApply: false
 - `apps/frontend` may enrich behavior later, but it should **inherit the state graph from `apps/designer`** (extend it, don’t replace/redefine the graph).
 
 ## Chat layout style contract (designer)
+- Canonical reference: `docs/designer-chat-styling.md` (keep rules and that doc aligned).
 - For the 3-column chat shell, use Flexbox as the primary mechanism (no sticky-based primary layout).
-- Each column must use `flex flex-col` and split into:
+- Shell: fixed viewport height and `overflow-hidden` on the root chat layout wrappers so the document does not scroll; only column bodies scroll.
+- Each column must use `flex flex-col` (with `h-full min-h-0` on the column container as in the current implementation) and split into:
   - fixed header (`shrink-0`)
   - scrollable body (`flex-1 min-h-0 overflow-y-auto`)
-  - fixed footer (`shrink-0`)
-- Disable page-level scrolling for the chat shell; scrolling should happen inside column bodies.
-- Keep visual hierarchy consistent: subtle incoming/outgoing message difference, fixed composer area in chat column, and stable border placement defined by the shell.
-- If changing these conventions, document the reason in a corresponding docs update in the same change scope.
+  - fixed footer (`shrink-0`; use an empty footer when no controls are needed)
+- Border placement: column-level separators (e.g. services column `border-r`, chat column `border-l-2` accent); header/footer `border-b` / `border-t` inside columns where separation is needed.
+- Message bubbles: subtle incoming vs outgoing styling (neutral surface vs primary-tinted bubble); see `ChatMessageList`.
+- Keep the message composer in a fixed footer under the scrollable thread in the chat column.
+- If changing these conventions, document the reason in `docs/designer-chat-styling.md` (and related docs) in the same change scope.
 
 ## What to avoid in `apps/designer`
 - Real backend calls (no `fetch`/`axios` to backend endpoints, no OAuth token exchange, no auth refresh workers that coordinate real sessions).

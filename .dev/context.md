@@ -16,6 +16,11 @@
 - Имитация загрузки треда: `CHAT_STREAM_LOAD_MS` в `routes/~$id/~index.tsx` при смене `serverUrl` или `chatId` (скелетон в теле чата).
 - В репозитории нет `scripts/prettier.sh`; проверка сборки дизайнера: `cd apps/designer && npm run build`.
 
+## Step 06: Document chat styling guidelines
+
+- Canonical layout/styling contract for the designer chat shell: `docs/designer-chat-styling.md` (English); `DESIGNER_SANDBOX.md` links to it for RU readers.
+- Rules: `.cursor/rules/designer.mdc` and `frontend.mdc` must stay aligned with that doc when the shell changes.
+
 ## Step 05: Composer autoreply and header gear
 
 - Дополнительные сообщения чата: `designerAppendedChatMessagesAtom` и `sendDesignerChatMessage` в `state/chatComposerActions.ts`; список в UI — `getMergedChatMessages` в `routes/~$id/~index.tsx`.

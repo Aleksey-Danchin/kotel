@@ -16,6 +16,32 @@ alwaysApply: false
 - It is expected to be run **separately** (its own Vite dev server) when needed.
 - Do not wire `apps/designer` into compose stacks or runtime envs intended for the main application.
 
+## Stack (what to expect in code)
+- React + Vite dev server (uses `react-dom/client` and `StrictMode`)
+- TanStack Router (`@tanstack/react-router` + `@tanstack/router-plugin/vite`) with file-based routes in `apps/designer/src/routes/**`
+- Tailwind CSS + DaisyUI (configured via `tailwindcss()` + `daisyui` plugin)
+- `jotai` as the main shared-store / state graph
+- local persistence for designer state is implemented via `localStorage` inside `apps/designer/src/state/**`
+- `apps/designer/vite.config.ts` defines alias `@contracts` (points to backend `src/contracts`) for type-level/contract references; do not import backend runtime logic into designer
+
+## Routes (UI-only)
+- `/` -> root layout (`~__root.tsx`) + `Outlet`
+- `/setup` -> designer-only setup UI (no real `fetch` to backend)
+- `/callback` -> designer callback UI (real OAuth exchange disabled)
+- `/users` -> static table with mock rows
+- `/session-test` -> UI scenario testing (mock “status/refresh/logout” without backend)
+- `/$key/` -> simple parameterized mock button
+
+## Where shared state is designed
+- Shared cross-page UI state must be represented in `apps/designer/src/state/**` (jotai design contract).
+- In this sandbox the main atoms/stores are implemented in `apps/designer/src/state/servers.ts`:
+  - `serversAtom` and `activeServerUrlAtom`
+  - shared store `serversStore`
+  - actions: `setServerSession`, `removeServerSession`, `setActiveServer`, `resetServersStore`
+- Persistence keys used by the designer state:
+  - `kotel.designer.servers`
+  - `kotel.designer.activeServerUrl`
+
 ## How it relates to the rest of the project
 - Backend business logic, auth, and API integrations belong elsewhere (backend app modules + shared contracts).
 - `apps/designer` must not become a second implementation of backend logic.

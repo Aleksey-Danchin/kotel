@@ -34,6 +34,11 @@
 - To exit attached Expo, press `Ctrl+C`.
 - To stop all dev containers, run `scripts/dev-stop.sh`.
 
+## Designer Sandbox (apps/designer)
+- `apps/designer` — UI/UX песочница (designer layer) для прототипирования интерфейса.
+- Она должна оставаться **изолированной** от бизнес-логики backend и от dev/test окружений основного приложения.
+- Стек/маршруты/`jotai`-контракт и правила работы: `.cursor/rules/designer.mdc`.
+
 ## Two Backend Dev Servers
 
 - The dev stack includes two backend servers behind Traefik:

@@ -32,12 +32,22 @@
     },
     {
       "id": "srv_local",
-      "serverUrl": "http://127.0.0.1:8081",
+      "serverUrl": "http://localhost:5173",
       "user": {
         "id": "mock-user-4",
         "fullname": "Local Dev",
         "login": "local-dev",
-        "role": "developer"
+        "role": "admin"
+      }
+    },
+    {
+      "id": "srv_no_chats",
+      "serverUrl": "https://no-chats.localhost",
+      "user": {
+        "id": "mock-user-5",
+        "fullname": "No Chats Server",
+        "login": "no-chats",
+        "role": "viewer"
       }
     }
   ],
@@ -105,6 +115,13 @@
       "title": "Local / QA",
       "subtitle": "Проверка сценариев интерфейса",
       "unread": 1
+    },
+    {
+      "id": "chat_empty_messages",
+      "type": "group",
+      "title": "Пустой тред",
+      "subtitle": "Проверка сценария без сообщений",
+      "unread": 0
     }
   ],
   "messages": [
@@ -625,6 +642,10 @@
     [
       "srv_main",
       "chat_backend"
+    ],
+    [
+      "srv_main",
+      "chat_empty_messages"
     ],
     [
       "srv_eu",

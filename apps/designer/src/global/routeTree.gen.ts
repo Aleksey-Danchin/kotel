@@ -14,7 +14,7 @@ import { Route as SetupIndexRouteImport } from './../routes/~setup/~index'
 import { Route as SessionTestIndexRouteImport } from './../routes/~session-test/~index'
 import { Route as CallbackIndexRouteImport } from './../routes/~callback/~index'
 import { Route as indexIndexRouteImport } from './../routes/~(index)/~index'
-import { Route as ChatIdIndexRouteImport } from './../routes/~$chatId/~index'
+import { Route as IdIndexRouteImport } from './../routes/~$id/~index'
 
 const UsersIndexRoute = UsersIndexRouteImport.update({
   id: '/users/',
@@ -41,14 +41,14 @@ const indexIndexRoute = indexIndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChatIdIndexRoute = ChatIdIndexRouteImport.update({
-  id: '/$chatId/',
-  path: '/$chatId/',
+const IdIndexRoute = IdIndexRouteImport.update({
+  id: '/$id/',
+  path: '/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/$chatId/': typeof ChatIdIndexRoute
+  '/$id/': typeof IdIndexRoute
   '/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
@@ -56,7 +56,7 @@ export interface FileRoutesByFullPath {
   '/users/': typeof UsersIndexRoute
 }
 export interface FileRoutesByTo {
-  '/$chatId': typeof ChatIdIndexRoute
+  '/$id': typeof IdIndexRoute
   '/': typeof indexIndexRoute
   '/callback': typeof CallbackIndexRoute
   '/session-test': typeof SessionTestIndexRoute
@@ -65,7 +65,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/$chatId/': typeof ChatIdIndexRoute
+  '/$id/': typeof IdIndexRoute
   '/(index)/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
@@ -75,17 +75,17 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/$chatId/'
+    | '/$id/'
     | '/'
     | '/callback/'
     | '/session-test/'
     | '/setup/'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$chatId' | '/' | '/callback' | '/session-test' | '/setup' | '/users'
+  to: '/$id' | '/' | '/callback' | '/session-test' | '/setup' | '/users'
   id:
     | '__root__'
-    | '/$chatId/'
+    | '/$id/'
     | '/(index)/'
     | '/callback/'
     | '/session-test/'
@@ -94,7 +94,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  ChatIdIndexRoute: typeof ChatIdIndexRoute
+  IdIndexRoute: typeof IdIndexRoute
   indexIndexRoute: typeof indexIndexRoute
   CallbackIndexRoute: typeof CallbackIndexRoute
   SessionTestIndexRoute: typeof SessionTestIndexRoute
@@ -139,18 +139,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$chatId/': {
-      id: '/$chatId/'
-      path: '/$chatId'
-      fullPath: '/$chatId/'
-      preLoaderRoute: typeof ChatIdIndexRouteImport
+    '/$id/': {
+      id: '/$id/'
+      path: '/$id'
+      fullPath: '/$id/'
+      preLoaderRoute: typeof IdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  ChatIdIndexRoute: ChatIdIndexRoute,
+  IdIndexRoute: IdIndexRoute,
   indexIndexRoute: indexIndexRoute,
   CallbackIndexRoute: CallbackIndexRoute,
   SessionTestIndexRoute: SessionTestIndexRoute,

@@ -1,22 +1,25 @@
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChatCard } from "../components/ChatCard";
 import {
+  activeServerIdAtom,
+  lastChatByServerIdAtom,
+  type LastChatByServerId,
+} from "../state/selectionAtoms";
+import {
   chatsForSelectedServerAtom,
-  selectedChatIdAtom,
+  effectiveChatIdAtom,
   selectedServerAtom,
 } from "../state/store";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
 export function ChatsColumn() {
   const navigate = useNavigate();
   const selectedServer = useAtomValue(selectedServerAtom);
   const chats = useAtomValue(chatsForSelectedServerAtom);
-  const setSelectedChatId = useSetAtom(selectedChatIdAtom);
-
-  const activeChatId = useRouterState({
-    select: (state) =>
-      (state.matches.at(-1)?.params as { chatId?: string } | undefined)?.chatId,
-  });
+  const highlightedChatId = useAtomValue(effectiveChatIdAtom);
+  const setActiveServerId = useSetAtom(activeServerIdAtom);
+  const setLastByServer = useSetAtom(lastChatByServerIdAtom);
 
   const content = (() => {
     if (!selectedServer) return null;
@@ -32,12 +35,19 @@ export function ChatsColumn() {
           <ChatCard
             key={chat.id}
             chat={chat}
-            active={chat.id === activeChatId}
+            active={chat.id === highlightedChatId}
             onSelect={() => {
-              setSelectedChatId(chat.id);
+              const serverRid = serverRouteIdFromServerUrl(
+                selectedServer.serverUrl,
+              );
+              setLastByServer((prev: LastChatByServerId) => ({
+                ...prev,
+                [serverRid]: chat.id,
+              }));
+              setActiveServerId(serverRid);
               navigate({
-                to: "/$chatId",
-                params: { chatId: chat.id },
+                to: "/$id",
+                params: { id: chat.id },
               });
             }}
           />

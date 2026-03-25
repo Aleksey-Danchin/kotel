@@ -5,10 +5,13 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { useSetAtom } from "jotai";
 import { defaultStore } from "../global/defaultStore";
-import { selectedChatIdAtom, selectedServerUrlAtom } from "../state/store";
+import { activeServerIdAtom } from "../state/selectionAtoms";
+import { serversAtom } from "../state/servers";
+import { resolveRouteParam, routeContextAtom } from "../state/store";
+import { selectionIdFromPathname } from "../state/routePath";
 import { ChatsColumn } from "./ChatsColumn";
 import { ServicesColumn } from "./ServicesColumn";
 
@@ -18,10 +21,22 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   const navigate = useNavigate();
-  const setChatId = useSetAtom(selectedChatIdAtom);
-  const setServerUrl = useSetAtom(selectedServerUrlAtom);
-  const matches = useRouterState({ select: (s) => s.matches });
-  const matchesRef = useRef(matches);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const setRouteCtx = useSetAtom(routeContextAtom);
+  const pathnameRef = useRef(pathname);
+
+  useLayoutEffect(() => {
+    const id = selectionIdFromPathname(pathname);
+    if (id) {
+      setRouteCtx({ type: "id", id });
+    } else {
+      setRouteCtx({ type: "index" });
+    }
+  }, [pathname, setRouteCtx]);
+
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -39,27 +54,32 @@ function RootLayout() {
         return;
       }
 
-      const onChatRoute = matchesRef.current.some(
-        (m) => typeof (m.params as { chatId?: string }).chatId === "string",
-      );
+      const id = selectionIdFromPathname(pathnameRef.current);
+      const serversMap = defaultStore.get(serversAtom);
+      const activeId = defaultStore.get(activeServerIdAtom);
 
-      if (onChatRoute) {
+      if (id) {
+        const r = resolveRouteParam(id, serversMap, activeId);
+        if (r.kind === "chat") {
+          event.preventDefault();
+          void navigate({ to: "/" });
+          return;
+        }
         event.preventDefault();
-        setChatId(null);
-        navigate({ to: "/" });
+        defaultStore.set(activeServerIdAtom, null);
+        void navigate({ to: "/" });
         return;
       }
 
-      const serverUrl = defaultStore.get(selectedServerUrlAtom);
-      if (serverUrl != null && serverUrl !== "") {
+      if (activeId != null && activeId !== "") {
         event.preventDefault();
-        setServerUrl(null);
+        defaultStore.set(activeServerIdAtom, null);
       }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [navigate, setChatId, setServerUrl]);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-base-100">

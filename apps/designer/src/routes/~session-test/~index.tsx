@@ -1,22 +1,25 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
+import { useNavigate } from "@tanstack/react-router";
 import {
   serversAtom,
   setServerSession,
   removeServerSession,
 } from "../../state/servers";
-import { selectedServerUrlAtom } from "../../state/store";
+import { activeServerIdAtom } from "../../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 
 export const Route = createFileRoute("/session-test/")({
   component: SessionTestPage,
 });
 
 function SessionTestPage() {
+  const navigate = useNavigate();
   const [banner, setBanner] = useState<string | null>(null);
   const serversMap = useAtomValue(serversAtom);
   const servers = Array.from(serversMap.values());
-  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
+  const setActiveServerId = useSetAtom(activeServerIdAtom);
   const [newServerUrl, setNewServerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusByServer, setStatusByServer] = useState<
@@ -63,7 +66,9 @@ function SessionTestPage() {
           role: "designer",
         },
       });
-      setSelectedServerUrl(normalized);
+      const rid = serverRouteIdFromServerUrl(normalized);
+      setActiveServerId(rid);
+      void navigate({ to: "/$id", params: { id: rid } });
 
       setNewServerUrl("");
       setBanner(`(mock) Сервер добавлен: ${host}`);

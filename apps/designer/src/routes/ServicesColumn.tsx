@@ -1,4 +1,5 @@
 import { useRef, useState, type SubmitEventHandler } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   serversAtom,
@@ -6,12 +7,13 @@ import {
   removeServerSession,
   type ServerSession,
 } from "../state/servers";
+import { activeServerIdAtom } from "../state/selectionAtoms";
 import {
   getTotalUnreadForServerSession,
-  resolvedSelectedServerUrlAtom,
-  selectedServerUrlAtom,
+  selectedServerAtom,
 } from "../state/store";
 import { ServerCard } from "../components/ServerCard";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
 function displayServerHost(serverUrl: string): string {
   try {
@@ -43,9 +45,10 @@ function normalizeServerAddressInput(raw: string): string {
 }
 
 export function ServicesColumn() {
+  const navigate = useNavigate();
   const serversMap = useAtomValue(serversAtom);
-  const resolvedSelectedServerUrl = useAtomValue(resolvedSelectedServerUrlAtom);
-  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
+  const selectedServer = useAtomValue(selectedServerAtom);
+  const setActiveServerId = useSetAtom(activeServerIdAtom);
   const servers = Array.from(serversMap.values());
   const [newServerUrl, setNewServerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +89,9 @@ export function ServicesColumn() {
       };
 
       setServerSession(nextSession);
-      setSelectedServerUrl(normalized);
+      const rid = serverRouteIdFromServerUrl(normalized);
+      setActiveServerId(rid);
+      navigate({ to: "/$id", params: { id: rid } });
       setNewServerUrl("");
       addServerDialogRef.current?.close();
     } catch (addError) {
@@ -109,7 +114,9 @@ export function ServicesColumn() {
     <aside className="flex h-full min-h-screen w-full flex-col border-r border-base-200 bg-base-300 p-1">
       <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
         {servers.map((session) => {
-          const isActive = session.serverUrl === resolvedSelectedServerUrl;
+          const isActive =
+            selectedServer != null &&
+            session.serverUrl === selectedServer.serverUrl;
 
           return (
             <ServerCard
@@ -117,7 +124,11 @@ export function ServicesColumn() {
               state={session}
               active={isActive}
               unreadCount={getTotalUnreadForServerSession(session)}
-              onSelect={() => setSelectedServerUrl(session.serverUrl)}
+              onSelect={() => {
+                const rid = serverRouteIdFromServerUrl(session.serverUrl);
+                setActiveServerId(rid);
+                navigate({ to: "/$id", params: { id: rid } });
+              }}
               onDelete={() => onDisconnect(session.serverUrl)}
             />
           );

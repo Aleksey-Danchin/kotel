@@ -57,6 +57,16 @@ alwaysApply: false
 - If some state is expected to be shared between pages/sections, or is expected to be persisted, it must be represented in `jotai` (not duplicated via isolated `useState`).
 - `apps/frontend` may enrich behavior later, but it should **inherit the state graph from `apps/designer`** (extend it, don’t replace/redefine the graph).
 
+## Chat layout style contract (designer)
+- For the 3-column chat shell, use Flexbox as the primary mechanism (no sticky-based primary layout).
+- Each column must use `flex flex-col` and split into:
+  - fixed header (`shrink-0`)
+  - scrollable body (`flex-1 min-h-0 overflow-y-auto`)
+  - fixed footer (`shrink-0`)
+- Disable page-level scrolling for the chat shell; scrolling should happen inside column bodies.
+- Keep visual hierarchy consistent: subtle incoming/outgoing message difference, fixed composer area in chat column, and stable border placement defined by the shell.
+- If changing these conventions, document the reason in a corresponding docs update in the same change scope.
+
 ## What to avoid in `apps/designer`
 - Real backend calls (no `fetch`/`axios` to backend endpoints, no OAuth token exchange, no auth refresh workers that coordinate real sessions).
 - Network side effects required for business correctness.

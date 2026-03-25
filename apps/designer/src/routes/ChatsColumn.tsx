@@ -1,25 +1,25 @@
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ChatCard } from "../components/ChatCard";
 import {
   chatsForSelectedServerAtom,
-  selectedChatAtom,
   selectedChatIdAtom,
   selectedServerAtom,
 } from "../state/store";
 
 export function ChatsColumn() {
+  const navigate = useNavigate();
   const selectedServer = useAtomValue(selectedServerAtom);
   const chats = useAtomValue(chatsForSelectedServerAtom);
-  const selectedChat = useAtomValue(selectedChatAtom);
   const setSelectedChatId = useSetAtom(selectedChatIdAtom);
 
+  const activeChatId = useRouterState({
+    select: (state) =>
+      (state.matches.at(-1)?.params as { chatId?: string } | undefined)?.chatId,
+  });
+
   const content = (() => {
-    if (!selectedServer)
-      return (
-        <div className="text-sm text-base-content/80">
-          Выберите сервер слева, чтобы увидеть чаты.
-        </div>
-      );
+    if (!selectedServer) return null;
 
     if (chats.length === 0)
       return (
@@ -32,8 +32,14 @@ export function ChatsColumn() {
           <ChatCard
             key={chat.id}
             chat={chat}
-            active={chat.id === selectedChat?.id}
-            onSelect={() => setSelectedChatId(chat.id)}
+            active={chat.id === activeChatId}
+            onSelect={() => {
+              setSelectedChatId(chat.id);
+              navigate({
+                to: "/$chatId",
+                params: { chatId: chat.id },
+              });
+            }}
           />
         ))}
       </div>

@@ -9,18 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './../routes/~__root'
-import { Route as IndexRouteImport } from './../routes/~index'
 import { Route as UsersIndexRouteImport } from './../routes/~users/~index'
 import { Route as SetupIndexRouteImport } from './../routes/~setup/~index'
 import { Route as SessionTestIndexRouteImport } from './../routes/~session-test/~index'
 import { Route as CallbackIndexRouteImport } from './../routes/~callback/~index'
-import { Route as KeyIndexRouteImport } from './../routes/~$key/~index'
+import { Route as indexIndexRouteImport } from './../routes/~(index)/~index'
+import { Route as ChatIdIndexRouteImport } from './../routes/~$chatId/~index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const UsersIndexRoute = UsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -41,23 +36,28 @@ const CallbackIndexRoute = CallbackIndexRouteImport.update({
   path: '/callback/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const KeyIndexRoute = KeyIndexRouteImport.update({
-  id: '/$key/',
-  path: '/$key/',
+const indexIndexRoute = indexIndexRouteImport.update({
+  id: '/(index)/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatIdIndexRoute = ChatIdIndexRouteImport.update({
+  id: '/$chatId/',
+  path: '/$chatId/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/$key/': typeof KeyIndexRoute
+  '/$chatId/': typeof ChatIdIndexRoute
+  '/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
   '/setup/': typeof SetupIndexRoute
   '/users/': typeof UsersIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/$key': typeof KeyIndexRoute
+  '/$chatId': typeof ChatIdIndexRoute
+  '/': typeof indexIndexRoute
   '/callback': typeof CallbackIndexRoute
   '/session-test': typeof SessionTestIndexRoute
   '/setup': typeof SetupIndexRoute
@@ -65,8 +65,8 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/$key/': typeof KeyIndexRoute
+  '/$chatId/': typeof ChatIdIndexRoute
+  '/(index)/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
   '/setup/': typeof SetupIndexRoute
@@ -75,18 +75,18 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$chatId/'
     | '/'
-    | '/$key/'
     | '/callback/'
     | '/session-test/'
     | '/setup/'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$key' | '/callback' | '/session-test' | '/setup' | '/users'
+  to: '/$chatId' | '/' | '/callback' | '/session-test' | '/setup' | '/users'
   id:
     | '__root__'
-    | '/'
-    | '/$key/'
+    | '/$chatId/'
+    | '/(index)/'
     | '/callback/'
     | '/session-test/'
     | '/setup/'
@@ -94,8 +94,8 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  KeyIndexRoute: typeof KeyIndexRoute
+  ChatIdIndexRoute: typeof ChatIdIndexRoute
+  indexIndexRoute: typeof indexIndexRoute
   CallbackIndexRoute: typeof CallbackIndexRoute
   SessionTestIndexRoute: typeof SessionTestIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
@@ -104,13 +104,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/users/': {
       id: '/users/'
       path: '/users'
@@ -139,19 +132,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CallbackIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$key/': {
-      id: '/$key/'
-      path: '/$key'
-      fullPath: '/$key/'
-      preLoaderRoute: typeof KeyIndexRouteImport
+    '/(index)/': {
+      id: '/(index)/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof indexIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$chatId/': {
+      id: '/$chatId/'
+      path: '/$chatId'
+      fullPath: '/$chatId/'
+      preLoaderRoute: typeof ChatIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  KeyIndexRoute: KeyIndexRoute,
+  ChatIdIndexRoute: ChatIdIndexRoute,
+  indexIndexRoute: indexIndexRoute,
   CallbackIndexRoute: CallbackIndexRoute,
   SessionTestIndexRoute: SessionTestIndexRoute,
   SetupIndexRoute: SetupIndexRoute,

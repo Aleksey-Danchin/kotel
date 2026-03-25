@@ -72,17 +72,22 @@ export function getChatMessages(chatId: string): ChatMessage[] {
 }
 
 // “Разрешенный” выбранный сервер:
-// - если storage-значение есть в песочнице, используем его
-// - иначе показываем первый сервер из списка (или null).
+// - null в storage — явно «ничего не выбрано» (например после Escape)
+// - иначе URL из storage, если он есть в списке подключённых
+// - иначе null (не подставляем первый сервер автоматически)
 export const resolvedSelectedServerUrlAtom = atom((get) => {
   const serversMap = get(serversAtom);
   const storageValue = get(selectedServerUrlAtom);
 
-  if (storageValue && serversMap.has(storageValue)) {
+  if (storageValue == null || storageValue === "") {
+    return null;
+  }
+
+  if (serversMap.has(storageValue)) {
     return storageValue;
   }
 
-  return serversMap.keys().next().value ?? null;
+  return null;
 });
 
 export const selectedServerAtom = atom((get) => {
@@ -123,7 +128,7 @@ export const resolvedSelectedChatIdAtom = atom((get) => {
     return storageValue;
   }
 
-  return chats[0]!.id;
+  return null;
 });
 
 export const selectedChatAtom = atom((get) => {

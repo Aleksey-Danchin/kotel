@@ -51,15 +51,16 @@ Cleanup rule:
 6. Browser back/forward transitions do not produce mismatched server/chat selection.
 
 ## Verification Scenario
-1. Open a server, then open a chat.
-2. Verify URL reflects selected chat id.
-3. Press Esc and verify URL becomes server id and chat memory for that server is removed.
-4. Re-enter same server and verify no auto-chat selection occurs.
-5. Open chat again, then navigate to server via any non-Esc path (e.g., server card click), verify cleanup still happens.
-6. Press Esc from server level and verify URL becomes `/`.
+1. Open `http://localhost:5173/` via MCP `cursor-ide-browser`.
+2. Open a server, then open a chat.
+3. Verify URL reflects selected chat id.
+4. Press Esc and verify URL becomes server id and chat memory for that server is removed.
+5. Re-enter same server and verify no auto-chat selection occurs.
+6. Open chat again, then navigate to server via any non-Esc path (e.g., server card click), verify cleanup still happens.
+7. Press Esc from server level and verify URL becomes `/`.
 
 ## Testing
-Manual interaction checks in designer UI only.  
+Manual interaction checks in designer UI via MCP `cursor-ide-browser` on `http://localhost:5173/` only.  
 Do not add E2E tests in this scope (explicitly deferred).
 
 ## Notes

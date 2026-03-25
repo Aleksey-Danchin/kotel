@@ -57,14 +57,15 @@ Layout uses `min-h-screen` wrappers with mixed scroll behavior and no strict `he
 7. Column internals are built using Flexbox (`flex-col` with `shrink-0` header/footer and `flex-1 min-h-0 overflow-y-auto` body).
 
 ## Verification Scenario
-1. Open designer root page and inspect viewport behavior while scrolling outside column bodies.
-2. Add enough servers/chats/messages to force overflow in each column.
-3. Verify only middle content areas scroll.
-4. Confirm headers and footers remain fixed while body scrolls.
-5. Verify border is on main chat column container and visually distinct in current DaisyUI theme.
+1. Open `http://localhost:5173/` via MCP `cursor-ide-browser`.
+2. Open designer root page and inspect viewport behavior while scrolling outside column bodies.
+3. Add enough servers/chats/messages to force overflow in each column.
+4. Verify only middle content areas scroll.
+5. Confirm headers and footers remain fixed while body scrolls.
+6. Verify border is on main chat column container and visually distinct in current DaisyUI theme.
 
 ## Testing
-Manual UI verification only.  
+Manual UI verification via MCP `cursor-ide-browser` on `http://localhost:5173/` only.  
 No automated tests are required in this scope.
 
 ## Notes

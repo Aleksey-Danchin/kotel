@@ -60,15 +60,16 @@ Header gear behavior:
 7. Clicking gear does not trigger navigation/errors.
 
 ## Verification Scenario
-1. Open a person chat and type multiline text using Shift+Enter.
-2. Press Enter and verify immediate outgoing message appears.
-3. Wait ~2 seconds and verify incoming duplicate reply appears.
-4. Send whitespace-only text and verify no new message appears.
-5. Select server/session matching local web client + admin/root role and verify gears in all three headers.
-6. Switch to non-matching server or non-admin/root role and verify gears disappear.
+1. Open `http://localhost:5173/` via MCP `cursor-ide-browser`.
+2. Open a person chat and type multiline text using Shift+Enter.
+3. Press Enter and verify immediate outgoing message appears.
+4. Wait ~2 seconds and verify incoming duplicate reply appears.
+5. Send whitespace-only text and verify no new message appears.
+6. Select server/session matching local web client + admin/root role and verify gears in all three headers.
+7. Switch to non-matching server or non-admin/root role and verify gears disappear.
 
 ## Testing
-Manual-only checks for composer and header rules.  
+Manual-only checks for composer and header rules via MCP `cursor-ide-browser` on `http://localhost:5173/`.  
 Automated E2E tests are intentionally out of scope for this suggestion cycle.
 
 ## Notes

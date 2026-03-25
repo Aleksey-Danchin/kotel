@@ -61,15 +61,16 @@ Persistence rules:
 7. Static routes `/setup`, `/session-test`, `/users`, `/callback` remain reachable and are not intercepted by `/:id`.
 
 ## Verification Scenario
-1. Clear designer localStorage keys related to active server/chat.
-2. Open `/` and verify no selected server/chat.
-3. Open `/<known-server-id>` and verify server selection with empty chat if no remembered chat.
-4. Open `/<known-chat-id>` and verify server+chat selection.
-5. Open `/<unknown-id>` and verify no error text in main area and empty chat list.
-6. Reload page and verify selection restoration follows the new storage rules.
+1. Open `http://localhost:5173/` via MCP `cursor-ide-browser`.
+2. Clear designer localStorage keys related to active server/chat.
+3. Open `/` and verify no selected server/chat.
+4. Open `/<known-server-id>` and verify server selection with empty chat if no remembered chat.
+5. Open `/<known-chat-id>` and verify server+chat selection.
+6. Open `/<unknown-id>` and verify no error text in main area and empty chat list.
+7. Reload page and verify selection restoration follows the new storage rules.
 
 ## Testing
-Manual verification only in `apps/designer` is required for this step.  
+Manual verification only in `apps/designer` via MCP `cursor-ide-browser` on `http://localhost:5173/` is required for this step.  
 Automated E2E coverage is intentionally deferred to future `apps/frontend` migration per user decision.
 
 ## Notes

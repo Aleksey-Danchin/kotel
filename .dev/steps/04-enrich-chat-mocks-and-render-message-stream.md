@@ -55,14 +55,15 @@ Mock messages are sparse and only partially linked to chats, `ChatPage` renders 
 6. No placeholder text remains in chat body for normal selected-chat flow.
 
 ## Verification Scenario
-1. Open several different chats and verify each displays messages.
-2. Confirm at least one chat provides long scroll in message body.
-3. Switch between servers and observe loading state before messages appear.
-4. Switch between chats in one server and observe loading state each time.
-5. Validate direction styling by comparing messages authored by current session user id vs others.
+1. Open `http://localhost:5173/` via MCP `cursor-ide-browser`.
+2. Open several different chats and verify each displays messages.
+3. Confirm at least one chat provides long scroll in message body.
+4. Switch between servers and observe loading state before messages appear.
+5. Switch between chats in one server and observe loading state each time.
+6. Validate direction styling by comparing messages authored by current session user id vs others.
 
 ## Testing
-Manual-only verification in designer UI.  
+Manual-only verification in designer UI via MCP `cursor-ide-browser` on `http://localhost:5173/`.  
 No Playwright/Vitest additions in this scope by explicit product decision.
 
 ## Notes

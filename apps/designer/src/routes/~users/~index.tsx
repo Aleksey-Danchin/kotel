@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/users")({
+export const Route = createFileRoute("/users/")({
   component: UsersPage,
 });
 
@@ -23,7 +23,8 @@ function UsersPage() {
   return (
     <main className="p-4 flex flex-col gap-4">
       <div className="alert alert-info">
-        Страница “users” в песочнице: данные статические, без запросов к backend.
+        Страница “users” в песочнице: данные статические, без запросов к
+        backend.
       </div>
 
       <table className="table table-zebra">

@@ -1,0 +1,160 @@
+{
+  "servers": [
+    {
+      "id": "srv_main",
+      "serverUrl": "https://kotel.localhost",
+      "user": {
+        "id": "mock-user-1",
+        "fullname": "Mock User",
+        "login": "mock",
+        "role": "admin"
+      }
+    },
+    {
+      "id": "srv_eu",
+      "serverUrl": "https://kotel-eu.localhost",
+      "user": {
+        "id": "mock-user-2",
+        "fullname": "EU Operator",
+        "login": "eu-operator",
+        "role": "operator"
+      }
+    },
+    {
+      "id": "srv_ru",
+      "serverUrl": "https://kotel-ru.localhost",
+      "user": {
+        "id": "mock-user-3",
+        "fullname": "RU Viewer",
+        "login": "ru-viewer",
+        "role": "viewer"
+      }
+    },
+    {
+      "id": "srv_local",
+      "serverUrl": "http://127.0.0.1:8081",
+      "user": {
+        "id": "mock-user-4",
+        "fullname": "Local Dev",
+        "login": "local-dev",
+        "role": "developer"
+      }
+    }
+  ],
+  "chats": [
+    {
+      "id": "chat_general",
+      "title": "Общий чат",
+      "subtitle": "Основной канал команды",
+      "unread": 2
+    },
+    {
+      "id": "chat_design",
+      "title": "Дизайн",
+      "subtitle": "Макеты и UX-флоу",
+      "unread": 0
+    },
+    {
+      "id": "chat_backend",
+      "title": "Backend",
+      "subtitle": "Контракты и интеграции",
+      "unread": 1
+    },
+    {
+      "id": "chat_eu_ops",
+      "title": "EU / Операции",
+      "subtitle": "Операционные вопросы",
+      "unread": 0
+    },
+    {
+      "id": "chat_eu_support",
+      "title": "EU / Поддержка",
+      "subtitle": "Запросы пользователей EU",
+      "unread": 3
+    },
+    {
+      "id": "chat_ru_sales",
+      "title": "RU / Продажи",
+      "subtitle": "Сделки и лиды",
+      "unread": 4
+    },
+    {
+      "id": "chat_ru_support",
+      "title": "RU / Поддержка",
+      "subtitle": "Запросы пользователей RU",
+      "unread": 1
+    },
+    {
+      "id": "chat_local_debug",
+      "title": "Local / Debug",
+      "subtitle": "Технические эксперименты",
+      "unread": 0
+    },
+    {
+      "id": "chat_local_qa",
+      "title": "Local / QA",
+      "subtitle": "Проверка сценариев интерфейса",
+      "unread": 1
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg_1",
+      "author": "System",
+      "text": "Добро пожаловать в общий чат",
+      "createdAt": "2026-03-25T09:00:00.000Z"
+    },
+    {
+      "id": "msg_2",
+      "author": "Designer",
+      "text": "Добавил новые макеты для обсуждения",
+      "createdAt": "2026-03-25T09:05:00.000Z"
+    },
+    {
+      "id": "msg_3",
+      "author": "Backend",
+      "text": "Подготовил обновление контрактов",
+      "createdAt": "2026-03-25T09:10:00.000Z"
+    },
+    {
+      "id": "msg_4",
+      "author": "Ops",
+      "text": "EU инфраструктура стабильна",
+      "createdAt": "2026-03-25T09:15:00.000Z"
+    },
+    {
+      "id": "msg_5",
+      "author": "Support",
+      "text": "Есть новый тикет от клиента",
+      "createdAt": "2026-03-25T09:20:00.000Z"
+    },
+    {
+      "id": "msg_6",
+      "author": "Sales",
+      "text": "Обновил статус по сделкам",
+      "createdAt": "2026-03-25T09:25:00.000Z"
+    }
+  ],
+  "serverChats": [
+    ["srv_main", "chat_general"],
+    ["srv_main", "chat_design"],
+    ["srv_main", "chat_backend"],
+    ["srv_eu", "chat_general"],
+    ["srv_eu", "chat_eu_ops"],
+    ["srv_eu", "chat_eu_support"],
+    ["srv_ru", "chat_general"],
+    ["srv_ru", "chat_ru_sales"],
+    ["srv_ru", "chat_ru_support"],
+    ["srv_local", "chat_general"],
+    ["srv_local", "chat_local_debug"],
+    ["srv_local", "chat_local_qa"]
+  ],
+  "chatMessages": [
+    ["chat_general", "msg_1"],
+    ["chat_general", "msg_2"],
+    ["chat_backend", "msg_3"],
+    ["chat_eu_ops", "msg_4"],
+    ["chat_eu_support", "msg_5"],
+    ["chat_ru_sales", "msg_6"]
+  ]
+}

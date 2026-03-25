@@ -1,10 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { setActiveServer, setServerSession } from "../state/servers";
+import { useSetAtom } from "jotai";
+import { setServerSession } from "../../state/servers";
+import { selectedServerUrlAtom } from "../../state/store";
 
-type AvailabilityState = "idle" | "checking" | "available" | "configured" | "error";
+type AvailabilityState =
+  | "idle"
+  | "checking"
+  | "available"
+  | "configured"
+  | "error";
 
-export const Route = createFileRoute("/setup")({
+export const Route = createFileRoute("/setup/")({
   component: SetupPage,
 });
 
@@ -14,6 +21,7 @@ function SetupPage() {
   const [setupError, setSetupError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [created, setCreated] = useState(false);
+  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
   const [form, setForm] = useState({
     login: "",
     password: "",
@@ -34,11 +42,15 @@ function SetupPage() {
     try {
       // Песочница: имитируем ответ сервера без fetch.
       await new Promise((r) => setTimeout(r, 500));
-      setAvailability(/configured/i.test(normalizedUrl) ? "configured" : "available");
+      setAvailability(
+        /configured/i.test(normalizedUrl) ? "configured" : "available",
+      );
     } catch (error) {
       setAvailability("error");
       setSetupError(
-        error instanceof Error ? error.message : "Не удалось проверить доступность setup",
+        error instanceof Error
+          ? error.message
+          : "Не удалось проверить доступность setup",
       );
     }
   }
@@ -56,12 +68,18 @@ function SetupPage() {
     try {
       // Песочница: “создаём” root пользователя только для верстки.
       await new Promise((r) => setTimeout(r, 700));
-      if (!form.login.trim() || !form.password.trim() || !form.fullname.trim()) {
+      if (
+        !form.login.trim() ||
+        !form.password.trim() ||
+        !form.fullname.trim()
+      ) {
         throw new Error("Заполните login/password/fullname");
       }
       setCreated(true);
     } catch (error) {
-      setSetupError(error instanceof Error ? error.message : "Ошибка инициализации setup");
+      setSetupError(
+        error instanceof Error ? error.message : "Ошибка инициализации setup",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -80,13 +98,20 @@ function SetupPage() {
       setServerSession({
         serverUrl: new URL(normalizedUrl).toString(),
         user: {
-          id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `mock-${host}`,
+          id:
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? crypto.randomUUID()
+              : `mock-${host}`,
           fullname: `User @ ${host}`,
-          login: host.replace(/[^a-zA-Z0-9]+/g, "_").toLowerCase().slice(0, 24) || "user",
+          login:
+            host
+              .replace(/[^a-zA-Z0-9]+/g, "_")
+              .toLowerCase()
+              .slice(0, 24) || "user",
           role: "designer",
         },
       });
-      setActiveServer(new URL(normalizedUrl).toString());
+      setSelectedServerUrl(new URL(normalizedUrl).toString());
       setSetupError(null);
     } catch (e) {
       setSetupError(e instanceof Error ? e.message : "Неверный URL сервера");
@@ -122,7 +147,9 @@ function SetupPage() {
               onClick={() => void onCheckAvailability()}
               disabled={availability === "checking"}
             >
-              {availability === "checking" ? "Проверяем..." : "Check availability"}
+              {availability === "checking"
+                ? "Проверяем..."
+                : "Check availability"}
             </button>
           </div>
         </div>
@@ -145,7 +172,10 @@ function SetupPage() {
               placeholder="Логин"
               value={form.login}
               onChange={(event) =>
-                setForm((current) => ({ ...current, login: event.target.value }))
+                setForm((current) => ({
+                  ...current,
+                  login: event.target.value,
+                }))
               }
               required
             />
@@ -155,7 +185,10 @@ function SetupPage() {
               type="password"
               value={form.password}
               onChange={(event) =>
-                setForm((current) => ({ ...current, password: event.target.value }))
+                setForm((current) => ({
+                  ...current,
+                  password: event.target.value,
+                }))
               }
               required
             />
@@ -164,12 +197,19 @@ function SetupPage() {
               placeholder="ФИО"
               value={form.fullname}
               onChange={(event) =>
-                setForm((current) => ({ ...current, fullname: event.target.value }))
+                setForm((current) => ({
+                  ...current,
+                  fullname: event.target.value,
+                }))
               }
               required
             />
             <div className="card-actions justify-end">
-              <button className="btn btn-success" type="submit" disabled={isSubmitting}>
+              <button
+                className="btn btn-success"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Создаем..." : "Инициализировать"}
               </button>
             </div>
@@ -179,10 +219,16 @@ function SetupPage() {
 
       {created ? (
         <div className="alert alert-success flex flex-wrap items-center justify-between gap-3">
-          <span>Root user “создан” (песочница). Для UI доступна только верстка.</span>
+          <span>
+            Root user “создан” (песочница). Для UI доступна только верстка.
+          </span>
           <div className="flex items-center gap-2">
             <span className="badge badge-primary badge-outline">mock</span>
-            <button type="button" className="btn btn-sm btn-primary" onClick={onAddServerToSandbox}>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary"
+              onClick={onAddServerToSandbox}
+            >
               Add server to sandbox
             </button>
           </div>

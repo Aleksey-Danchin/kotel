@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
-export const Route = createFileRoute("/callback")({
+export const Route = createFileRoute("/callback/")({
   component: CallbackPage,
 });
 
@@ -15,7 +15,9 @@ function CallbackPage() {
     postedRef.current = true;
   }, []);
 
-  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
   const code = params.get("code");
   const state = params.get("state");
 
@@ -23,7 +25,8 @@ function CallbackPage() {
     <section className="space-y-3">
       <h1 className="text-2xl font-semibold">OAuth callback (designer)</h1>
       <p className="text-sm text-base-content/80">
-        В песочнице обработка OAuth отключена. Здесь показываем только входящие параметры для верстки.
+        В песочнице обработка OAuth отключена. Здесь показываем только входящие
+        параметры для верстки.
       </p>
       <div className="card bg-base-200 shadow-sm">
         <div className="card-body gap-2">

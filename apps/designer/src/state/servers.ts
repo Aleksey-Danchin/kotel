@@ -1,4 +1,7 @@
-import { atom, createStore } from "jotai";
+import { atom } from "jotai";
+
+import { defaultStore } from "../global/defaultStore";
+import stateMocks from "./mocks.json";
 
 export interface ServerUser {
   id: string;
@@ -8,12 +11,26 @@ export interface ServerUser {
 }
 
 export interface ServerSession {
+  id?: string;
   serverUrl: string;
   user: ServerUser;
 }
 
 const SERVERS_STORAGE_KEY = "kotel.designer.servers";
 const ACTIVE_SERVER_STORAGE_KEY = "kotel.designer.activeServerUrl";
+
+const DESIGNER_DEFAULT_SERVERS = stateMocks.servers as ServerSession[];
+
+function makeServerId(serverUrl: string): string {
+  return `srv_${serverUrl.replace(/[^a-zA-Z0-9]+/g, "_").toLowerCase()}`;
+}
+
+function normalizeServerSession(session: ServerSession): ServerSession {
+  return {
+    ...session,
+    id: session.id ?? makeServerId(session.serverUrl),
+  };
+}
 
 function loadPersistedServers(): ServerSession[] {
   if (typeof localStorage === "undefined") {
@@ -31,15 +48,17 @@ function loadPersistedServers(): ServerSession[] {
       return [];
     }
 
-    return parsed.filter((value): value is ServerSession => {
-      return (
-        value &&
-        typeof value === "object" &&
-        typeof (value as ServerSession).serverUrl === "string" &&
-        typeof (value as ServerSession).user === "object" &&
-        typeof (value as ServerSession).user?.id === "string"
-      );
-    });
+    return parsed
+      .filter((value): value is ServerSession => {
+        return (
+          value &&
+          typeof value === "object" &&
+          typeof (value as ServerSession).serverUrl === "string" &&
+          typeof (value as ServerSession).user === "object" &&
+          typeof (value as ServerSession).user?.id === "string"
+        );
+      })
+      .map(normalizeServerSession);
   } catch {
     return [];
   }
@@ -58,7 +77,10 @@ function loadPersistedActiveServerUrl(): string | null {
   return rawValue.trim().length ? rawValue : null;
 }
 
-function persist(servers: Map<string, ServerSession>, activeServerUrl: string | null): void {
+function persist(
+  servers: Map<string, ServerSession>,
+  activeServerUrl: string | null,
+): void {
   if (typeof localStorage === "undefined") {
     return;
   }
@@ -71,31 +93,45 @@ function persist(servers: Map<string, ServerSession>, activeServerUrl: string | 
 }
 
 const initialSessions = loadPersistedServers();
-const initialActiveServerUrl = loadPersistedActiveServerUrl();
+const designerDefaults = DESIGNER_DEFAULT_SERVERS.map(normalizeServerSession);
+
+// По умолчанию всегда держим “базовый набор” серверов (как раньше делали в `~__root.tsx`),
+// а persisted-данные поверх них приоритетнее.
+const initialSessionsByUrl = new Map<string, ServerSession>();
+designerDefaults.forEach((s) => initialSessionsByUrl.set(s.serverUrl, s));
+initialSessions.forEach((s) => initialSessionsByUrl.set(s.serverUrl, s));
+
+const initialActiveServerUrl = (() => {
+  const persisted = loadPersistedActiveServerUrl();
+  if (persisted && initialSessionsByUrl.has(persisted)) {
+    return persisted;
+  }
+
+  return designerDefaults[0]?.serverUrl ?? null;
+})();
 
 export const serversAtom = atom<Map<string, ServerSession>>(
-  new Map(initialSessions.map((s) => [s.serverUrl, s])),
+  new Map(Array.from(initialSessionsByUrl.values()).map((s) => [s.serverUrl, s])),
 );
 
 export const activeServerUrlAtom = atom<string | null>(initialActiveServerUrl);
 
-export const serversStore = createStore();
-
 export function setServerSession(session: ServerSession): void {
-  const currentServers = serversStore.get(serversAtom);
+  const normalizedSession = normalizeServerSession(session);
+  const currentServers = defaultStore.get(serversAtom);
   const nextServers = new Map(currentServers);
-  nextServers.set(session.serverUrl, session);
+  nextServers.set(normalizedSession.serverUrl, normalizedSession);
 
-  const currentActive = serversStore.get(activeServerUrlAtom);
-  const nextActive = currentActive ?? session.serverUrl;
+  const currentActive = defaultStore.get(activeServerUrlAtom);
+  const nextActive = currentActive ?? normalizedSession.serverUrl;
 
-  serversStore.set(serversAtom, nextServers);
-  serversStore.set(activeServerUrlAtom, nextActive);
+  defaultStore.set(serversAtom, nextServers);
+  defaultStore.set(activeServerUrlAtom, nextActive);
   persist(nextServers, nextActive);
 }
 
 export function removeServerSession(serverUrl: string): void {
-  const currentServers = serversStore.get(serversAtom);
+  const currentServers = defaultStore.get(serversAtom);
   if (!currentServers.has(serverUrl)) {
     return;
   }
@@ -103,32 +139,33 @@ export function removeServerSession(serverUrl: string): void {
   const nextServers = new Map(currentServers);
   nextServers.delete(serverUrl);
 
-  const currentActive = serversStore.get(activeServerUrlAtom);
+  const currentActive = defaultStore.get(activeServerUrlAtom);
   const nextActive =
-    currentActive === serverUrl ? nextServers.keys().next().value ?? null : currentActive;
+    currentActive === serverUrl
+      ? (nextServers.keys().next().value ?? null)
+      : currentActive;
 
-  serversStore.set(serversAtom, nextServers);
-  serversStore.set(activeServerUrlAtom, nextActive);
+  defaultStore.set(serversAtom, nextServers);
+  defaultStore.set(activeServerUrlAtom, nextActive);
   persist(nextServers, nextActive);
 }
 
 export function setActiveServer(serverUrl: string | null): void {
-  const currentServers = serversStore.get(serversAtom);
+  const currentServers = defaultStore.get(serversAtom);
   if (serverUrl === null) {
-    serversStore.set(activeServerUrlAtom, null);
+    defaultStore.set(activeServerUrlAtom, null);
     persist(currentServers, null);
     return;
   }
 
   const exists = currentServers.has(serverUrl);
   const next = exists ? serverUrl : null;
-  serversStore.set(activeServerUrlAtom, next);
+  defaultStore.set(activeServerUrlAtom, next);
   persist(currentServers, next);
 }
 
 export function resetServersStore(): void {
-  serversStore.set(serversAtom, new Map());
-  serversStore.set(activeServerUrlAtom, null);
+  defaultStore.set(serversAtom, new Map());
+  defaultStore.set(activeServerUrlAtom, null);
   persist(new Map(), null);
 }
-

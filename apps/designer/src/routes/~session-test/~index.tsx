@@ -1,27 +1,27 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
   serversAtom,
-  serversStore,
-  setActiveServer,
   setServerSession,
   removeServerSession,
-} from "../state/servers";
+} from "../../state/servers";
+import { selectedServerUrlAtom } from "../../state/store";
 
-export const Route = createFileRoute("/session-test")({
+export const Route = createFileRoute("/session-test/")({
   component: SessionTestPage,
 });
 
 function SessionTestPage() {
   const [banner, setBanner] = useState<string | null>(null);
-  const serversMap = useAtomValue(serversAtom, { store: serversStore });
+  const serversMap = useAtomValue(serversAtom);
   const servers = Array.from(serversMap.values());
+  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
   const [newServerUrl, setNewServerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [statusByServer, setStatusByServer] = useState<Record<string, { sessionId: string }>>(
-    {},
-  );
+  const [statusByServer, setStatusByServer] = useState<
+    Record<string, { sessionId: string }>
+  >({});
 
   function displayServerHost(serverUrl: string): string {
     try {
@@ -55,11 +55,15 @@ function SessionTestPage() {
               ? crypto.randomUUID()
               : `mock-${host}`,
           fullname: `User @ ${host}`,
-          login: host.replace(/[^a-zA-Z0-9]+/g, "_").toLowerCase().slice(0, 24) || "user",
+          login:
+            host
+              .replace(/[^a-zA-Z0-9]+/g, "_")
+              .toLowerCase()
+              .slice(0, 24) || "user",
           role: "designer",
         },
       });
-      setActiveServer(normalized);
+      setSelectedServerUrl(normalized);
 
       setNewServerUrl("");
       setBanner(`(mock) Сервер добавлен: ${host}`);
@@ -84,7 +88,9 @@ function SessionTestPage() {
       delete next[url];
       return next;
     });
-    setBanner(`(mock) logout${allDevices ? " all devices" : ""}: ${displayServerHost(url)}`);
+    setBanner(
+      `(mock) logout${allDevices ? " all devices" : ""}: ${displayServerHost(url)}`,
+    );
   }
 
   function onForceRefresh(url: string) {
@@ -118,7 +124,11 @@ function SessionTestPage() {
               disabled={isSubmitting}
             />
             <div className="card-actions justify-end">
-              <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Добавляем..." : "Add server"}
               </button>
             </div>
@@ -133,15 +143,21 @@ function SessionTestPage() {
             {servers.map((session) => {
               const status = statusByServer[session.serverUrl];
               return (
-                <li key={session.serverUrl} className="card bg-base-200 shadow-sm">
+                <li
+                  key={session.serverUrl}
+                  className="card bg-base-200 shadow-sm"
+                >
                   <div className="card-body gap-3">
                     <div>
                       <p className="font-medium">{session.serverUrl}</p>
                       <p className="text-sm text-base-content/80">
-                        {session.user.fullname} ({session.user.login}) - {session.user.role}
+                        {session.user.fullname} ({session.user.login}) -{" "}
+                        {session.user.role}
                       </p>
                       {status ? (
-                        <p className="text-xs text-base-content/70">sessionId: {status.sessionId}</p>
+                        <p className="text-xs text-base-content/70">
+                          sessionId: {status.sessionId}
+                        </p>
                       ) : null}
                     </div>
                     <div className="flex flex-wrap gap-2">

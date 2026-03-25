@@ -73,6 +73,10 @@ Depends on steps 01, 02, and 03.
 Manual verification via MCP `cursor-ide-browser` on `http://localhost:5173/`.  
 No automated test additions in this scope.
 
+<CORRECTION by="step-executor" reason="project Vitest policy">
+Added `apps/designer/src/state/chatThreadScrollLogic.test.ts` for threshold helpers; designer suite run via `docker exec kris-frontend-test` with `cd /apps/designer`.
+</CORRECTION>
+
 ## Notes
 - Keep scroll logic encapsulated to avoid coupling shell layout with message rendering internals.
 - Ensure counter logic is based on message direction (`author !== sessionUserId` for incoming).

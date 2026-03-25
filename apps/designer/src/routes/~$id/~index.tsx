@@ -5,12 +5,13 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { ChatMessageBodySkeleton } from "../../components/ChatMessageBodySkeleton";
 import { ChatMessageList } from "../../components/ChatMessageList";
 import { DESIGNER_LOADING_DELAY_MS } from "../../components/loadingDelay";
-import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
-import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 import {
   designerAppendedChatMessagesAtom,
   getMergedChatMessages,
 } from "../../state/chatComposerActions";
+import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
+import { useChatThreadScroll } from "../../state/chatThreadScrollContext";
 import { routeContextAtom, selectedChatAtom, selectedServerAtom } from "../../state/store";
 
 export const Route = createFileRoute("/$id/")({
@@ -23,6 +24,7 @@ function IdShellPage() {
   const routeCtx = useAtomValue(routeContextAtom);
   const appendedByChat = useAtomValue(designerAppendedChatMessagesAtom);
   const setLastByServer = useSetAtom(lastChatByServerIdAtom);
+  const chatScroll = useChatThreadScroll();
 
   const [streamLoading, setStreamLoading] = useState(false);
   const initializedRef = useRef(false);
@@ -67,6 +69,25 @@ function IdShellPage() {
 
     return () => window.clearTimeout(timer);
   }, [selectedServer?.serverUrl, routeTransitionId]);
+
+  useEffect(() => {
+    if (
+      !chatScroll ||
+      streamLoading ||
+      !selectedServer ||
+      !selectedChat
+    ) {
+      return;
+    }
+    const msgs = getMergedChatMessages(selectedChat.id, appendedByChat);
+    chatScroll.notifyThreadMessagesSnapshot(msgs, selectedServer.user.id);
+  }, [
+    chatScroll,
+    streamLoading,
+    selectedServer,
+    selectedChat,
+    appendedByChat,
+  ]);
 
   if (!selectedServer) {
     return null;

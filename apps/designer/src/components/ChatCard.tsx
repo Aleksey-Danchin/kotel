@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ChatPreview } from "../state/store";
+import { chatHeaderTitle, type ChatPreview } from "../state/store";
 
 export interface ChatCardProps {
   chat: ChatPreview;
@@ -19,7 +19,7 @@ export function ChatCard({ chat, active, onSelect }: ChatCardProps) {
       onClick={onSelect}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="font-medium">{chat.title}</div>
+        <div className="font-medium">{chatHeaderTitle(chat)}</div>
         {chat.unread > 0 && (
           <span className="badge badge-primary badge-sm">{chat.unread}</span>
         )}

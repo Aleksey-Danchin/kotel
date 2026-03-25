@@ -8,3 +8,10 @@
 - Навигация по серверу/чату централизована в `state/designerNavigation.ts` (`enterServer`, `enterChat`, `exitChatToServer`, `exitServerToRoot`).
 - Сброс `lastChatByServerId` для сервера владельца чата выполняется при любом переходе с URL `/:chatId` на другой путь (`applyLastChatCleanupOnPathnameChange` в `useLayoutEffect` корня), включая браузерные Back/Forward и клики по карточкам.
 - `activeServerId` в корне выравнивается с pathname (сегмент `/$id` как сервер или как чат через `resolveRouteParam`), чтобы история браузера не оставляла рассогласованный выбор.
+
+## Step 04: Enrich chat mocks and message stream
+
+- Моки чатов: поле `type: "person" | "group"` и опционально `peerName` для личных; шапка через `chatHeaderTitle()` в `store.ts`.
+- Сообщения: `author` — id пользователя (`mock-user-*` или peer-id); исходящее: `message.author === selectedServer.user.id`.
+- Имитация загрузки треда: `CHAT_STREAM_LOAD_MS` в `routes/~$id/~index.tsx` при смене `serverUrl` или `chatId` (скелетон в теле чата).
+- В репозитории нет `scripts/prettier.sh`; проверка сборки дизайнера: `cd apps/designer && npm run build`.

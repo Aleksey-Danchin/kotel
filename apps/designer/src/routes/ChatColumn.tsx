@@ -1,6 +1,6 @@
 import type { FormEventHandler } from "react";
 import { useAtomValue } from "jotai";
-import { selectedChatAtom } from "../state/store";
+import { chatHeaderTitle, selectedChatAtom } from "../state/store";
 
 export interface ChatColumnProps {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ export function ChatColumn({ children }: ChatColumnProps) {
         {selectedChat ? (
           <>
             <h1 className="truncate text-lg font-semibold text-base-content">
-              {selectedChat.title}
+              {chatHeaderTitle(selectedChat)}
             </h1>
             {selectedChat.subtitle ? (
               <p className="mt-0.5 truncate text-sm text-base-content/70">

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T19:22:46.892Z",
-  "updatedAt": "2026-03-25T19:32:21.626Z",
+  "updatedAt": "2026-03-25T19:33:52.798Z",
   "steps": [
     {
       "order": 1,
@@ -201,10 +201,10 @@
     {
       "order": 3,
       "file": "03-build-fixed-three-column-shell.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "1be7cd2",
       "startedAt": "2026-03-25T19:30:40.697Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T19:32:32.775Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -304,12 +304,101 @@
     {
       "order": 4,
       "file": "04-enrich-chat-mocks-and-render-message-stream.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T19:32:35.027Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified dev health"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not in repo; designer build OK"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Step specifies manual-only verification, no new tests"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Explicit product decision: no Vitest/Playwright"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "N/A"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer sandbox only; no docs/ change"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "docker ps: kotel dev containers healthy; test compose down attempted"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: every chat has at least one message",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: one chat enough items for scroll",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: person chat header peer name",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: incoming/outgoing subtle color difference",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: loader on server and chat switch",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: no placeholder in normal selected-chat flow",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

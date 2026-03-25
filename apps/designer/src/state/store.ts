@@ -8,18 +8,36 @@ import { serverUrlFromServersByRouteId } from "./serverRouteId";
 
 export type ChatId = string;
 
+/** Тип чата в макете: личный (peer) или группа/канал. Notes для песочницы: бэкенд не подключён. */
+export type ChatType = "person" | "group";
+
 export interface ChatPreview {
   id: ChatId;
+  type: ChatType;
   title: string;
   subtitle: string;
   unread: number;
+  /** Для `type: "person"` — имя собеседника в шапке; для группы не задаётся. */
+  peerName?: string;
 }
 
+/**
+ * author — id пользователя сессии мок-сервера (`ServerSession.user.id`) или id «собеседника»
+ * из фиктивного каталога; совпадение с текущей сессией задаёт исходящее направление.
+ */
 export interface ChatMessage {
   id: string;
   author: string;
   text: string;
   createdAt: string;
+}
+
+/** Заголовок колонки чата: имя пира для личного чата, иначе название группы. */
+export function chatHeaderTitle(chat: ChatPreview): string {
+  if (chat.type === "person" && chat.peerName) {
+    return chat.peerName;
+  }
+  return chat.title;
 }
 
 /** Текущий сегмент маршрута: либо главная без id, либо `/$id`. */
@@ -59,9 +77,10 @@ export function getTotalUnreadForServerSession(session: ServerSession): number {
 }
 
 export function getChatMessages(chatId: string): ChatMessage[] {
-  return CHAT_MESSAGES.filter(([linkChatId]) => linkChatId === chatId)
+  const list = CHAT_MESSAGES.filter(([linkChatId]) => linkChatId === chatId)
     .map(([, messageId]) => MESSAGE_BY_ID.get(messageId))
     .filter((message): message is ChatMessage => message !== undefined);
+  return [...list].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
 // Список всех серверов из песочницы.

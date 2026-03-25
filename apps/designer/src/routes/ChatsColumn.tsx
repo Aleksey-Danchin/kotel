@@ -1,7 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatCard } from "../components/ChatCard";
+import { DESIGNER_LOADING_DELAY_MS } from "../components/loadingDelay";
+import { ChatsColumnBodySkeleton } from "../components/ChatsColumnBodySkeleton";
+import { ChatsColumnSkeleton } from "../components/ChatsColumnSkeleton";
 import { enterChat } from "../state/designerNavigation";
 import {
   chatsForSelectedServerAtom,
@@ -18,13 +22,51 @@ function displayServerHost(serverUrl: string): string {
   }
 }
 
-export function ChatsColumn() {
+export interface ChatsColumnProps {
+  isLoading?: boolean;
+}
+
+export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
   const navigate = useNavigate();
   const selectedServer = useAtomValue(selectedServerAtom);
   const chats = useAtomValue(chatsForSelectedServerAtom);
   const highlightedChatId = useAtomValue(effectiveChatIdAtom);
 
+  const [serverSwitchLoading, setServerSwitchLoading] = useState(false);
+  const initializedRef = useRef(false);
+  const transitionIdRef = useRef(0);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const serverUrl = selectedServer?.serverUrl;
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      return;
+    }
+
+    if (!serverUrl) return;
+
+    transitionIdRef.current += 1;
+    const myId = transitionIdRef.current;
+
+    // eslint/React rule: avoid direct setState in effect body.
+    // We still want the skeleton to appear immediately, so flip the state
+    // in a microtask and guard against stale transitions.
+    queueMicrotask(() => {
+      if (transitionIdRef.current !== myId) return;
+      setServerSwitchLoading(true);
+    });
+    const timer = window.setTimeout(() => {
+      if (transitionIdRef.current !== myId) return;
+      setServerSwitchLoading(false);
+    }, DESIGNER_LOADING_DELAY_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [isLoading, selectedServer?.serverUrl]);
+
   const content = (() => {
+    if (serverSwitchLoading && selectedServer) return <ChatsColumnBodySkeleton />;
     if (!selectedServer) return null;
 
     if (chats.length === 0)
@@ -50,6 +92,10 @@ export function ChatsColumn() {
       </div>
     );
   })();
+
+  if (isLoading) {
+    return <ChatsColumnSkeleton />;
+  }
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col bg-base-200 p-1">

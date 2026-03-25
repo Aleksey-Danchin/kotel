@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T20:38:11.724Z",
-  "updatedAt": "2026-03-25T20:47:51.929Z",
+  "updatedAt": "2026-03-25T21:02:18.074Z",
   "steps": [
     {
       "order": 1,
       "file": "01-update-mocks-and-gear-host-rule-data.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "09684de",
       "startedAt": "2026-03-25T20:38:20.905Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T20:48:58.149Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -100,12 +100,104 @@
     {
       "order": 2,
       "file": "02-add-startup-and-server-switch-skeletons.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T20:49:05.070Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped (verified by orchestrator)"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed",
+          "note": "Identified current timer logic in IdShellPage and missing column skeletons"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed",
+          "note": "Unified DESIGNER_LOADING_DELAY_MS=1200ms and added startup/server skeletons"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует; прогнал eslint"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг только для apps/designer (sandbox), авто-тесты не предусмотрены; делаем lint + code inspection"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Без добавления/обновления тестов в этом шаге"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Нет релевантных авто-регрессионных тестов для designer sandbox"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed",
+          "note": "ACs verified via code inspection + lint"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения UI в apps/designer: документация не требуется в рамках шага"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Dev containers healthy; test containers stopped"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: all three columns show loading skeletons on initial load",
+          "status": "completed",
+          "note": "Root startupLoading mounts skeletons in all columns"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: normal UI replaces skeletons after 1200ms",
+          "status": "completed",
+          "note": "startupLoading=false after 1200ms; IdShellPage/ChatsColumn suppress initial timers"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: server change shows skeletons in chats and messages",
+          "status": "completed",
+          "note": "ChatsColumn serverSwitchLoading + IdShellPage streamLoading both use 1200ms"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: loading delay is consistently 1200ms",
+          "status": "completed",
+          "note": "Single constant DESIGNER_LOADING_DELAY_MS=1200ms used everywhere"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: rapid switching never leaves stale skeletons",
+          "status": "completed",
+          "note": "transitionIdRef token guards prevent stale skeleton state"
+        }
+      ]
     },
     {
       "order": 3,

@@ -73,6 +73,9 @@ export function enterChat(
   chatId: string,
   _serverRouteId: string,
 ): void {
+  // Аргумент нужен для сигнатуры вызовов/интуитивности переходов,
+  // но в песочнице он не участвует в навигации.
+  void _serverRouteId;
   void navigate({ to: "/$id", params: { id: chatId } });
 }
 

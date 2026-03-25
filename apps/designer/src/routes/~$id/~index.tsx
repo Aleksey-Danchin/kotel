@@ -1,19 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { ChatMessageBodySkeleton } from "../../components/ChatMessageBodySkeleton";
 import { ChatMessageList } from "../../components/ChatMessageList";
+import { DESIGNER_LOADING_DELAY_MS } from "../../components/loadingDelay";
 import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
 import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 import {
   designerAppendedChatMessagesAtom,
   getMergedChatMessages,
 } from "../../state/chatComposerActions";
-import { selectedChatAtom, selectedServerAtom } from "../../state/store";
-
-/** Детерминированная задержка имитации загрузки треда в песочнице (без сети). */
-const CHAT_STREAM_LOAD_MS = 420;
+import { routeContextAtom, selectedChatAtom, selectedServerAtom } from "../../state/store";
 
 export const Route = createFileRoute("/$id/")({
   component: IdShellPage,
@@ -22,10 +20,14 @@ export const Route = createFileRoute("/$id/")({
 function IdShellPage() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const selectedChat = useAtomValue(selectedChatAtom);
+  const routeCtx = useAtomValue(routeContextAtom);
   const appendedByChat = useAtomValue(designerAppendedChatMessagesAtom);
   const setLastByServer = useSetAtom(lastChatByServerIdAtom);
 
   const [streamLoading, setStreamLoading] = useState(false);
+  const initializedRef = useRef(false);
+  const transitionIdRef = useRef(0);
+  const routeTransitionId = routeCtx.type === "id" ? routeCtx.id : null;
 
   useEffect(() => {
     if (!selectedServer) return;
@@ -41,31 +43,45 @@ function IdShellPage() {
   }, [selectedServer, selectedChat, setLastByServer]);
 
   useEffect(() => {
-    if (!selectedServer || !selectedChat) {
-      setStreamLoading(false);
+    const serverUrl = selectedServer?.serverUrl;
+    if (!serverUrl) return;
+
+    if (!initializedRef.current) {
+      initializedRef.current = true;
       return;
     }
 
-    setStreamLoading(true);
+    transitionIdRef.current += 1;
+    const myId = transitionIdRef.current;
+
+    // eslint/React rule: avoid direct setState in effect body.
+    // Flip the flag in a microtask and guard against stale transitions.
+    queueMicrotask(() => {
+      if (transitionIdRef.current !== myId) return;
+      setStreamLoading(true);
+    });
     const timer = window.setTimeout(() => {
+      if (transitionIdRef.current !== myId) return;
       setStreamLoading(false);
-    }, CHAT_STREAM_LOAD_MS);
+    }, DESIGNER_LOADING_DELAY_MS);
 
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [selectedServer?.serverUrl, selectedChat?.id]);
+    return () => window.clearTimeout(timer);
+  }, [selectedServer?.serverUrl, routeTransitionId]);
 
-  if (!selectedServer || !selectedChat) {
+  if (!selectedServer) {
+    return null;
+  }
+
+  if (streamLoading) {
+    return <ChatMessageBodySkeleton />;
+  }
+
+  if (!selectedChat) {
     return null;
   }
 
   const messages = getMergedChatMessages(selectedChat.id, appendedByChat);
   const sessionUserId = selectedServer.user.id;
-
-  if (streamLoading) {
-    return <ChatMessageBodySkeleton />;
-  }
 
   return <ChatMessageList messages={messages} sessionUserId={sessionUserId} />;
 }

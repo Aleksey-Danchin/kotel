@@ -7,6 +7,7 @@ import {
 import { useAtomValue } from "jotai";
 
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
+import { ChatColumnSkeleton } from "../components/ChatColumnSkeleton";
 import { sendDesignerChatMessage } from "../state/chatComposerActions";
 import {
   chatHeaderTitle,
@@ -16,10 +17,11 @@ import {
 
 export interface ChatColumnProps {
   children: React.ReactNode;
+  isLoading?: boolean;
 }
 
 /** Личный чат: в данных `title` — имя собеседника; группа/канал: `title` — название. */
-export function ChatColumn({ children }: ChatColumnProps) {
+export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const selectedChat = useAtomValue(selectedChatAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
   const [draft, setDraft] = useState("");
@@ -44,6 +46,10 @@ export function ChatColumn({ children }: ChatColumnProps) {
     event.preventDefault();
     trySend();
   };
+
+  if (isLoading) {
+    return <ChatColumnSkeleton />;
+  }
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col border-l-2 border-base-content/20 bg-base-100">

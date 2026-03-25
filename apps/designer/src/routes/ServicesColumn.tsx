@@ -14,7 +14,12 @@ import {
 } from "../state/store";
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ServerCard } from "../components/ServerCard";
+import { ServicesColumnSkeleton } from "../components/ServicesColumnSkeleton";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
+
+export interface ServicesColumnProps {
+  isLoading?: boolean;
+}
 
 function displayServerHost(serverUrl: string): string {
   try {
@@ -45,7 +50,7 @@ function normalizeServerAddressInput(raw: string): string {
   }
 }
 
-export function ServicesColumn() {
+export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
   const navigate = useNavigate();
   const serversMap = useAtomValue(serversAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
@@ -107,6 +112,10 @@ export function ServicesColumn() {
   function onDisconnect(serverUrl: string) {
     setError(null);
     removeServerSession(serverUrl);
+  }
+
+  if (isLoading) {
+    return <ServicesColumnSkeleton />;
   }
 
   return (

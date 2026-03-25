@@ -5,9 +5,10 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSetAtom } from "jotai";
 import { defaultStore } from "../global/defaultStore";
+import { DESIGNER_LOADING_DELAY_MS } from "../components/loadingDelay";
 import {
   applyLastChatCleanupOnPathnameChange,
   exitChatToServer,
@@ -32,6 +33,7 @@ function RootLayout() {
   const setRouteCtx = useSetAtom(routeContextAtom);
   const pathnameRef = useRef(pathname);
   const prevPathnameRef = useRef<string | null>(null);
+  const [startupLoading, setStartupLoading] = useState(true);
 
   useLayoutEffect(() => {
     const prev = prevPathnameRef.current;
@@ -65,6 +67,11 @@ function RootLayout() {
   useEffect(() => {
     pathnameRef.current = pathname;
   }, [pathname]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setStartupLoading(false), DESIGNER_LOADING_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -115,15 +122,15 @@ function RootLayout() {
     <div className="h-dvh overflow-hidden bg-base-100">
       <div className="mx-auto flex h-full min-h-0 w-full max-w-[1400px] overflow-hidden">
         <div className="flex h-full min-h-0 w-70 shrink-0">
-          <ServicesColumn />
+          <ServicesColumn isLoading={startupLoading} />
         </div>
 
         <div className="flex h-full min-h-0 w-70 shrink-0">
-          <ChatsColumn />
+          <ChatsColumn isLoading={startupLoading} />
         </div>
 
         <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <ChatColumn>
+          <ChatColumn isLoading={startupLoading}>
             <Outlet />
           </ChatColumn>
         </main>

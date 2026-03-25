@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
-import {
-  activeServerIdAtom,
-  lastChatByServerIdAtom,
-} from "../../state/selectionAtoms";
+import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
 import { selectedChatAtom, selectedServerAtom } from "../../state/store";
 import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 
@@ -15,14 +12,12 @@ export const Route = createFileRoute("/$id/")({
 function IdShellPage() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const selectedChat = useAtomValue(selectedChatAtom);
-  const setActiveServerId = useSetAtom(activeServerIdAtom);
   const setLastByServer = useSetAtom(lastChatByServerIdAtom);
 
   useEffect(() => {
     if (!selectedServer) return;
 
     const routeId = serverRouteIdFromServerUrl(selectedServer.serverUrl);
-    setActiveServerId(routeId);
 
     if (selectedChat) {
       setLastByServer((prev) => ({
@@ -30,7 +25,7 @@ function IdShellPage() {
         [routeId]: selectedChat.id,
       }));
     }
-  }, [selectedServer, selectedChat, setActiveServerId, setLastByServer]);
+  }, [selectedServer, selectedChat, setLastByServer]);
 
   if (!selectedServer) {
     return (

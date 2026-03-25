@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T19:22:46.892Z",
-  "updatedAt": "2026-03-25T19:27:03.773Z",
+  "updatedAt": "2026-03-25T19:30:32.097Z",
   "steps": [
     {
       "order": 1,
       "file": "01-unify-url-id-and-selection-state.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "57f0d80",
       "startedAt": "2026-03-25T19:22:59.481Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T19:27:11.497Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -106,12 +106,97 @@
     {
       "order": 2,
       "file": "02-implement-url-driven-navigation-and-exit-flows.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T19:27:14.763Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped: orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer-only UX; no API/docs impact"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test stack down; dev ps skipped (compose env not loaded here); orchestrator pre-verified dev health"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: server card navigates to /:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: chat card navigates to /:chatId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Esc on chat -> /:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Esc on server -> /",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: exit chat to server clears lastChatByServerId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: back/forward coherent with URL",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 3,

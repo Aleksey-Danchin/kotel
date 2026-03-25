@@ -1,11 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { ChatCard } from "../components/ChatCard";
-import {
-  activeServerIdAtom,
-  lastChatByServerIdAtom,
-  type LastChatByServerId,
-} from "../state/selectionAtoms";
+import { enterChat } from "../state/designerNavigation";
 import {
   chatsForSelectedServerAtom,
   effectiveChatIdAtom,
@@ -18,8 +14,6 @@ export function ChatsColumn() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const chats = useAtomValue(chatsForSelectedServerAtom);
   const highlightedChatId = useAtomValue(effectiveChatIdAtom);
-  const setActiveServerId = useSetAtom(activeServerIdAtom);
-  const setLastByServer = useSetAtom(lastChatByServerIdAtom);
 
   const content = (() => {
     if (!selectedServer) return null;
@@ -40,15 +34,7 @@ export function ChatsColumn() {
               const serverRid = serverRouteIdFromServerUrl(
                 selectedServer.serverUrl,
               );
-              setLastByServer((prev: LastChatByServerId) => ({
-                ...prev,
-                [serverRid]: chat.id,
-              }));
-              setActiveServerId(serverRid);
-              navigate({
-                to: "/$id",
-                params: { id: chat.id },
-              });
+              enterChat(navigate, chat.id, serverRid);
             }}
           />
         ))}

@@ -1,13 +1,13 @@
 import { useRef, useState, type SubmitEventHandler } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import {
   serversAtom,
   setServerSession,
   removeServerSession,
   type ServerSession,
 } from "../state/servers";
-import { activeServerIdAtom } from "../state/selectionAtoms";
+import { enterServer } from "../state/designerNavigation";
 import {
   getTotalUnreadForServerSession,
   selectedServerAtom,
@@ -48,7 +48,6 @@ export function ServicesColumn() {
   const navigate = useNavigate();
   const serversMap = useAtomValue(serversAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
-  const setActiveServerId = useSetAtom(activeServerIdAtom);
   const servers = Array.from(serversMap.values());
   const [newServerUrl, setNewServerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,8 +89,7 @@ export function ServicesColumn() {
 
       setServerSession(nextSession);
       const rid = serverRouteIdFromServerUrl(normalized);
-      setActiveServerId(rid);
-      navigate({ to: "/$id", params: { id: rid } });
+      enterServer(navigate, rid);
       setNewServerUrl("");
       addServerDialogRef.current?.close();
     } catch (addError) {
@@ -126,8 +124,7 @@ export function ServicesColumn() {
               unreadCount={getTotalUnreadForServerSession(session)}
               onSelect={() => {
                 const rid = serverRouteIdFromServerUrl(session.serverUrl);
-                setActiveServerId(rid);
-                navigate({ to: "/$id", params: { id: rid } });
+                enterServer(navigate, rid);
               }}
               onDelete={() => onDisconnect(session.serverUrl)}
             />

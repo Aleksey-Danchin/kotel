@@ -8,8 +8,14 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useSetAtom } from "jotai";
 import { defaultStore } from "../global/defaultStore";
+import {
+  applyLastChatCleanupOnPathnameChange,
+  exitChatToServer,
+  exitServerToRoot,
+} from "../state/designerNavigation";
 import { activeServerIdAtom } from "../state/selectionAtoms";
 import { serversAtom } from "../state/servers";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 import { resolveRouteParam, routeContextAtom } from "../state/store";
 import { selectionIdFromPathname } from "../state/routePath";
 import { ChatsColumn } from "./ChatsColumn";
@@ -24,13 +30,34 @@ function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const setRouteCtx = useSetAtom(routeContextAtom);
   const pathnameRef = useRef(pathname);
+  const prevPathnameRef = useRef<string | null>(null);
 
   useLayoutEffect(() => {
+    const prev = prevPathnameRef.current;
+    if (prev !== null && prev !== pathname) {
+      applyLastChatCleanupOnPathnameChange(prev, pathname);
+    }
+    prevPathnameRef.current = pathname;
+
     const id = selectionIdFromPathname(pathname);
     if (id) {
       setRouteCtx({ type: "id", id });
+      const serversMap = defaultStore.get(serversAtom);
+      const activeId = defaultStore.get(activeServerIdAtom);
+      const r = resolveRouteParam(id, serversMap, activeId);
+      if (r.kind === "server") {
+        defaultStore.set(activeServerIdAtom, id);
+      } else if (r.kind === "chat") {
+        defaultStore.set(
+          activeServerIdAtom,
+          serverRouteIdFromServerUrl(r.serverUrl),
+        );
+      } else {
+        defaultStore.set(activeServerIdAtom, null);
+      }
     } else {
       setRouteCtx({ type: "index" });
+      defaultStore.set(activeServerIdAtom, null);
     }
   }, [pathname, setRouteCtx]);
 
@@ -62,12 +89,14 @@ function RootLayout() {
         const r = resolveRouteParam(id, serversMap, activeId);
         if (r.kind === "chat") {
           event.preventDefault();
-          void navigate({ to: "/" });
+          exitChatToServer(
+            navigate,
+            serverRouteIdFromServerUrl(r.serverUrl),
+          );
           return;
         }
         event.preventDefault();
-        defaultStore.set(activeServerIdAtom, null);
-        void navigate({ to: "/" });
+        exitServerToRoot(navigate);
         return;
       }
 

@@ -22,7 +22,6 @@ function RootLayout() {
   const setServerUrl = useSetAtom(selectedServerUrlAtom);
   const matches = useRouterState({ select: (s) => s.matches });
   const matchesRef = useRef(matches);
-  matchesRef.current = matches;
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {

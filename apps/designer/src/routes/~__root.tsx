@@ -18,6 +18,7 @@ import { serversAtom } from "../state/servers";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 import { resolveRouteParam, routeContextAtom } from "../state/store";
 import { selectionIdFromPathname } from "../state/routePath";
+import { ChatColumn } from "./ChatColumn";
 import { ChatsColumn } from "./ChatsColumn";
 import { ServicesColumn } from "./ServicesColumn";
 
@@ -111,18 +112,20 @@ function RootLayout() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-base-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-[1400px]">
-        <div className="w-70 shrink-0 self-stretch">
+    <div className="h-dvh overflow-hidden bg-base-100">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1400px] overflow-hidden">
+        <div className="flex h-full min-h-0 w-70 shrink-0">
           <ServicesColumn />
         </div>
 
-        <div className="w-70 shrink-0 self-stretch">
+        <div className="flex h-full min-h-0 w-70 shrink-0">
           <ChatsColumn />
         </div>
 
-        <main className="flex min-h-screen min-w-0 flex-1 flex-col p-6">
-          <Outlet />
+        <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <ChatColumn>
+            <Outlet />
+          </ChatColumn>
         </main>
 
         <TanStackRouterDevtools />

@@ -109,7 +109,11 @@ export function ServicesColumn() {
   }
 
   return (
-    <aside className="flex h-full min-h-screen w-full flex-col border-r border-base-200 bg-base-300 p-1">
+    <aside className="flex h-full min-h-0 w-full flex-col border-r border-base-200 bg-base-300 p-1">
+      <header className="shrink-0 px-2 py-2">
+        <h2 className="text-sm font-semibold text-base-content">Сервера</h2>
+      </header>
+
       <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
         {servers.map((session) => {
           const isActive =
@@ -132,16 +136,18 @@ export function ServicesColumn() {
         })}
       </div>
 
-      <button
-        type="button"
-        className="btn btn-primary btn-outline mt-4 w-full shrink-0"
-        onClick={() => {
-          setError(null);
-          addServerDialogRef.current?.showModal();
-        }}
-      >
-        Добавить сервер
-      </button>
+      <footer className="shrink-0 pt-2">
+        <button
+          type="button"
+          className="btn btn-primary btn-outline w-full"
+          onClick={() => {
+            setError(null);
+            addServerDialogRef.current?.showModal();
+          }}
+        >
+          Добавить сервер
+        </button>
+      </footer>
 
       <dialog
         ref={addServerDialogRef}

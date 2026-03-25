@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T19:22:46.892Z",
-  "updatedAt": "2026-03-25T19:30:32.097Z",
+  "updatedAt": "2026-03-25T19:32:21.626Z",
   "steps": [
     {
       "order": 1,
@@ -106,10 +106,10 @@
     {
       "order": 2,
       "file": "02-implement-url-driven-navigation-and-exit-flows.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "2195f1f",
       "startedAt": "2026-03-25T19:27:14.763Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T19:30:37.344Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -201,12 +201,105 @@
     {
       "order": 3,
       "file": "03-build-fixed-three-column-shell.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-25T19:30:40.697Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not in repo"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Step: manual verification only"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "designer vitest 10 passed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No doc impact"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "test compose down"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: page background does not scroll document",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: three columns scroll independently",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: fixed header and footer per column visible",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: server/chats column header/footer and slots",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: chat border on main chat container not chats column",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: no modal/control regression",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: flexbox column layout per spec",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

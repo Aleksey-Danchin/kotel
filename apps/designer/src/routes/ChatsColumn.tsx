@@ -9,6 +9,14 @@ import {
 } from "../state/store";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
+function displayServerHost(serverUrl: string): string {
+  try {
+    return new URL(serverUrl).hostname;
+  } catch {
+    return serverUrl;
+  }
+}
+
 export function ChatsColumn() {
   const navigate = useNavigate();
   const selectedServer = useAtomValue(selectedServerAtom);
@@ -43,8 +51,21 @@ export function ChatsColumn() {
   })();
 
   return (
-    <aside className="flex h-full min-h-screen w-full flex-col border-r border-base-300 bg-base-200 p-1">
-      {content}
+    <aside className="flex h-full min-h-0 w-full flex-col bg-base-200 p-1">
+      <header className="shrink-0 border-b border-base-300 px-2 py-2">
+        <h2 className="truncate text-sm font-semibold text-base-content">
+          {selectedServer
+            ? displayServerHost(selectedServer.serverUrl)
+            : "Чаты"}
+        </h2>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">{content}</div>
+
+      <footer
+        className="shrink-0 min-h-10 border-t border-base-300"
+        aria-hidden="true"
+      />
     </aside>
   );
 }

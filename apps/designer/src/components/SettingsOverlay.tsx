@@ -260,12 +260,14 @@ export function SettingsOverlay() {
   }
 
   function onConfirmAccountAction() {
-    if (!selectedServer || !confirmAction) {
+    if (!confirmAction) {
       return;
     }
-    const currentServerId = resolveCatalogServerId(selectedServer);
+    const currentServerId = selectedServer
+      ? resolveCatalogServerId(selectedServer)
+      : null;
 
-    if (confirmAction === "demote-admin") {
+    if (confirmAction === "demote-admin" && selectedServer) {
       setServerSession({
         ...selectedServer,
         user: {
@@ -273,11 +275,11 @@ export function SettingsOverlay() {
           role: "USER",
         },
       });
-    } else if (confirmAction === "remove-current-session") {
+    } else if (confirmAction === "remove-current-session" && currentServerId) {
       removeCurrentSession(currentServerId);
     } else if (confirmAction === "remove-all-sessions") {
       removeAllSessions();
-    } else if (confirmAction === "remove-all-except-current") {
+    } else if (confirmAction === "remove-all-except-current" && currentServerId) {
       removeAllSessionsExcept(currentServerId);
     } else if (confirmAction === "remove-session" && sessionToDelete) {
       removeSessionById(sessionToDelete);

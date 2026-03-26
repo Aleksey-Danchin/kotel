@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T11:58:09.982Z",
+  "updatedAt": "2026-03-26T12:03:39.536Z",
   "steps": [
     {
       "order": 1,
@@ -457,10 +457,10 @@
     {
       "order": 6,
       "file": "06-implement-settings-users-tab-and-user-creation-flow.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "03d489d",
       "startedAt": "2026-03-26T11:50:33.114Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T11:58:30.303Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -546,12 +546,92 @@
     {
       "order": 7,
       "file": "07-implement-settings-account-tab-and-session-management.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T11:58:38.740Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is absent in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed",
+          "note": "Existing automated coverage used; no test file changes needed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data-model/domain/architecture documentation impact"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: account tab edits own profile and saves",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: admin self-demotion with confirmation",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: session block actions and lifetime rendering",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: current session not deletable, others with confirm",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: session actions mutate local list correctly",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 8,

@@ -1,12 +1,10 @@
 import { useMemo } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import clsx from "clsx";
 
 import {
   buildChatTimelineRows,
   formatMessageTimestamp,
 } from "../state/chatMessageTimeline";
-import { useChatThreadScroll } from "../state/chatThreadScrollContext";
 import type { ChatMessage } from "../state/store";
 
 export interface ChatMessageListProps {
@@ -18,37 +16,22 @@ export function ChatMessageList({
   messages,
   sessionUserId,
 }: ChatMessageListProps) {
-  const chatScroll = useChatThreadScroll();
   const rows = useMemo(() => buildChatTimelineRows(messages), [messages]);
 
   if (messages.length === 0) {
     return <p className="text-sm text-base-content/60">Сообщений нет</p>;
   }
 
-  const rowVirtualizer = useVirtualizer({
-    count: rows.length,
-    getScrollElement: () => chatScroll?.getScrollElement() ?? null,
-    getItemKey: (index) => rows[index]?.key ?? index,
-    estimateSize: (index) => (rows[index]?.kind === "day-badge" ? 40 : 88),
-    overscan: 10,
-  });
-
   return (
-    <div
-      className="relative w-full"
-      style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
-    >
-      {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-        const row = rows[virtualRow.index];
-        if (!row) return null;
+    <div className="w-full space-y-1">
+      {rows.map((row) => {
+        if (!row) {
+          return null;
+        }
 
         if (row.kind === "day-badge") {
           return (
-            <div
-              key={virtualRow.key}
-              className="absolute left-0 top-0 w-full px-3 py-2"
-              style={{ transform: `translateY(${virtualRow.start}px)` }}
-            >
+            <div key={row.key} className="w-full px-3 py-2">
               <div className="flex justify-center">
                 <span className="badge badge-neutral badge-outline rounded-full px-3">
                   {row.label}
@@ -61,11 +44,7 @@ export function ChatMessageList({
         const message = row.message;
         const outgoing = message.userId === sessionUserId;
         return (
-          <div
-            key={virtualRow.key}
-            className="absolute left-0 top-0 w-full py-1.5"
-            style={{ transform: `translateY(${virtualRow.start}px)` }}
-          >
+          <div key={row.key} className="w-full py-1.5">
             <div
               className={clsx("chat px-0", outgoing ? "chat-end" : "chat-start")}
             >

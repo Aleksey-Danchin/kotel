@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-25T20:38:11.724Z",
-  "updatedAt": "2026-03-25T21:10:37.029Z",
+  "updatedAt": "2026-03-25T21:10:57.898Z",
   "steps": [
     {
       "order": 1,
@@ -297,10 +297,10 @@
     {
       "order": 4,
       "file": "04-implement-composer-focus-and-sticky-scroll-controls.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "7170f95",
       "startedAt": "2026-03-25T21:08:42.525Z",
-      "completedAt": null,
+      "completedAt": "2026-03-25T21:10:57.898Z",
       "error": null,
       "retryCount": 0,
       "progress": [

@@ -23,6 +23,16 @@ export function serverRouteIdToClearAfterPathChange(
   if (prevRes.kind !== "chat") return null;
   const nextSeg = selectionIdFromPathname(nextPathname);
   if (nextSeg === prevRes.chatId) return null;
+  if (!nextSeg) {
+    return serverRouteIdFromServerUrl(prevRes.serverUrl);
+  }
+  const nextRes = resolveRouteParam(nextSeg, serversMap, activeServerId);
+  if (nextRes.kind === "unknown") {
+    return serverRouteIdFromServerUrl(prevRes.serverUrl);
+  }
+  if (nextRes.kind === "server" && nextRes.serverUrl !== prevRes.serverUrl) {
+    return null;
+  }
   return serverRouteIdFromServerUrl(prevRes.serverUrl);
 }
 

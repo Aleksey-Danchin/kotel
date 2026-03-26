@@ -17,6 +17,12 @@ import { ChatColumnSkeleton } from "../components/ChatColumnSkeleton";
 import { sendDesignerChatMessage } from "../state/chatComposerActions";
 import { ChatThreadScrollProvider } from "../state/chatThreadScrollContext";
 import {
+  DESIGNER_CHAT_COMPOSER_MAX_CHARS,
+  clampComposerText,
+  remainingComposerChars,
+  shouldShowComposerCounter,
+} from "../state/chatComposerConstraints";
+import {
   DESIGNER_CHAT_STICKY_THRESHOLD_PX,
   isNearBottom,
 } from "../state/chatThreadScrollLogic";
@@ -169,6 +175,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       if (newMsgs.length === 0) return;
 
       if (stickyRef.current) {
+        scrollToBottom();
         scrollToBottomStable();
         return;
       }
@@ -181,7 +188,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
         setUnreadBelow((c) => c + incomingNew);
       }
     },
-    [scrollToBottomStable],
+    [scrollToBottom, scrollToBottomStable],
   );
 
   const scrollApi = useMemo(
@@ -213,6 +220,32 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     event.preventDefault();
     trySend();
   };
+
+  const remainingChars = remainingComposerChars(draft);
+  const showComposerCounter = shouldShowComposerCounter(remainingChars);
+
+  useLayoutEffect(() => {
+    const composer = composerRef.current;
+    if (!composer) return;
+
+    const computed = window.getComputedStyle(composer);
+    const lineHeight = Number.parseFloat(computed.lineHeight) || 20;
+    const verticalPadding =
+      Number.parseFloat(computed.paddingTop) +
+      Number.parseFloat(computed.paddingBottom) +
+      Number.parseFloat(computed.borderTopWidth) +
+      Number.parseFloat(computed.borderBottomWidth);
+    const minHeight = lineHeight * 2 + verticalPadding;
+    const maxHeight = lineHeight * 10 + verticalPadding;
+
+    composer.style.height = "auto";
+    const nextHeight = Math.min(
+      maxHeight,
+      Math.max(minHeight, composer.scrollHeight),
+    );
+    composer.style.height = `${nextHeight}px`;
+    composer.style.overflowY = composer.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [draft, hasSelectedChat, selectedChatId]);
 
   if (isLoading) {
     return <ChatColumnSkeleton />;
@@ -293,14 +326,32 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                 <textarea
                   ref={composerRef}
                   id="designer-chat-composer"
-                  className="textarea textarea-bordered min-h-16 max-h-40 w-full resize-y"
+                  className="textarea textarea-bordered min-h-16 max-h-80 w-full resize-none"
                   placeholder="Сообщение..."
                   rows={2}
+                  maxLength={DESIGNER_CHAT_COMPOSER_MAX_CHARS}
                   value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  onChange={(e) => setDraft(clampComposerText(e.target.value))}
                   onKeyDown={onComposerKeyDown}
                   disabled={!selectedChat || !selectedServer}
                 />
+                <div className="mt-1 h-5 text-right text-xs tabular-nums">
+                  {showComposerCounter ? (
+                    <span
+                      className={
+                        remainingChars === 0
+                          ? "text-error"
+                          : "text-base-content/70"
+                      }
+                    >
+                      осталось {remainingChars}
+                    </span>
+                  ) : (
+                    <span aria-hidden="true" className="invisible">
+                      осталось 0000
+                    </span>
+                  )}
+                </div>
               </label>
               <div className="relative flex shrink-0 flex-col items-center">
                 {!sticky ? (

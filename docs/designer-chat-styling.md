@@ -34,7 +34,6 @@ Primary layout mechanism is **Flexbox**, not sticky positioning, for this shell.
 - **Outgoing** (author equals session user): align end; bubble uses primary-tinted background and border (`bg-primary/15`, `border-primary/20`).
 - **Incoming**: align start; bubble uses neutral surface (`bg-base-200/90`, `border-base-300/80`).
 - Bubbles: `rounded-box`, light `shadow-sm`, timestamp in muted smaller text.
-- Небольшой **«хвостик» в стиле комикса**: треугольник через псевдоэлемент `::after` (`border-*-transparent` + `border-t-*`) внизу пузыря; входящие — слева, исходящие — справа (см. `ChatMessageList.tsx`, классы `after:*`).
 
 ## Chat column composer
 

@@ -173,7 +173,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
 
       let incomingNew = 0;
       for (const m of newMsgs) {
-        if (m.author !== sessionUserId) incomingNew++;
+        if (m.userId !== sessionUserId) incomingNew++;
       }
       if (incomingNew > 0) {
         setUnreadBelow((c) => c + incomingNew);

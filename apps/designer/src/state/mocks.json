@@ -8,7 +8,8 @@
         "fullname": "Mock User",
         "login": "mock",
         "role": "root"
-      }
+      },
+      "name": "Main"
     },
     {
       "id": "srv_eu",
@@ -18,7 +19,8 @@
         "fullname": "EU Operator",
         "login": "eu-operator",
         "role": "operator"
-      }
+      },
+      "name": "EU"
     },
     {
       "id": "srv_ru",
@@ -28,7 +30,8 @@
         "fullname": "RU Viewer",
         "login": "ru-viewer",
         "role": "viewer"
-      }
+      },
+      "name": "RU"
     },
     {
       "id": "srv_local",
@@ -38,7 +41,8 @@
         "fullname": "Local Dev",
         "login": "local-dev",
         "role": "admin"
-      }
+      },
+      "name": "Local"
     },
     {
       "id": "srv_no_chats",
@@ -48,7 +52,8 @@
         "fullname": "No Chats Server",
         "login": "no-chats",
         "role": "viewer"
-      }
+      },
+      "name": "No chats"
     }
   ],
   "chats": [
@@ -127,899 +132,780 @@
   "messages": [
     {
       "id": "msg_gen_001",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Добро пожаловать в общий чат — короткий статус перед планированием.",
       "createdAt": "2026-03-25T06:00:00.000Z"
     },
     {
       "id": "msg_gen_002",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 2 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:01:30.000Z"
     },
     {
       "id": "msg_gen_003",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 3 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:03:00.000Z"
     },
     {
       "id": "msg_gen_004",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 4 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:04:30.000Z"
     },
     {
       "id": "msg_gen_005",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 5 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:06:00.000Z"
     },
     {
       "id": "msg_gen_006",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 6 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:07:30.000Z"
     },
     {
       "id": "msg_gen_007",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 7 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:09:00.000Z"
     },
     {
       "id": "msg_gen_008",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 8 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:10:30.000Z"
     },
     {
       "id": "msg_gen_009",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 9 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:12:00.000Z"
     },
     {
       "id": "msg_gen_010",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 10 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:13:30.000Z"
     },
     {
       "id": "msg_gen_011",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 11 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:15:00.000Z"
     },
     {
       "id": "msg_gen_012",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 12 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:16:30.000Z"
     },
     {
       "id": "msg_gen_013",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 13 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:18:00.000Z"
     },
     {
       "id": "msg_gen_014",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 14 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:19:30.000Z"
     },
     {
       "id": "msg_gen_015",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 15 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:21:00.000Z"
     },
     {
       "id": "msg_gen_016",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 16 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:22:30.000Z"
     },
     {
       "id": "msg_gen_017",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 17 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:24:00.000Z"
     },
     {
       "id": "msg_gen_018",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 18 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:25:30.000Z"
     },
     {
       "id": "msg_gen_019",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 19 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:27:00.000Z"
     },
     {
       "id": "msg_gen_020",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 20 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:28:30.000Z"
     },
     {
       "id": "msg_gen_021",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 21 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:30:00.000Z"
     },
     {
       "id": "msg_gen_022",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 22 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:31:30.000Z"
     },
     {
       "id": "msg_gen_023",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 23 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:33:00.000Z"
     },
     {
       "id": "msg_gen_024",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 24 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:34:30.000Z"
     },
     {
       "id": "msg_gen_025",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 25 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:36:00.000Z"
     },
     {
       "id": "msg_gen_026",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 26 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:37:30.000Z"
     },
     {
       "id": "msg_gen_027",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 27 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:39:00.000Z"
     },
     {
       "id": "msg_gen_028",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 28 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:40:30.000Z"
     },
     {
       "id": "msg_gen_029",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 29 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:42:00.000Z"
     },
     {
       "id": "msg_gen_030",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 30 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:43:30.000Z"
     },
     {
       "id": "msg_gen_031",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 31 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:45:00.000Z"
     },
     {
       "id": "msg_gen_032",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 32 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:46:30.000Z"
     },
     {
       "id": "msg_gen_033",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 33 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:48:00.000Z"
     },
     {
       "id": "msg_gen_034",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 34 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:49:30.000Z"
     },
     {
       "id": "msg_gen_035",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 35 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:51:00.000Z"
     },
     {
       "id": "msg_gen_036",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 36 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:52:30.000Z"
     },
     {
       "id": "msg_gen_037",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 37 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:54:00.000Z"
     },
     {
       "id": "msg_gen_038",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 38 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:55:30.000Z"
     },
     {
       "id": "msg_gen_039",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 39 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:57:00.000Z"
     },
     {
       "id": "msg_gen_040",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 40 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T06:58:30.000Z"
     },
     {
       "id": "msg_gen_041",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 41 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:00:00.000Z"
     },
     {
       "id": "msg_gen_042",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 42 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:01:30.000Z"
     },
     {
       "id": "msg_gen_043",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 43 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:03:00.000Z"
     },
     {
       "id": "msg_gen_044",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Сообщение 44 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:04:30.000Z"
     },
     {
       "id": "msg_gen_045",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сообщение 45 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:06:00.000Z"
     },
     {
       "id": "msg_gen_046",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Сообщение 46 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:07:30.000Z"
     },
     {
       "id": "msg_gen_047",
-      "author": "peer-designer",
+      "userId": "peer-designer",
       "text": "Сообщение 47 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:09:00.000Z"
     },
     {
       "id": "msg_gen_048",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Сообщение 48 в общем канале: синхронизация задач и блокеры.",
       "createdAt": "2026-03-25T07:10:30.000Z"
     },
     {
       "id": "msg_dm_1",
-      "author": "peer-maria",
+      "userId": "peer-maria",
       "text": "Привет! Прислала обновлённые макеты навигации.",
       "createdAt": "2026-03-24T10:00:00.000Z"
     },
     {
       "id": "msg_dm_2",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Спасибо, посмотрю до вечера.",
       "createdAt": "2026-03-24T10:10:00.000Z"
     },
     {
       "id": "msg_dm_3",
-      "author": "peer-maria",
+      "userId": "peer-maria",
       "text": "Ок. Если нужны правки по отступам — напиши.",
       "createdAt": "2026-03-24T10:20:00.000Z"
     },
     {
       "id": "msg_dm_4",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "В чат-колонке оставляем фиксированный композер.",
       "createdAt": "2026-03-24T10:30:00.000Z"
     },
     {
       "id": "msg_dm_5",
-      "author": "peer-maria",
+      "userId": "peer-maria",
       "text": "Согласна, так проще проверить длинные треды.",
       "createdAt": "2026-03-24T10:40:00.000Z"
     },
     {
       "id": "msg_dm_6",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Добавлю скелетон загрузки между переключениями.",
       "createdAt": "2026-03-24T10:50:00.000Z"
     },
     {
       "id": "msg_dm_7",
-      "author": "peer-maria",
+      "userId": "peer-maria",
       "text": "Отлично, это снимет «рывок» при смене чата.",
       "createdAt": "2026-03-24T11:00:00.000Z"
     },
     {
       "id": "msg_dm_8",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Выложу превью завтра утром.",
       "createdAt": "2026-03-24T11:10:00.000Z"
     },
     {
       "id": "msg_be_1",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Обновил схему DTO для событий турнира.",
       "createdAt": "2026-03-23T14:00:00.000Z"
     },
     {
       "id": "msg_be_2",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Проверю совместимость с текущим frontend.",
       "createdAt": "2026-03-23T14:07:30.000Z"
     },
     {
       "id": "msg_be_3",
-      "author": "peer-backend",
+      "userId": "peer-backend",
       "text": "Ветка feature/dto-events-v2, можно смотреть diff.",
       "createdAt": "2026-03-23T14:15:00.000Z"
     },
     {
       "id": "msg_be_4",
-      "author": "mock-user-1",
+      "userId": "mock-user-1",
       "text": "Ок, заведу задачу на smoke после мержа.",
       "createdAt": "2026-03-23T14:22:30.000Z"
     },
     {
       "id": "msg_euop_1",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Ночной деплой прошёл без отката.",
       "createdAt": "2026-03-22T09:30:00.000Z"
     },
     {
       "id": "msg_euop_2",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Отлично, фиксирую в журнале изменений.",
       "createdAt": "2026-03-22T09:38:20.000Z"
     },
     {
       "id": "msg_euop_3",
-      "author": "peer-ops",
+      "userId": "peer-ops",
       "text": "Метрики latency в норме по EU-краю.",
       "createdAt": "2026-03-22T09:46:40.000Z"
     },
     {
       "id": "msg_euop_4",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Сделаю рассылку командам после standup.",
       "createdAt": "2026-03-22T09:55:00.000Z"
     },
     {
       "id": "msg_eusu_1",
-      "author": "peer-support-eu",
+      "userId": "peer-support-eu",
       "text": "Новый тикет P1 от крупного клиента.",
       "createdAt": "2026-03-21T11:00:00.000Z"
     },
     {
       "id": "msg_eusu_2",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Приняла в работу, нужен лог за последний час.",
       "createdAt": "2026-03-21T11:08:00.000Z"
     },
     {
       "id": "msg_eusu_3",
-      "author": "peer-support-eu",
+      "userId": "peer-support-eu",
       "text": "Приложил архив в тред.",
       "createdAt": "2026-03-21T11:16:00.000Z"
     },
     {
       "id": "msg_eusu_4",
-      "author": "mock-user-2",
+      "userId": "mock-user-2",
       "text": "Воспроизвела локально, эскалирую в backend.",
       "createdAt": "2026-03-21T11:24:00.000Z"
     },
     {
       "id": "msg_rusl_1",
-      "author": "peer-sales",
+      "userId": "peer-sales",
       "text": "Обновил воронку по ключевым лидам.",
       "createdAt": "2026-03-20T08:15:00.000Z"
     },
     {
       "id": "msg_rusl_2",
-      "author": "mock-user-3",
+      "userId": "mock-user-3",
       "text": "Спасибо, перенесу в CRM и отмечу стадии.",
       "createdAt": "2026-03-20T08:23:40.000Z"
     },
     {
       "id": "msg_rusl_3",
-      "author": "peer-sales",
+      "userId": "peer-sales",
       "text": "Есть риск по срокам на одном контракте.",
       "createdAt": "2026-03-20T08:32:20.000Z"
     },
     {
       "id": "msg_rusl_4",
-      "author": "mock-user-3",
+      "userId": "mock-user-3",
       "text": "Запланирую звонок на четверг.",
       "createdAt": "2026-03-20T08:41:00.000Z"
     },
     {
       "id": "msg_rusu_1",
-      "author": "peer-support-ru",
+      "userId": "peer-support-ru",
       "text": "Пользователь не видит обновление счёта.",
       "createdAt": "2026-03-19T16:45:00.000Z"
     },
     {
       "id": "msg_rusu_2",
-      "author": "mock-user-3",
+      "userId": "mock-user-3",
       "text": "Проверю кэш и права роли.",
       "createdAt": "2026-03-19T16:51:40.000Z"
     },
     {
       "id": "msg_rusu_3",
-      "author": "peer-support-ru",
+      "userId": "peer-support-ru",
       "text": "Скрин и HAR уже в задаче.",
       "createdAt": "2026-03-19T16:58:20.000Z"
     },
     {
       "id": "msg_rusu_4",
-      "author": "mock-user-3",
+      "userId": "mock-user-3",
       "text": "Похоже на задержку CDN, завёл инцидент.",
       "createdAt": "2026-03-19T17:05:00.000Z"
     },
     {
       "id": "msg_ld_1",
-      "author": "mock-user-4",
+      "userId": "mock-user-4",
       "text": "Пробую новый флаг dev tools в песочнице.",
       "createdAt": "2026-03-18T13:20:00.000Z"
     },
     {
       "id": "msg_ld_2",
-      "author": "peer-local-buddy",
+      "userId": "peer-local-buddy",
       "text": "Подскажи, какой порт у мок-сервера?",
       "createdAt": "2026-03-18T13:25:00.000Z"
     },
     {
       "id": "msg_ld_3",
-      "author": "mock-user-4",
+      "userId": "mock-user-4",
       "text": "8081, см. карточку Local в списке серверов.",
       "createdAt": "2026-03-18T13:30:00.000Z"
     },
     {
       "id": "msg_ld_4",
-      "author": "peer-local-buddy",
+      "userId": "peer-local-buddy",
       "text": "Принято, спасибо.",
       "createdAt": "2026-03-18T13:35:00.000Z"
     },
     {
       "id": "msg_lq_1",
-      "author": "peer-qa",
+      "userId": "peer-qa",
       "text": "Чеклист регрессии для колонки чатов готов.",
       "createdAt": "2026-03-17T09:00:00.000Z"
     },
     {
       "id": "msg_lq_2",
-      "author": "mock-user-4",
+      "userId": "mock-user-4",
       "text": "Прогоню сценарий смены сервера и чата.",
       "createdAt": "2026-03-17T09:06:00.000Z"
     },
     {
       "id": "msg_lq_3",
-      "author": "peer-qa",
+      "userId": "peer-qa",
       "text": "Не забудь проверить длинный скролл в общем чате.",
       "createdAt": "2026-03-17T09:12:00.000Z"
     },
     {
       "id": "msg_lq_4",
-      "author": "mock-user-4",
+      "userId": "mock-user-4",
       "text": "Уже в списке, добавлю заметку по багам.",
       "createdAt": "2026-03-17T09:18:00.000Z"
     }
   ],
   "serverChats": [
-    [
-      "srv_main",
-      "chat_general"
-    ],
-    [
-      "srv_main",
-      "chat_design"
-    ],
-    [
-      "srv_main",
-      "chat_backend"
-    ],
-    [
-      "srv_main",
-      "chat_empty_messages"
-    ],
-    [
-      "srv_eu",
-      "chat_general"
-    ],
-    [
-      "srv_eu",
-      "chat_eu_ops"
-    ],
-    [
-      "srv_eu",
-      "chat_eu_support"
-    ],
-    [
-      "srv_ru",
-      "chat_general"
-    ],
-    [
-      "srv_ru",
-      "chat_ru_sales"
-    ],
-    [
-      "srv_ru",
-      "chat_ru_support"
-    ],
-    [
-      "srv_local",
-      "chat_general"
-    ],
-    [
-      "srv_local",
-      "chat_local_debug"
-    ],
-    [
-      "srv_local",
-      "chat_local_qa"
-    ]
+    ["srv_main", "chat_general"],
+    ["srv_main", "chat_design"],
+    ["srv_main", "chat_backend"],
+    ["srv_main", "chat_empty_messages"],
+    ["srv_eu", "chat_general"],
+    ["srv_eu", "chat_eu_ops"],
+    ["srv_eu", "chat_eu_support"],
+    ["srv_ru", "chat_general"],
+    ["srv_ru", "chat_ru_sales"],
+    ["srv_ru", "chat_ru_support"],
+    ["srv_local", "chat_general"],
+    ["srv_local", "chat_local_debug"],
+    ["srv_local", "chat_local_qa"]
   ],
   "chatMessages": [
-    [
-      "chat_general",
-      "msg_gen_001"
-    ],
-    [
-      "chat_general",
-      "msg_gen_002"
-    ],
-    [
-      "chat_general",
-      "msg_gen_003"
-    ],
-    [
-      "chat_general",
-      "msg_gen_004"
-    ],
-    [
-      "chat_general",
-      "msg_gen_005"
-    ],
-    [
-      "chat_general",
-      "msg_gen_006"
-    ],
-    [
-      "chat_general",
-      "msg_gen_007"
-    ],
-    [
-      "chat_general",
-      "msg_gen_008"
-    ],
-    [
-      "chat_general",
-      "msg_gen_009"
-    ],
-    [
-      "chat_general",
-      "msg_gen_010"
-    ],
-    [
-      "chat_general",
-      "msg_gen_011"
-    ],
-    [
-      "chat_general",
-      "msg_gen_012"
-    ],
-    [
-      "chat_general",
-      "msg_gen_013"
-    ],
-    [
-      "chat_general",
-      "msg_gen_014"
-    ],
-    [
-      "chat_general",
-      "msg_gen_015"
-    ],
-    [
-      "chat_general",
-      "msg_gen_016"
-    ],
-    [
-      "chat_general",
-      "msg_gen_017"
-    ],
-    [
-      "chat_general",
-      "msg_gen_018"
-    ],
-    [
-      "chat_general",
-      "msg_gen_019"
-    ],
-    [
-      "chat_general",
-      "msg_gen_020"
-    ],
-    [
-      "chat_general",
-      "msg_gen_021"
-    ],
-    [
-      "chat_general",
-      "msg_gen_022"
-    ],
-    [
-      "chat_general",
-      "msg_gen_023"
-    ],
-    [
-      "chat_general",
-      "msg_gen_024"
-    ],
-    [
-      "chat_general",
-      "msg_gen_025"
-    ],
-    [
-      "chat_general",
-      "msg_gen_026"
-    ],
-    [
-      "chat_general",
-      "msg_gen_027"
-    ],
-    [
-      "chat_general",
-      "msg_gen_028"
-    ],
-    [
-      "chat_general",
-      "msg_gen_029"
-    ],
-    [
-      "chat_general",
-      "msg_gen_030"
-    ],
-    [
-      "chat_general",
-      "msg_gen_031"
-    ],
-    [
-      "chat_general",
-      "msg_gen_032"
-    ],
-    [
-      "chat_general",
-      "msg_gen_033"
-    ],
-    [
-      "chat_general",
-      "msg_gen_034"
-    ],
-    [
-      "chat_general",
-      "msg_gen_035"
-    ],
-    [
-      "chat_general",
-      "msg_gen_036"
-    ],
-    [
-      "chat_general",
-      "msg_gen_037"
-    ],
-    [
-      "chat_general",
-      "msg_gen_038"
-    ],
-    [
-      "chat_general",
-      "msg_gen_039"
-    ],
-    [
-      "chat_general",
-      "msg_gen_040"
-    ],
-    [
-      "chat_general",
-      "msg_gen_041"
-    ],
-    [
-      "chat_general",
-      "msg_gen_042"
-    ],
-    [
-      "chat_general",
-      "msg_gen_043"
-    ],
-    [
-      "chat_general",
-      "msg_gen_044"
-    ],
-    [
-      "chat_general",
-      "msg_gen_045"
-    ],
-    [
-      "chat_general",
-      "msg_gen_046"
-    ],
-    [
-      "chat_general",
-      "msg_gen_047"
-    ],
-    [
-      "chat_general",
-      "msg_gen_048"
-    ],
-    [
-      "chat_design",
-      "msg_dm_1"
-    ],
-    [
-      "chat_design",
-      "msg_dm_2"
-    ],
-    [
-      "chat_design",
-      "msg_dm_3"
-    ],
-    [
-      "chat_design",
-      "msg_dm_4"
-    ],
-    [
-      "chat_design",
-      "msg_dm_5"
-    ],
-    [
-      "chat_design",
-      "msg_dm_6"
-    ],
-    [
-      "chat_design",
-      "msg_dm_7"
-    ],
-    [
-      "chat_design",
-      "msg_dm_8"
-    ],
-    [
-      "chat_backend",
-      "msg_be_1"
-    ],
-    [
-      "chat_backend",
-      "msg_be_2"
-    ],
-    [
-      "chat_backend",
-      "msg_be_3"
-    ],
-    [
-      "chat_backend",
-      "msg_be_4"
-    ],
-    [
-      "chat_eu_ops",
-      "msg_euop_1"
-    ],
-    [
-      "chat_eu_ops",
-      "msg_euop_2"
-    ],
-    [
-      "chat_eu_ops",
-      "msg_euop_3"
-    ],
-    [
-      "chat_eu_ops",
-      "msg_euop_4"
-    ],
-    [
-      "chat_eu_support",
-      "msg_eusu_1"
-    ],
-    [
-      "chat_eu_support",
-      "msg_eusu_2"
-    ],
-    [
-      "chat_eu_support",
-      "msg_eusu_3"
-    ],
-    [
-      "chat_eu_support",
-      "msg_eusu_4"
-    ],
-    [
-      "chat_ru_sales",
-      "msg_rusl_1"
-    ],
-    [
-      "chat_ru_sales",
-      "msg_rusl_2"
-    ],
-    [
-      "chat_ru_sales",
-      "msg_rusl_3"
-    ],
-    [
-      "chat_ru_sales",
-      "msg_rusl_4"
-    ],
-    [
-      "chat_ru_support",
-      "msg_rusu_1"
-    ],
-    [
-      "chat_ru_support",
-      "msg_rusu_2"
-    ],
-    [
-      "chat_ru_support",
-      "msg_rusu_3"
-    ],
-    [
-      "chat_ru_support",
-      "msg_rusu_4"
-    ],
-    [
-      "chat_local_debug",
-      "msg_ld_1"
-    ],
-    [
-      "chat_local_debug",
-      "msg_ld_2"
-    ],
-    [
-      "chat_local_debug",
-      "msg_ld_3"
-    ],
-    [
-      "chat_local_debug",
-      "msg_ld_4"
-    ],
-    [
-      "chat_local_qa",
-      "msg_lq_1"
-    ],
-    [
-      "chat_local_qa",
-      "msg_lq_2"
-    ],
-    [
-      "chat_local_qa",
-      "msg_lq_3"
-    ],
-    [
-      "chat_local_qa",
-      "msg_lq_4"
-    ]
+    ["chat_general", "msg_gen_001"],
+    ["chat_general", "msg_gen_002"],
+    ["chat_general", "msg_gen_003"],
+    ["chat_general", "msg_gen_004"],
+    ["chat_general", "msg_gen_005"],
+    ["chat_general", "msg_gen_006"],
+    ["chat_general", "msg_gen_007"],
+    ["chat_general", "msg_gen_008"],
+    ["chat_general", "msg_gen_009"],
+    ["chat_general", "msg_gen_010"],
+    ["chat_general", "msg_gen_011"],
+    ["chat_general", "msg_gen_012"],
+    ["chat_general", "msg_gen_013"],
+    ["chat_general", "msg_gen_014"],
+    ["chat_general", "msg_gen_015"],
+    ["chat_general", "msg_gen_016"],
+    ["chat_general", "msg_gen_017"],
+    ["chat_general", "msg_gen_018"],
+    ["chat_general", "msg_gen_019"],
+    ["chat_general", "msg_gen_020"],
+    ["chat_general", "msg_gen_021"],
+    ["chat_general", "msg_gen_022"],
+    ["chat_general", "msg_gen_023"],
+    ["chat_general", "msg_gen_024"],
+    ["chat_general", "msg_gen_025"],
+    ["chat_general", "msg_gen_026"],
+    ["chat_general", "msg_gen_027"],
+    ["chat_general", "msg_gen_028"],
+    ["chat_general", "msg_gen_029"],
+    ["chat_general", "msg_gen_030"],
+    ["chat_general", "msg_gen_031"],
+    ["chat_general", "msg_gen_032"],
+    ["chat_general", "msg_gen_033"],
+    ["chat_general", "msg_gen_034"],
+    ["chat_general", "msg_gen_035"],
+    ["chat_general", "msg_gen_036"],
+    ["chat_general", "msg_gen_037"],
+    ["chat_general", "msg_gen_038"],
+    ["chat_general", "msg_gen_039"],
+    ["chat_general", "msg_gen_040"],
+    ["chat_general", "msg_gen_041"],
+    ["chat_general", "msg_gen_042"],
+    ["chat_general", "msg_gen_043"],
+    ["chat_general", "msg_gen_044"],
+    ["chat_general", "msg_gen_045"],
+    ["chat_general", "msg_gen_046"],
+    ["chat_general", "msg_gen_047"],
+    ["chat_general", "msg_gen_048"],
+    ["chat_design", "msg_dm_1"],
+    ["chat_design", "msg_dm_2"],
+    ["chat_design", "msg_dm_3"],
+    ["chat_design", "msg_dm_4"],
+    ["chat_design", "msg_dm_5"],
+    ["chat_design", "msg_dm_6"],
+    ["chat_design", "msg_dm_7"],
+    ["chat_design", "msg_dm_8"],
+    ["chat_backend", "msg_be_1"],
+    ["chat_backend", "msg_be_2"],
+    ["chat_backend", "msg_be_3"],
+    ["chat_backend", "msg_be_4"],
+    ["chat_eu_ops", "msg_euop_1"],
+    ["chat_eu_ops", "msg_euop_2"],
+    ["chat_eu_ops", "msg_euop_3"],
+    ["chat_eu_ops", "msg_euop_4"],
+    ["chat_eu_support", "msg_eusu_1"],
+    ["chat_eu_support", "msg_eusu_2"],
+    ["chat_eu_support", "msg_eusu_3"],
+    ["chat_eu_support", "msg_eusu_4"],
+    ["chat_ru_sales", "msg_rusl_1"],
+    ["chat_ru_sales", "msg_rusl_2"],
+    ["chat_ru_sales", "msg_rusl_3"],
+    ["chat_ru_sales", "msg_rusl_4"],
+    ["chat_ru_support", "msg_rusu_1"],
+    ["chat_ru_support", "msg_rusu_2"],
+    ["chat_ru_support", "msg_rusu_3"],
+    ["chat_ru_support", "msg_rusu_4"],
+    ["chat_local_debug", "msg_ld_1"],
+    ["chat_local_debug", "msg_ld_2"],
+    ["chat_local_debug", "msg_ld_3"],
+    ["chat_local_debug", "msg_ld_4"],
+    ["chat_local_qa", "msg_lq_1"],
+    ["chat_local_qa", "msg_lq_2"],
+    ["chat_local_qa", "msg_lq_3"],
+    ["chat_local_qa", "msg_lq_4"]
+  ],
+  "users": [
+    {
+      "id": "mock-user-1",
+      "fullname": "Mock User",
+      "login": "mock",
+      "role": "root",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:30:00.000Z"
+    },
+    {
+      "id": "mock-user-2",
+      "fullname": "EU Operator",
+      "login": "eu-operator",
+      "role": "operator",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:20:00.000Z"
+    },
+    {
+      "id": "mock-user-3",
+      "fullname": "RU Viewer",
+      "login": "ru-viewer",
+      "role": "viewer",
+      "isOnline": false,
+      "lastSeenAt": "2026-03-26T07:55:00.000Z"
+    },
+    {
+      "id": "mock-user-4",
+      "fullname": "Local Dev",
+      "login": "local-dev",
+      "role": "admin",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:29:00.000Z"
+    },
+    {
+      "id": "mock-user-5",
+      "fullname": "No Chats Server",
+      "login": "no-chats",
+      "role": "viewer",
+      "isOnline": false,
+      "lastSeenAt": "2026-03-25T16:00:00.000Z"
+    },
+    {
+      "id": "peer-designer",
+      "fullname": "Дизайнер",
+      "login": "peer-designer",
+      "role": "designer",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:27:00.000Z"
+    },
+    {
+      "id": "peer-backend",
+      "fullname": "Backend коллега",
+      "login": "peer-backend",
+      "role": "developer",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:26:00.000Z"
+    },
+    {
+      "id": "peer-ops",
+      "fullname": "Ops коллега",
+      "login": "peer-ops",
+      "role": "operator",
+      "isOnline": false,
+      "lastSeenAt": "2026-03-26T07:40:00.000Z"
+    },
+    {
+      "id": "peer-maria",
+      "fullname": "Мария Волкова",
+      "login": "maria.volkova",
+      "role": "designer",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:25:00.000Z"
+    },
+    {
+      "id": "peer-support-eu",
+      "fullname": "EU Support",
+      "login": "peer-support-eu",
+      "role": "support",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:10:00.000Z"
+    },
+    {
+      "id": "peer-sales",
+      "fullname": "RU Sales",
+      "login": "peer-sales",
+      "role": "sales",
+      "isOnline": false,
+      "lastSeenAt": "2026-03-26T07:45:00.000Z"
+    },
+    {
+      "id": "peer-support-ru",
+      "fullname": "RU Support",
+      "login": "peer-support-ru",
+      "role": "support",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:05:00.000Z"
+    },
+    {
+      "id": "peer-local-buddy",
+      "fullname": "Local Buddy",
+      "login": "peer-local-buddy",
+      "role": "developer",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:00:00.000Z"
+    },
+    {
+      "id": "peer-qa",
+      "fullname": "QA коллега",
+      "login": "peer-qa",
+      "role": "qa",
+      "isOnline": false,
+      "lastSeenAt": "2026-03-26T07:35:00.000Z"
+    }
+  ],
+  "serverUsers": [
+    ["srv_main", "mock-user-1"],
+    ["srv_eu", "mock-user-2"],
+    ["srv_ru", "mock-user-3"],
+    ["srv_local", "mock-user-4"],
+    ["srv_no_chats", "mock-user-5"],
+    ["srv_main", "peer-designer"],
+    ["srv_main", "peer-backend"],
+    ["srv_main", "peer-ops"],
+    ["srv_main", "mock-user-2"],
+    ["srv_main", "peer-maria"],
+    ["srv_eu", "mock-user-1"],
+    ["srv_eu", "peer-designer"],
+    ["srv_eu", "peer-backend"],
+    ["srv_eu", "peer-ops"],
+    ["srv_eu", "peer-support-eu"],
+    ["srv_ru", "mock-user-1"],
+    ["srv_ru", "peer-designer"],
+    ["srv_ru", "peer-backend"],
+    ["srv_ru", "peer-ops"],
+    ["srv_ru", "mock-user-2"],
+    ["srv_ru", "peer-sales"],
+    ["srv_ru", "peer-support-ru"],
+    ["srv_local", "mock-user-1"],
+    ["srv_local", "peer-designer"],
+    ["srv_local", "peer-backend"],
+    ["srv_local", "peer-ops"],
+    ["srv_local", "mock-user-2"],
+    ["srv_local", "peer-local-buddy"],
+    ["srv_local", "peer-qa"]
+  ],
+  "sessions": [
+    {
+      "id": "sess_srv_main",
+      "serverId": "srv_main",
+      "createdAt": "2026-03-20T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu",
+      "serverId": "srv_eu",
+      "createdAt": "2026-03-21T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru",
+      "serverId": "srv_ru",
+      "createdAt": "2026-03-22T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_local",
+      "serverId": "srv_local",
+      "createdAt": "2026-03-23T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_no_chats",
+      "serverId": "srv_no_chats",
+      "createdAt": "2026-03-24T08:00:00.000Z"
+    }
   ]
 }

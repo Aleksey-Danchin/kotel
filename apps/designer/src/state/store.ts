@@ -22,12 +22,12 @@ export interface ChatPreview {
 }
 
 /**
- * author — id пользователя сессии мок-сервера (`ServerSession.user.id`) или id «собеседника»
+ * userId — id пользователя сессии мок-сервера (`ServerSession.user.id`) или id «собеседника»
  * из фиктивного каталога; совпадение с текущей сессией задаёт исходящее направление.
  */
 export interface ChatMessage {
   id: string;
-  author: string;
+  userId: string;
   text: string;
   createdAt: string;
 }
@@ -49,14 +49,27 @@ export const routeContextAtom = atom<
 export const threadTransitionLoadingAtom = atom(false);
 
 type MockServer = { id: string; serverUrl: string };
+type MockUser = {
+  id: string;
+  fullname: string;
+  login: string;
+  role: string;
+  isOnline: boolean;
+  lastSeenAt: string;
+};
+type MockSession = { id: string; serverId: string; createdAt: string };
 type ServerChatLink = [serverId: string, chatId: string];
 type ChatMessageLink = [chatId: string, messageId: string];
+type ServerUserLink = [serverId: string, userId: string];
 
 const MOCK_SERVERS = stateMocks.servers as MockServer[];
+const MOCK_USERS = stateMocks.users as MockUser[];
+const MOCK_SESSIONS = stateMocks.sessions as MockSession[];
 const MOCK_CHATS = stateMocks.chats as ChatPreview[];
 const MOCK_MESSAGES = stateMocks.messages as ChatMessage[];
 const SERVER_CHATS = stateMocks.serverChats as ServerChatLink[];
 const CHAT_MESSAGES = stateMocks.chatMessages as ChatMessageLink[];
+const SERVER_USERS = stateMocks.serverUsers as ServerUserLink[];
 
 const CHAT_BY_ID = new Map(MOCK_CHATS.map((chat) => [chat.id, chat]));
 const MESSAGE_BY_ID = new Map(
@@ -65,6 +78,7 @@ const MESSAGE_BY_ID = new Map(
 const SERVER_ID_BY_URL = new Map(
   MOCK_SERVERS.map((server) => [server.serverUrl, server.id]),
 );
+const USER_BY_ID = new Map(MOCK_USERS.map((user) => [user.id, user]));
 
 export function getServerChats(serverId: string): ChatPreview[] {
   return SERVER_CHATS.filter(([linkServerId]) => linkServerId === serverId)
@@ -84,6 +98,20 @@ export function getChatMessages(chatId: string): ChatMessage[] {
     .map(([, messageId]) => MESSAGE_BY_ID.get(messageId))
     .filter((message): message is ChatMessage => message !== undefined);
   return [...list].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+export function getUsersForServer(
+  serverId: string,
+  currentUserId: string | null,
+): MockUser[] {
+  return SERVER_USERS.filter(([linkServerId]) => linkServerId === serverId)
+    .map(([, userId]) => USER_BY_ID.get(userId))
+    .filter((user): user is MockUser => user !== undefined)
+    .filter((user) => user.id !== currentUserId);
+}
+
+export function getSessionsForServer(serverId: string): MockSession[] {
+  return MOCK_SESSIONS.filter((session) => session.serverId === serverId);
 }
 
 // Список всех серверов из песочницы.
@@ -172,6 +200,29 @@ export const chatsForSelectedServerAtom = atom((get) => {
 
   const serverId = catalogServerId(selectedServer);
   return getServerChats(serverId);
+});
+
+export const usersForSelectedServerAtom = atom((get) => {
+  const selectedServer = get(selectedServerAtom);
+  if (!selectedServer) return [];
+  const serverId = catalogServerId(selectedServer);
+  return getUsersForServer(serverId, selectedServer.user.id);
+});
+
+export const sessionsForSelectedServerAtom = atom((get) => {
+  const selectedServer = get(selectedServerAtom);
+  if (!selectedServer) return [];
+  const serverId = catalogServerId(selectedServer);
+  return getSessionsForServer(serverId);
+});
+
+export const selectedPersonChatPeerAtom = atom((get) => {
+  const selectedChat = get(selectedChatAtom);
+  const users = get(usersForSelectedServerAtom);
+  if (!selectedChat || selectedChat.type !== "person") return null;
+  const byTitle = users.find((user) => user.fullname === selectedChat.title);
+  if (byTitle) return byTitle;
+  return users.find((user) => user.fullname === selectedChat.peerName) ?? null;
 });
 
 /** Эффективный открытый чат согласно маршруту и lastChatByServerId. */

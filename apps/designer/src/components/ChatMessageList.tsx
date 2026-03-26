@@ -29,9 +29,12 @@ export function ChatMessageList({
   return (
     <ul className="flex flex-col gap-3">
       {messages.map((message) => {
-        const outgoing = message.author === sessionUserId;
+        const outgoing = message.userId === sessionUserId;
         return (
-          <li key={message.id} className={clsx("chat px-0", outgoing ? "chat-end" : "chat-start")}>
+          <li
+            key={message.id}
+            className={clsx("chat px-0", outgoing ? "chat-end" : "chat-start")}
+          >
             {/*
               daisyUI chat-bubble сам рисует корректный хвостик по стороне (start/end).
               Ширина: то же число px, что max-w-[…px] у треда в ChatColumn.

@@ -14,7 +14,7 @@ describe("getMergedChatMessages", () => {
       chat_general: [
         {
           id: "x1",
-          author: "a",
+          userId: "a",
           text: "late",
           createdAt: "2026-03-25T09:00:00.000Z",
         },
@@ -55,7 +55,7 @@ describe("sendDesignerChatMessage", () => {
     ]!;
     expect(mid).toHaveLength(1);
     expect(mid[0]!.text).toBe("ping");
-    expect(mid[0]!.author).toBe("mock-user-1");
+    expect(mid[0]!.userId).toBe("mock-user-1");
 
     vi.advanceTimersByTime(DESIGNER_CHAT_AUTOREPLY_MS - 1);
     expect(
@@ -68,6 +68,6 @@ describe("sendDesignerChatMessage", () => {
     ]!;
     expect(final).toHaveLength(2);
     expect(final[1]!.text).toBe("ping");
-    expect(final[1]!.author).not.toBe("mock-user-1");
+    expect(final[1]!.userId).not.toBe("mock-user-1");
   });
 });

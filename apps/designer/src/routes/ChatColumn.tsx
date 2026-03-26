@@ -270,7 +270,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                 <span className="truncate">{chatHeaderTitle(selectedChat!)}</span>
               </h1>
             </div>
-            <ColumnHeaderGear />
+            <ColumnHeaderGear source="chat" />
           </div>
         </header>
       ) : null}

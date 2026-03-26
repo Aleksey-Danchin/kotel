@@ -9,6 +9,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSetAtom } from "jotai";
 import { defaultStore } from "../global/defaultStore";
 import { DESIGNER_LOADING_DELAY_MS } from "../components/loadingDelay";
+import { SettingsOverlay } from "../components/SettingsOverlay";
 import {
   applyLastChatCleanupOnPathnameChange,
   exitChatToServer,
@@ -19,6 +20,7 @@ import { serversAtom } from "../state/servers";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 import { resolveRouteParam, routeContextAtom } from "../state/store";
 import { selectionIdFromPathname } from "../state/routePath";
+import { isSettingsOpenAtom } from "../state/settingsOverlay";
 import { ChatColumn } from "./ChatColumn";
 import { ChatsColumn } from "./ChatsColumn";
 import { ServicesColumn } from "./ServicesColumn";
@@ -34,6 +36,7 @@ function RootLayout() {
   const pathnameRef = useRef(pathname);
   const prevPathnameRef = useRef<string | null>(null);
   const [startupLoading, setStartupLoading] = useState(true);
+  const setIsSettingsOpen = useSetAtom(isSettingsOpenAtom);
 
   useLayoutEffect(() => {
     const prev = prevPathnameRef.current;
@@ -81,6 +84,11 @@ function RootLayout() {
       if (event.key !== "Escape" || event.repeat) {
         return;
       }
+      if (defaultStore.get(isSettingsOpenAtom)) {
+        event.preventDefault();
+        setIsSettingsOpen(false);
+        return;
+      }
       if (document.querySelector("dialog[open]")) {
         return;
       }
@@ -124,11 +132,11 @@ function RootLayout() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [navigate]);
+  }, [navigate, setIsSettingsOpen]);
 
   return (
     <div className="h-dvh overflow-hidden bg-base-100">
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1400px] overflow-hidden">
+      <div className="relative mx-auto flex h-full min-h-0 w-full max-w-[1400px] overflow-hidden">
         <div className="flex h-full min-h-0 w-70 shrink-0">
           <ServicesColumn isLoading={startupLoading} />
         </div>
@@ -144,6 +152,7 @@ function RootLayout() {
         </main>
 
         <TanStackRouterDevtools />
+        <SettingsOverlay />
       </div>
     </div>
   );

@@ -161,7 +161,7 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
               ? displayServerHost(selectedServer.serverUrl)
               : "Чаты"}
           </h2>
-          <ColumnHeaderGear />
+          <ColumnHeaderGear source="chats" />
         </div>
       </header>
 

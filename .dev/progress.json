@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T10:38:29.490Z",
+  "updatedAt": "2026-03-26T10:43:27.321Z",
   "steps": [
     {
       "order": 1,
@@ -187,10 +187,10 @@
     {
       "order": 3,
       "file": "03-add-online-indicators-and-header-background-unification.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "e39952b",
       "startedAt": "2026-03-26T10:35:06.639Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T10:38:53.553Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -277,12 +277,92 @@
     {
       "order": 4,
       "file": "04-build-settings-overlay-shell-and-role-based-tab-entry.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T10:39:03.127Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped by orchestrator: dev health already verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены sandbox UI, API/модели/архитектурная документация не изменилась"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: all three headers always show clickable gear",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: each gear opens settings with correct initial tab",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: non-root/admin restricted to account tab",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: root/admin current server gets all tabs, non-current restricted",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Esc closes settings before existing navigation",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 5,

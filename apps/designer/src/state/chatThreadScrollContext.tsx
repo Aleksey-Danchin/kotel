@@ -3,6 +3,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import type { ChatMessage } from "./store";
 
 export type ChatThreadScrollContextValue = {
+  getScrollElement: () => HTMLDivElement | null;
   notifyThreadMessagesSnapshot: (
     messages: ChatMessage[],
     sessionUserId: string,

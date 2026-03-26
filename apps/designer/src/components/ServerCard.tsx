@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { normalizeDesignerRole, shouldShowDesignerRoleBadge } from "../state/roles";
 import type { ServerSession } from "../state/servers";
 
 function displayServerHost(serverUrl: string): string {
@@ -7,6 +8,13 @@ function displayServerHost(serverUrl: string): string {
   } catch {
     return serverUrl;
   }
+}
+
+export function serverCardTitle(state: ServerSession): string {
+  if (typeof state.name === "string" && state.name.trim()) {
+    return state.name.trim();
+  }
+  return displayServerHost(state.serverUrl);
 }
 
 export interface ServerCardProps {
@@ -29,9 +37,12 @@ export function ServerCard({
   onSelect,
   onDelete,
 }: ServerCardProps) {
+  const title = serverCardTitle(state);
   const host = displayServerHost(state.serverUrl);
   const disconnectLabel = `Отключить ${host}`;
   const showUnread = unreadCount > 0;
+  const normalizedRole = normalizeDesignerRole(state.user.role);
+  const showRoleBadge = shouldShowDesignerRoleBadge(state.user.role);
 
   return (
     <div
@@ -52,7 +63,7 @@ export function ServerCard({
         onClick={onSelect}
       >
         <div className="flex flex-row justify-between">
-          <div className="font-medium">{host}</div>
+          <div className="font-medium">{title}</div>
 
           {showUnread && (
             <span
@@ -68,11 +79,11 @@ export function ServerCard({
           {state.user.fullname}
         </div>
 
-        <div>
-          <span className="mt-1 badge badge-outline badge-sm">
-            {state.user.role.toUpperCase()}
-          </span>
-        </div>
+        {showRoleBadge ? (
+          <div>
+            <span className="mt-1 badge badge-outline badge-sm">{normalizedRole}</span>
+          </div>
+        ) : null}
 
         <button
           type="button"

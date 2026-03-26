@@ -17,6 +17,12 @@ import { ChatColumnSkeleton } from "../components/ChatColumnSkeleton";
 import { sendDesignerChatMessage } from "../state/chatComposerActions";
 import { ChatThreadScrollProvider } from "../state/chatThreadScrollContext";
 import {
+  DESIGNER_CHAT_COMPOSER_MAX_CHARS,
+  clampComposerText,
+  remainingComposerChars,
+  shouldShowComposerCounter,
+} from "../state/chatComposerConstraints";
+import {
   DESIGNER_CHAT_STICKY_THRESHOLD_PX,
   isNearBottom,
 } from "../state/chatThreadScrollLogic";
@@ -24,9 +30,11 @@ import type { ChatMessage } from "../state/store";
 import {
   chatHeaderTitle,
   selectedChatAtom,
+  selectedPersonChatPeerAtom,
   selectedServerAtom,
   threadTransitionLoadingAtom,
 } from "../state/store";
+import { formatUserPresenceSubtitle } from "../state/userPresence";
 
 export interface ChatColumnProps {
   children: ReactNode;
@@ -36,6 +44,7 @@ export interface ChatColumnProps {
 /** Личный чат: в данных `title` — имя собеседника; группа/канал: `title` — название. */
 export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const selectedChat = useAtomValue(selectedChatAtom);
+  const selectedPersonChatPeer = useAtomValue(selectedPersonChatPeerAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
   const threadTransitionLoading = useAtomValue(threadTransitionLoadingAtom);
   const hasSelectedChat = Boolean(selectedChat && selectedServer);
@@ -116,6 +125,8 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     scrollToBottomStable();
   }, [scrollToBottomStable]);
 
+  const getScrollElement = useCallback(() => scrollRef.current, []);
+
   const onScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -167,27 +178,29 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       if (newMsgs.length === 0) return;
 
       if (stickyRef.current) {
+        scrollToBottom();
         scrollToBottomStable();
         return;
       }
 
       let incomingNew = 0;
       for (const m of newMsgs) {
-        if (m.author !== sessionUserId) incomingNew++;
+        if (m.userId !== sessionUserId) incomingNew++;
       }
       if (incomingNew > 0) {
         setUnreadBelow((c) => c + incomingNew);
       }
     },
-    [scrollToBottomStable],
+    [scrollToBottom, scrollToBottomStable],
   );
 
   const scrollApi = useMemo(
     () => ({
+      getScrollElement,
       notifyThreadMessagesSnapshot,
       syncThreadScrollToBottom,
     }),
-    [notifyThreadMessagesSnapshot, syncThreadScrollToBottom],
+    [getScrollElement, notifyThreadMessagesSnapshot, syncThreadScrollToBottom],
   );
 
   const trySend = useCallback(() => {
@@ -211,6 +224,39 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     event.preventDefault();
     trySend();
   };
+
+  const remainingChars = remainingComposerChars(draft);
+  const showComposerCounter = shouldShowComposerCounter(remainingChars);
+  const personChatPresenceSubtitle =
+    selectedChat?.type === "person" && selectedPersonChatPeer
+      ? formatUserPresenceSubtitle(
+          selectedPersonChatPeer.isOnline,
+          selectedPersonChatPeer.lastSeenAt,
+        )
+      : null;
+
+  useLayoutEffect(() => {
+    const composer = composerRef.current;
+    if (!composer) return;
+
+    const computed = window.getComputedStyle(composer);
+    const lineHeight = Number.parseFloat(computed.lineHeight) || 20;
+    const verticalPadding =
+      Number.parseFloat(computed.paddingTop) +
+      Number.parseFloat(computed.paddingBottom) +
+      Number.parseFloat(computed.borderTopWidth) +
+      Number.parseFloat(computed.borderBottomWidth);
+    const minHeight = lineHeight * 2 + verticalPadding;
+    const maxHeight = lineHeight * 10 + verticalPadding;
+
+    composer.style.height = "auto";
+    const nextHeight = Math.min(
+      maxHeight,
+      Math.max(minHeight, composer.scrollHeight),
+    );
+    composer.style.height = `${nextHeight}px`;
+    composer.style.overflowY = composer.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [draft, hasSelectedChat, selectedChatId]);
 
   if (isLoading) {
     return <ChatColumnSkeleton />;
@@ -246,14 +292,34 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col border-l-2 border-base-content/20 bg-base-100">
       {hasSelectedChat ? (
-        <header className="shrink-0 min-h-12 border-b border-base-300 px-2">
+        <header className="shrink-0 min-h-16 border-b border-base-300 bg-base-300 px-2">
           <div className="flex h-full items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-lg font-semibold text-base-content">
-                {chatHeaderTitle(selectedChat!)}
+              <h1 className="flex items-center gap-2 text-lg font-semibold text-base-content">
+                {selectedChat?.type === "person" ? (
+                  <span
+                    className={
+                      selectedPersonChatPeer?.isOnline
+                        ? "h-2.5 w-2.5 shrink-0 rounded-full bg-success"
+                        : "h-2.5 w-2.5 shrink-0 rounded-full bg-base-content/30"
+                    }
+                    aria-label={
+                      selectedPersonChatPeer?.isOnline ? "В сети" : "Не в сети"
+                    }
+                    title={
+                      selectedPersonChatPeer?.isOnline ? "В сети" : "Не в сети"
+                    }
+                  />
+                ) : null}
+                <span className="truncate">{chatHeaderTitle(selectedChat!)}</span>
               </h1>
+              {personChatPresenceSubtitle ? (
+                <p className="truncate text-xs text-base-content/70">
+                  {personChatPresenceSubtitle}
+                </p>
+              ) : null}
             </div>
-            <ColumnHeaderGear />
+            <ColumnHeaderGear source="chat" />
           </div>
         </header>
       ) : null}
@@ -261,10 +327,11 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       {scrollBody}
 
       {hasSelectedChat ? (
-        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 py-3">
+        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 pt-3 pb-1">
           {/* Ширина треда и композера — крутите max-w-[…px] (дублируйте то же число в ChatMessageList). */}
           <div className="mx-auto w-full max-w-[600px] px-3">
             <form
+              data-chat-composer="true"
               className="relative flex flex-col items-center gap-2 sm:flex-row sm:items-center"
               onSubmit={onComposerSubmit}
             >
@@ -276,14 +343,32 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                 <textarea
                   ref={composerRef}
                   id="designer-chat-composer"
-                  className="textarea textarea-bordered min-h-16 max-h-40 w-full resize-y"
+                  className="textarea textarea-bordered min-h-16 max-h-80 w-full resize-none"
                   placeholder="Сообщение..."
                   rows={2}
+                  maxLength={DESIGNER_CHAT_COMPOSER_MAX_CHARS}
                   value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
+                  onChange={(e) => setDraft(clampComposerText(e.target.value))}
                   onKeyDown={onComposerKeyDown}
                   disabled={!selectedChat || !selectedServer}
                 />
+                <div className="mt-1 h-5 text-right text-xs tabular-nums">
+                  {showComposerCounter ? (
+                    <span
+                      className={
+                        remainingChars === 0
+                          ? "text-error"
+                          : "text-base-content/70"
+                      }
+                    >
+                      осталось {remainingChars}
+                    </span>
+                  ) : (
+                    <span aria-hidden="true" className="invisible">
+                      осталось 0000
+                    </span>
+                  )}
+                </div>
               </label>
               <div className="relative flex shrink-0 flex-col items-center">
                 {!sticky ? (
@@ -317,7 +402,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
           </div>
         </footer>
       ) : showSkeletonComposer ? (
-        <footer className="shrink-0 border-t border-base-300 bg-base-100 py-3">
+        <footer className="shrink-0 border-t border-base-300 bg-base-100 pt-3 pb-1">
           <div className="mx-auto w-full max-w-[600px] px-3">
             <form className="flex flex-col gap-2 sm:flex-row sm:items-end">
               <label className="min-w-0 flex-1" aria-hidden="true">

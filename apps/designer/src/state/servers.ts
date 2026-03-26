@@ -2,6 +2,7 @@ import { atom } from "jotai";
 
 import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom } from "./selectionAtoms";
+import { normalizeDesignerRole } from "./roles";
 import { serverRouteIdFromServerUrl } from "./serverRouteId";
 import stateMocks from "./mocks.json";
 
@@ -15,6 +16,7 @@ export interface ServerUser {
 export interface ServerSession {
   id?: string;
   serverUrl: string;
+  name?: string;
   user: ServerUser;
 }
 
@@ -27,9 +29,19 @@ function makeServerId(serverUrl: string): string {
 }
 
 function normalizeServerSession(session: ServerSession): ServerSession {
+  const normalizedName =
+    typeof session.name === "string" && session.name.trim()
+      ? session.name.trim()
+      : undefined;
+
   return {
     ...session,
     id: session.id ?? makeServerId(session.serverUrl),
+    name: normalizedName,
+    user: {
+      ...session.user,
+      role: normalizeDesignerRole(session.user.role),
+    },
   };
 }
 

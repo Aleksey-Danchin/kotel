@@ -1,7 +1,11 @@
-import { useAtomValue } from "jotai";
-
-import { selectedServerAtom } from "../state/store";
-import { shouldShowColumnHeaderGear } from "../state/headerGear";
+import { useSetAtom } from "jotai";
+import {
+  isSettingsOpenAtom,
+  settingsActiveTabAtom,
+  settingsInitialTabAtom,
+  type SettingsOpenSource,
+  initialSettingsTabForSource,
+} from "../state/settingsOverlay";
 
 function GearIcon({ className }: { className?: string }) {
   return (
@@ -28,15 +32,14 @@ function GearIcon({ className }: { className?: string }) {
   );
 }
 
-/** Кнопка-заглушка настроек колонки: видна только при совпадении host и роли admin|root. */
-export function ColumnHeaderGear() {
-  const selectedServer = useAtomValue(selectedServerAtom);
-  const visible = shouldShowColumnHeaderGear(
-    selectedServer?.serverUrl,
-    selectedServer?.user.role,
-  );
+interface ColumnHeaderGearProps {
+  source: SettingsOpenSource;
+}
 
-  if (!visible) return null;
+export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
+  const setIsOpen = useSetAtom(isSettingsOpenAtom);
+  const setInitialTab = useSetAtom(settingsInitialTabAtom);
+  const setActiveTab = useSetAtom(settingsActiveTabAtom);
 
   return (
     <button
@@ -45,6 +48,10 @@ export function ColumnHeaderGear() {
       aria-label="Настройки колонки"
       onClick={(event) => {
         event.preventDefault();
+        const initialTab = initialSettingsTabForSource(source);
+        setInitialTab(initialTab);
+        setActiveTab(initialTab);
+        setIsOpen(true);
       }}
     >
       <GearIcon className="size-5" />

@@ -1,5 +1,4 @@
-/** Порог «у низа» для липкого автоскролла (пиксели), в диапазоне 24–32. */
-export const DESIGNER_CHAT_STICKY_THRESHOLD_PX = 28;
+export const DESIGNER_CHAT_STICKY_THRESHOLD_PX = 200;
 
 type ScrollMetrics = Pick<
   HTMLElement,

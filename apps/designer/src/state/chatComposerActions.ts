@@ -7,7 +7,7 @@ import { getChatMessages } from "./store";
 /** Задержка авто-ответа в песочнице (мс). */
 export const DESIGNER_CHAT_AUTOREPLY_MS = 2000;
 
-const AUTOREPLY_FALLBACK_AUTHOR_ID = "designer-autoreply-peer";
+const AUTOREPLY_FALLBACK_USER_ID = "designer-autoreply-peer";
 
 export const designerAppendedChatMessagesAtom = atom<
   Record<string, ChatMessage[]>
@@ -31,14 +31,14 @@ export function getMergedChatMessages(
   );
 }
 
-function pickAutoReplyAuthorId(
+function pickAutoReplyUserId(
   chatId: string,
   sessionUserId: string,
   appendedBeforeOutgoing: Record<string, ChatMessage[]>,
 ): string {
   const merged = getMergedChatMessages(chatId, appendedBeforeOutgoing);
-  const peer = merged.find((m) => m.author !== sessionUserId);
-  return peer?.author ?? AUTOREPLY_FALLBACK_AUTHOR_ID;
+  const peer = merged.find((m) => m.userId !== sessionUserId);
+  return peer?.userId ?? AUTOREPLY_FALLBACK_USER_ID;
 }
 
 /**
@@ -54,11 +54,11 @@ export function sendDesignerChatMessage(
   if (!trimmed) return;
 
   const snapshot = defaultStore.get(designerAppendedChatMessagesAtom);
-  const replyAuthorId = pickAutoReplyAuthorId(chatId, sessionUserId, snapshot);
+  const replyUserId = pickAutoReplyUserId(chatId, sessionUserId, snapshot);
 
   const outgoing: ChatMessage = {
     id: newDesignerMessageId("out"),
-    author: sessionUserId,
+    userId: sessionUserId,
     text: trimmed,
     createdAt: new Date().toISOString(),
   };
@@ -71,7 +71,7 @@ export function sendDesignerChatMessage(
   globalThis.setTimeout(() => {
     const incoming: ChatMessage = {
       id: newDesignerMessageId("in"),
-      author: replyAuthorId,
+      userId: replyUserId,
       text: trimmed,
       createdAt: new Date().toISOString(),
     };

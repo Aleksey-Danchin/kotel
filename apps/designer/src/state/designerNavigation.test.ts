@@ -5,14 +5,27 @@ import type { ServerSession } from "./servers";
 import { serverRouteIdFromServerUrl } from "./serverRouteId";
 
 const mainUrl = "https://kotel.localhost";
+const altUrl = "https://alt.kotel.localhost";
 const session: ServerSession = {
   serverUrl: mainUrl,
   user: { id: "u", fullname: "u", login: "u", role: "r" },
   id: "srv_main",
 };
+const altSession: ServerSession = {
+  serverUrl: altUrl,
+  user: { id: "u2", fullname: "u2", login: "u2", role: "r" },
+  id: "srv_alt",
+};
 
 function mapOne(): Map<string, ServerSession> {
   return new Map([[mainUrl, session]]);
+}
+
+function mapTwo(): Map<string, ServerSession> {
+  return new Map([
+    [mainUrl, session],
+    [altUrl, altSession],
+  ]);
 }
 
 describe("serverRouteIdToClearAfterPathChange", () => {
@@ -58,6 +71,18 @@ describe("serverRouteIdToClearAfterPathChange", () => {
         "/",
         mapOne(),
         mainRid,
+      ),
+    ).toBeNull();
+  });
+
+  it("does not clear last chat when switching from chat to another server", () => {
+    const altRid = serverRouteIdFromServerUrl(altUrl);
+    expect(
+      serverRouteIdToClearAfterPathChange(
+        "/chat_general",
+        `/${altRid}`,
+        mapTwo(),
+        serverRouteIdFromServerUrl(mainUrl),
       ),
     ).toBeNull();
   });

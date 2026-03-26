@@ -89,7 +89,7 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
               .replace(/[^a-zA-Z0-9]+/g, "_")
               .toLowerCase()
               .slice(0, 24) || "user",
-          role: "designer",
+          role: "USER",
         },
       };
 
@@ -120,10 +120,10 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col border-r border-base-200 bg-base-300 p-1">
-      <header className="shrink-0 min-h-12 border-b border-base-200 px-2">
+      <header className="shrink-0 min-h-16 border-b border-base-200 bg-base-300 px-2">
         <div className="flex h-full items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-base-content">Сервера</h2>
-          <ColumnHeaderGear />
+          <ColumnHeaderGear source="services" />
         </div>
       </header>
 
@@ -149,7 +149,7 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
         })}
       </div>
 
-      <footer className="shrink-0 pt-2">
+      <footer className="shrink-0 pt-2 pb-2">
         <button
           type="button"
           className="btn btn-primary btn-outline w-full"
@@ -158,7 +158,7 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
             addServerDialogRef.current?.showModal();
           }}
         >
-          Добавить сервер
+          + Добавить сервер
         </button>
       </footer>
 

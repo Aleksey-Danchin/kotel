@@ -15,6 +15,7 @@ import {
   selectedServerAtom,
   usersForSelectedServerAtom,
   findOrCreatePersonChat,
+  resolvePersonChatPeer,
 } from "../state/store";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
@@ -101,19 +102,25 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
 
     return (
       <div className="flex flex-col gap-2 p-1">
-        {filteredChats.map((chat) => (
-          <ChatCard
-            key={chat.id}
-            chat={chat}
-            active={chat.id === highlightedChatId}
-            onSelect={() => {
-              const serverRid = serverRouteIdFromServerUrl(
-                selectedServer.serverUrl,
-              );
-              enterChat(navigate, chat.id, serverRid);
-            }}
-          />
-        ))}
+        {filteredChats.map((chat) => {
+          const peerUser =
+            chat.type === "person" ? resolvePersonChatPeer(chat, users) : null;
+
+          return (
+            <ChatCard
+              key={chat.id}
+              chat={chat}
+              peerUser={peerUser}
+              active={chat.id === highlightedChatId}
+              onSelect={() => {
+                const serverRid = serverRouteIdFromServerUrl(
+                  selectedServer.serverUrl,
+                );
+                enterChat(navigate, chat.id, serverRid);
+              }}
+            />
+          );
+        })}
         <div className="mt-2 pt-2 border-t border-base-300">
           <h3 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-base-content/70">
             Пользователи
@@ -147,7 +154,7 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
 
   return (
     <aside className="flex h-full min-h-0 w-full flex-col bg-base-200 p-1">
-      <header className="shrink-0 min-h-12 border-b border-base-300 px-2">
+      <header className="shrink-0 min-h-12 border-b border-base-300 bg-base-300 px-2">
         <div className="flex h-full items-center justify-between gap-2">
           <h2 className="min-w-0 truncate text-sm font-semibold text-base-content">
             {selectedServer

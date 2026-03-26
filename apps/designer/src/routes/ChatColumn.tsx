@@ -24,6 +24,7 @@ import type { ChatMessage } from "../state/store";
 import {
   chatHeaderTitle,
   selectedChatAtom,
+  selectedPersonChatPeerAtom,
   selectedServerAtom,
   threadTransitionLoadingAtom,
 } from "../state/store";
@@ -36,6 +37,7 @@ export interface ChatColumnProps {
 /** Личный чат: в данных `title` — имя собеседника; группа/канал: `title` — название. */
 export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const selectedChat = useAtomValue(selectedChatAtom);
+  const selectedPersonChatPeer = useAtomValue(selectedPersonChatPeerAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
   const threadTransitionLoading = useAtomValue(threadTransitionLoadingAtom);
   const hasSelectedChat = Boolean(selectedChat && selectedServer);
@@ -246,11 +248,26 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col border-l-2 border-base-content/20 bg-base-100">
       {hasSelectedChat ? (
-        <header className="shrink-0 min-h-12 border-b border-base-300 px-2">
+        <header className="shrink-0 min-h-12 border-b border-base-300 bg-base-300 px-2">
           <div className="flex h-full items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-lg font-semibold text-base-content">
-                {chatHeaderTitle(selectedChat!)}
+              <h1 className="flex items-center gap-2 text-lg font-semibold text-base-content">
+                {selectedChat?.type === "person" ? (
+                  <span
+                    className={
+                      selectedPersonChatPeer?.isOnline
+                        ? "h-2.5 w-2.5 shrink-0 rounded-full bg-success"
+                        : "h-2.5 w-2.5 shrink-0 rounded-full bg-base-content/30"
+                    }
+                    aria-label={
+                      selectedPersonChatPeer?.isOnline ? "В сети" : "Не в сети"
+                    }
+                    title={
+                      selectedPersonChatPeer?.isOnline ? "В сети" : "Не в сети"
+                    }
+                  />
+                ) : null}
+                <span className="truncate">{chatHeaderTitle(selectedChat!)}</span>
               </h1>
             </div>
             <ColumnHeaderGear />

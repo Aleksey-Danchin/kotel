@@ -134,6 +134,16 @@ export function getSessionsForServer(serverId: string): MockSession[] {
   return MOCK_SESSIONS.filter((session) => session.serverId === serverId);
 }
 
+export function resolvePersonChatPeer(
+  chat: ChatPreview,
+  users: MockUser[],
+): MockUser | null {
+  if (chat.type !== "person") return null;
+  const byPeerName = users.find((user) => user.fullname === chat.peerName);
+  if (byPeerName) return byPeerName;
+  return users.find((user) => user.fullname === chat.title) ?? null;
+}
+
 function newPersonChatId(serverId: string, peerUserId: string): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return `chat_person_${serverId}_${peerUserId}_${crypto.randomUUID()}`;
@@ -292,10 +302,8 @@ export const sessionsForSelectedServerAtom = atom((get) => {
 export const selectedPersonChatPeerAtom = atom((get) => {
   const selectedChat = get(selectedChatAtom);
   const users = get(usersForSelectedServerAtom);
-  if (!selectedChat || selectedChat.type !== "person") return null;
-  const byTitle = users.find((user) => user.fullname === selectedChat.title);
-  if (byTitle) return byTitle;
-  return users.find((user) => user.fullname === selectedChat.peerName) ?? null;
+  if (!selectedChat) return null;
+  return resolvePersonChatPeer(selectedChat, users);
 });
 
 /** Эффективный открытый чат согласно маршруту и lastChatByServerId. */

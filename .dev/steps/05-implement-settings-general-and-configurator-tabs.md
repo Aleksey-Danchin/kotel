@@ -17,6 +17,9 @@ Depends on steps 01 and 04.
 
 ## Current Behavior
 No settings tabs exist, server cards derive display title from URL host, and configurator controls are absent.
+<CORRECTION by="step-executor" reason="Step 04 already introduced tab framework">
+Settings overlay tabs and role-based visibility already exist from step 04. This step now implements concrete `основной` and `конфигуратор` tab content with save actions and server-name persistence.
+</CORRECTION>
 
 ## Expected Behavior
 - `основной` tab:

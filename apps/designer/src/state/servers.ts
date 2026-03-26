@@ -15,6 +15,7 @@ export interface ServerUser {
 export interface ServerSession {
   id?: string;
   serverUrl: string;
+  name?: string;
   user: ServerUser;
 }
 
@@ -27,9 +28,15 @@ function makeServerId(serverUrl: string): string {
 }
 
 function normalizeServerSession(session: ServerSession): ServerSession {
+  const normalizedName =
+    typeof session.name === "string" && session.name.trim()
+      ? session.name.trim()
+      : undefined;
+
   return {
     ...session,
     id: session.id ?? makeServerId(session.serverUrl),
+    name: normalizedName,
   };
 }
 

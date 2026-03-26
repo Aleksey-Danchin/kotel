@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T10:43:27.321Z",
+  "updatedAt": "2026-03-26T10:48:12.322Z",
   "steps": [
     {
       "order": 1,
@@ -277,10 +277,10 @@
     {
       "order": 4,
       "file": "04-build-settings-overlay-shell-and-role-based-tab-entry.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "d16fb72",
       "startedAt": "2026-03-26T10:39:03.127Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T10:43:59.444Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -367,12 +367,90 @@
     {
       "order": 5,
       "file": "05-implement-settings-general-and-configurator-tabs.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T10:44:06.729Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены UI-песочницей designer, без API/модели/архитектурных изменений"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: general tab edits and saves server name",
+          "status": "completed",
+          "note": "Проверено инспекцией SettingsOverlay + servers.test.ts (persist/update name)"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: saved server name updates card and persists refresh",
+          "status": "completed",
+          "note": "Проверено tests: servers.test.ts и ServerCard.test.ts"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: configurator tab has disabled frequency field and save",
+          "status": "completed",
+          "note": "Проверено инспекцией SettingsOverlay (disabled field + save)"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: tab access still follows role policy from step 04",
+          "status": "completed",
+          "note": "Проверено settingsOverlay.test.ts (role policy)"
+        }
+      ]
     },
     {
       "order": 6,

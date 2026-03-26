@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { selectedServerAtom } from "../state/store";
@@ -8,6 +8,7 @@ import {
   settingsActiveTabAtom,
   type SettingsTabId,
 } from "../state/settingsOverlay";
+import { setServerSession } from "../state/servers";
 
 function titleForTab(tabId: SettingsTabId): string {
   if (tabId === "main") return "Основные настройки сервера и интерфейса";
@@ -25,6 +26,11 @@ export function SettingsOverlay() {
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
   const safeActiveTab =
     availableTabs.find((tab) => tab.id === activeTab)?.id ?? availableTabs[0]?.id;
+  const [serverNameDraft, setServerNameDraft] = useState("");
+
+  useEffect(() => {
+    setServerNameDraft(selectedServer?.name ?? "");
+  }, [selectedServer?.name, selectedServer?.serverUrl]);
 
   useEffect(() => {
     if (!safeActiveTab || safeActiveTab === activeTab) {
@@ -34,6 +40,88 @@ export function SettingsOverlay() {
   }, [activeTab, safeActiveTab, setActiveTab]);
 
   if (!isOpen || !safeActiveTab) {
+    return null;
+  }
+
+  function onGeneralSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedServer) {
+      return;
+    }
+
+    const trimmedName = serverNameDraft.trim();
+    setServerSession({
+      ...selectedServer,
+      name: trimmedName || undefined,
+    });
+  }
+
+  function onConfiguratorSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+  }
+
+  function renderTabContent() {
+    if (safeActiveTab === "main") {
+      return (
+        <form className="flex max-w-xl flex-col gap-4" onSubmit={onGeneralSave}>
+          <label className="form-control w-full" htmlFor="settings-server-name">
+            <span className="label">
+              <span className="label-text">Название сервера</span>
+            </span>
+            <input
+              id="settings-server-name"
+              className="input input-bordered w-full"
+              type="text"
+              placeholder="Введите название"
+              value={serverNameDraft}
+              onChange={(event) => setServerNameDraft(event.target.value)}
+              disabled={!selectedServer}
+            />
+          </label>
+          <div>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={!selectedServer}
+            >
+              Сохранить
+            </button>
+          </div>
+        </form>
+      );
+    }
+
+    if (safeActiveTab === "configurator") {
+      return (
+        <form
+          className="flex max-w-xl flex-col gap-4"
+          onSubmit={onConfiguratorSave}
+        >
+          <label
+            className="form-control w-full"
+            htmlFor="settings-configurator-frequency"
+          >
+            <span className="label">
+              <span className="label-text">Частота отправки запросов</span>
+            </span>
+            <input
+              id="settings-configurator-frequency"
+              className="input input-bordered w-full"
+              type="text"
+              value="Скоро будет доступно"
+              disabled
+              readOnly
+            />
+          </label>
+          <div>
+            <button type="submit" className="btn btn-primary">
+              Сохранить
+            </button>
+          </div>
+        </form>
+      );
+    }
+
     return null;
   }
 
@@ -77,6 +165,7 @@ export function SettingsOverlay() {
           <div className="min-h-0 flex-1 overflow-y-auto p-6">
             <h3 className="text-xl font-semibold capitalize">{safeActiveTab}</h3>
             <p className="mt-2 text-base-content/70">{titleForTab(safeActiveTab)}</p>
+            <div className="mt-6">{renderTabContent()}</div>
           </div>
         </div>
       </section>

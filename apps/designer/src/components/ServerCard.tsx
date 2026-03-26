@@ -9,6 +9,13 @@ function displayServerHost(serverUrl: string): string {
   }
 }
 
+export function serverCardTitle(state: ServerSession): string {
+  if (typeof state.name === "string" && state.name.trim()) {
+    return state.name.trim();
+  }
+  return displayServerHost(state.serverUrl);
+}
+
 export interface ServerCardProps {
   state: ServerSession;
   active: boolean;
@@ -29,6 +36,7 @@ export function ServerCard({
   onSelect,
   onDelete,
 }: ServerCardProps) {
+  const title = serverCardTitle(state);
   const host = displayServerHost(state.serverUrl);
   const disconnectLabel = `Отключить ${host}`;
   const showUnread = unreadCount > 0;
@@ -52,7 +60,7 @@ export function ServerCard({
         onClick={onSelect}
       >
         <div className="flex flex-row justify-between">
-          <div className="font-medium">{host}</div>
+          <div className="font-medium">{title}</div>
 
           {showUnread && (
             <span

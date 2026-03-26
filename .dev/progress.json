@@ -2,15 +2,15 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T10:29:17.993Z",
+  "updatedAt": "2026-03-26T10:34:47.735Z",
   "steps": [
     {
       "order": 1,
       "file": "01-restructure-mocks-and-chat-identity.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "0e60c94",
       "startedAt": "2026-03-26T10:25:24.457Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T10:29:47.535Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -98,12 +98,91 @@
     {
       "order": 2,
       "file": "02-add-chat-users-panel-search-and-person-chat-open.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T10:29:57.124Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены UI/локальным store без изменений API/доменной модели"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: chat column shows chats and users sections",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: 250ms debounce and token-order search rules",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: clear button visibility and reset behavior",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: user click opens or creates deterministic DM",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: current session user excluded from users list",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 3,

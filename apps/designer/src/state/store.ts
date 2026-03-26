@@ -49,7 +49,7 @@ export const routeContextAtom = atom<
 export const threadTransitionLoadingAtom = atom(false);
 
 type MockServer = { id: string; serverUrl: string };
-type MockUser = {
+export type MockUser = {
   id: string;
   fullname: string;
   login: string;
@@ -79,6 +79,26 @@ const SERVER_ID_BY_URL = new Map(
   MOCK_SERVERS.map((server) => [server.serverUrl, server.id]),
 );
 const USER_BY_ID = new Map(MOCK_USERS.map((user) => [user.id, user]));
+const PERSON_CHAT_BY_SERVER_AND_PEER = new Map<string, string>();
+
+function personChatKey(serverId: string, peerUserId: string): string {
+  return `${serverId}:${peerUserId}`;
+}
+
+function seedPersonChatRegistry(): void {
+  for (const [serverId, chatId] of SERVER_CHATS) {
+    const chat = CHAT_BY_ID.get(chatId);
+    if (!chat || chat.type !== "person") continue;
+    const peerByName = MOCK_USERS.find((user) => user.fullname === chat.peerName);
+    if (!peerByName) continue;
+    PERSON_CHAT_BY_SERVER_AND_PEER.set(
+      personChatKey(serverId, peerByName.id),
+      chat.id,
+    );
+  }
+}
+
+seedPersonChatRegistry();
 
 export function getServerChats(serverId: string): ChatPreview[] {
   return SERVER_CHATS.filter(([linkServerId]) => linkServerId === serverId)
@@ -112,6 +132,59 @@ export function getUsersForServer(
 
 export function getSessionsForServer(serverId: string): MockSession[] {
   return MOCK_SESSIONS.filter((session) => session.serverId === serverId);
+}
+
+function newPersonChatId(serverId: string, peerUserId: string): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `chat_person_${serverId}_${peerUserId}_${crypto.randomUUID()}`;
+  }
+  return `chat_person_${serverId}_${peerUserId}_${Date.now()}`;
+}
+
+export function findOrCreatePersonChat(
+  serverId: string,
+  peerUserId: string,
+): ChatPreview | null {
+  const peerUser = USER_BY_ID.get(peerUserId);
+  if (!peerUser) return null;
+
+  const byRegistry = PERSON_CHAT_BY_SERVER_AND_PEER.get(
+    personChatKey(serverId, peerUserId),
+  );
+  if (byRegistry) {
+    return CHAT_BY_ID.get(byRegistry) ?? null;
+  }
+
+  const existing = getServerChats(serverId).find(
+    (chat) =>
+      chat.type === "person" &&
+      (chat.peerName === peerUser.fullname || chat.title === peerUser.fullname),
+  );
+  if (existing) {
+    PERSON_CHAT_BY_SERVER_AND_PEER.set(
+      personChatKey(serverId, peerUserId),
+      existing.id,
+    );
+    return existing;
+  }
+
+  const created: ChatPreview = {
+    id: newPersonChatId(serverId, peerUserId),
+    type: "person",
+    title: peerUser.fullname,
+    peerName: peerUser.fullname,
+    subtitle: `Личные сообщения · ${peerUser.login}`,
+    unread: 0,
+  };
+
+  MOCK_CHATS.push(created);
+  CHAT_BY_ID.set(created.id, created);
+  SERVER_CHATS.push([serverId, created.id]);
+  PERSON_CHAT_BY_SERVER_AND_PEER.set(
+    personChatKey(serverId, peerUserId),
+    created.id,
+  );
+  return created;
 }
 
 // Список всех серверов из песочницы.

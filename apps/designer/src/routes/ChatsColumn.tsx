@@ -3,14 +3,18 @@ import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatCard } from "../components/ChatCard";
+import { UserCard } from "../components/UserCard";
 import { DESIGNER_LOADING_DELAY_MS } from "../components/loadingDelay";
 import { ChatsColumnBodySkeleton } from "../components/ChatsColumnBodySkeleton";
 import { ChatsColumnSkeleton } from "../components/ChatsColumnSkeleton";
 import { enterChat } from "../state/designerNavigation";
+import { isSearchMatch } from "../state/chatSearch";
 import {
   chatsForSelectedServerAtom,
   effectiveChatIdAtom,
   selectedServerAtom,
+  usersForSelectedServerAtom,
+  findOrCreatePersonChat,
 } from "../state/store";
 import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
 
@@ -30,7 +34,10 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
   const navigate = useNavigate();
   const selectedServer = useAtomValue(selectedServerAtom);
   const chats = useAtomValue(chatsForSelectedServerAtom);
+  const users = useAtomValue(usersForSelectedServerAtom);
   const highlightedChatId = useAtomValue(effectiveChatIdAtom);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const [serverSwitchLoading, setServerSwitchLoading] = useState(false);
   const initializedRef = useRef(false);
@@ -65,22 +72,36 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
     return () => window.clearTimeout(timer);
   }, [isLoading, selectedServer?.serverUrl]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  const filteredChats = chats.filter((chat) =>
+    isSearchMatch(chat.title, debouncedSearch),
+  );
+  const filteredUsers = users.filter((user) =>
+    isSearchMatch(user.fullname, debouncedSearch),
+  );
+
   const content = (() => {
     if (serverSwitchLoading && selectedServer)
       return <ChatsColumnBodySkeleton />;
     if (!selectedServer) return null;
 
-    if (chats.length === 0) {
+    if (filteredChats.length === 0 && filteredUsers.length === 0) {
       return (
         <div className="p-2 text-base-content/80 w-full h-full flex justify-center items-center text-2xl">
-          Чатов нет
+          {debouncedSearch.trim() ? "Ничего не найдено" : "Чатов нет"}
         </div>
       );
     }
 
     return (
       <div className="flex flex-col gap-2 p-1">
-        {chats.map((chat) => (
+        {filteredChats.map((chat) => (
           <ChatCard
             key={chat.id}
             chat={chat}
@@ -93,6 +114,29 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
             }}
           />
         ))}
+        <div className="mt-2 pt-2 border-t border-base-300">
+          <h3 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-base-content/70">
+            Пользователи
+          </h3>
+          <div className="flex flex-col gap-2">
+            {filteredUsers.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onSelect={() => {
+                  const serverId =
+                    selectedServer.id ?? selectedServer.serverUrl;
+                  const dm = findOrCreatePersonChat(serverId, user.id);
+                  if (!dm) return;
+                  const serverRid = serverRouteIdFromServerUrl(
+                    selectedServer.serverUrl,
+                  );
+                  enterChat(navigate, dm.id, serverRid);
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     );
   })();
@@ -113,6 +157,28 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
           <ColumnHeaderGear />
         </div>
       </header>
+
+      <div className="shrink-0 border-b border-base-300 p-2">
+        <label className="input input-bordered flex items-center gap-2">
+          <input
+            type="text"
+            className="grow"
+            placeholder="Поиск чатов и пользователей"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          {search.trim() ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-xs"
+              onClick={() => setSearch("")}
+              aria-label="Очистить поиск"
+            >
+              X
+            </button>
+          ) : null}
+        </label>
+      </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">{content}</div>
 

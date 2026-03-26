@@ -2,8 +2,14 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import {
+  allSessionsAtom,
   allUsersForSelectedServerAtom,
   createServerUser,
+  isCurrentSession,
+  removeAllSessions,
+  removeAllSessionsExcept,
+  removeCurrentSession,
+  removeSessionById,
   resolveCatalogServerId,
   selectedServerAtom,
   updateServerUser,
@@ -22,6 +28,37 @@ import {
 } from "../state/settingsUsers";
 import { setServerSession } from "../state/servers";
 
+type AccountConfirmAction =
+  | "demote-admin"
+  | "remove-session"
+  | "remove-current-session"
+  | "remove-all-sessions"
+  | "remove-all-except-current";
+
+function formatSessionLifetime(createdAt: string): string {
+  const createdAtMs = Date.parse(createdAt);
+  if (Number.isNaN(createdAtMs)) {
+    return "Неизвестно";
+  }
+
+  const diffMs = Math.max(0, Date.now() - createdAtMs);
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  if (minutes < 1) {
+    return "меньше минуты";
+  }
+  if (minutes < 60) {
+    return `${minutes} мин`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    const restMinutes = minutes % 60;
+    return restMinutes === 0 ? `${hours} ч` : `${hours} ч ${restMinutes} мин`;
+  }
+  const days = Math.floor(hours / 24);
+  const restHours = hours % 24;
+  return restHours === 0 ? `${days} д` : `${days} д ${restHours} ч`;
+}
+
 function titleForTab(tabId: SettingsTabId): string {
   if (tabId === "main") return "Основные настройки сервера и интерфейса";
   if (tabId === "configurator") return "Параметры конфигуратора";
@@ -37,6 +74,7 @@ export function SettingsOverlay() {
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
   const usersRevision = useAtomValue(usersDataRevisionAtom);
   const serverUsers = useAtomValue(allUsersForSelectedServerAtom);
+  const allSessions = useAtomValue(allSessionsAtom);
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
   const safeActiveTab =
     availableTabs.find((tab) => tab.id === activeTab)?.id ?? availableTabs[0]?.id;
@@ -56,6 +94,13 @@ export function SettingsOverlay() {
     password: "",
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
+  const [accountDraft, setAccountDraft] = useState({
+    login: "",
+    fullname: "",
+    password: "",
+  });
+  const [confirmAction, setConfirmAction] = useState<AccountConfirmAction | null>(null);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     setServerNameDraft(selectedServer?.name ?? "");
@@ -120,6 +165,22 @@ export function SettingsOverlay() {
     selectedUserRole,
   ]);
 
+  useEffect(() => {
+    if (!selectedServer) {
+      setAccountDraft({ login: "", fullname: "", password: "" });
+      return;
+    }
+    setAccountDraft({
+      login: selectedServer.user.login,
+      fullname: selectedServer.user.fullname,
+      password: "",
+    });
+  }, [
+    selectedServer?.serverUrl,
+    selectedServer?.user.login,
+    selectedServer?.user.fullname,
+  ]);
+
   if (!isOpen || !safeActiveTab) {
     return null;
   }
@@ -181,6 +242,49 @@ export function SettingsOverlay() {
     setAddUserError(null);
     setAddUserDraft({ login: "", fullname: "", password: "" });
     setSelectedUserId(created.id);
+  }
+
+  function onSaveAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selectedServer) {
+      return;
+    }
+    setServerSession({
+      ...selectedServer,
+      user: {
+        ...selectedServer.user,
+        login: accountDraft.login.trim(),
+        fullname: accountDraft.fullname.trim(),
+      },
+    });
+  }
+
+  function onConfirmAccountAction() {
+    if (!selectedServer || !confirmAction) {
+      return;
+    }
+    const currentServerId = resolveCatalogServerId(selectedServer);
+
+    if (confirmAction === "demote-admin") {
+      setServerSession({
+        ...selectedServer,
+        user: {
+          ...selectedServer.user,
+          role: "USER",
+        },
+      });
+    } else if (confirmAction === "remove-current-session") {
+      removeCurrentSession(currentServerId);
+    } else if (confirmAction === "remove-all-sessions") {
+      removeAllSessions();
+    } else if (confirmAction === "remove-all-except-current") {
+      removeAllSessionsExcept(currentServerId);
+    } else if (confirmAction === "remove-session" && sessionToDelete) {
+      removeSessionById(sessionToDelete);
+    }
+
+    setSessionToDelete(null);
+    setConfirmAction(null);
   }
 
   function renderTabContent() {
@@ -393,6 +497,159 @@ export function SettingsOverlay() {
       );
     }
 
+    if (safeActiveTab === "account") {
+      const currentServerId = selectedServer
+        ? resolveCatalogServerId(selectedServer)
+        : null;
+      const sessionsSorted = [...allSessions].sort((left, right) =>
+        right.createdAt.localeCompare(left.createdAt),
+      );
+
+      return (
+        <div className="space-y-6">
+          <form className="grid gap-4 md:grid-cols-2" onSubmit={onSaveAccount}>
+            <label className="form-control w-full">
+              <span className="label">
+                <span className="label-text">Логин</span>
+              </span>
+              <input
+                className="input input-bordered w-full"
+                type="text"
+                value={accountDraft.login}
+                onChange={(event) =>
+                  setAccountDraft((prev) => ({ ...prev, login: event.target.value }))
+                }
+                disabled={!selectedServer}
+              />
+            </label>
+
+            <label className="form-control w-full">
+              <span className="label">
+                <span className="label-text">ФИО</span>
+              </span>
+              <input
+                className="input input-bordered w-full"
+                type="text"
+                value={accountDraft.fullname}
+                onChange={(event) =>
+                  setAccountDraft((prev) => ({ ...prev, fullname: event.target.value }))
+                }
+                disabled={!selectedServer}
+              />
+            </label>
+
+            <label className="form-control w-full">
+              <span className="label">
+                <span className="label-text">Пароль</span>
+              </span>
+              <input
+                className="input input-bordered w-full"
+                type="password"
+                value={accountDraft.password}
+                onChange={(event) =>
+                  setAccountDraft((prev) => ({ ...prev, password: event.target.value }))
+                }
+                disabled={!selectedServer}
+              />
+            </label>
+
+            <div className="flex items-end">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={!selectedServer}
+              >
+                Сохранить
+              </button>
+            </div>
+          </form>
+
+          {selectedServer?.user.role.trim().toUpperCase() === "ADMIN" ? (
+            <section className="rounded-box border border-warning/30 bg-warning/10 p-4">
+              <h4 className="font-medium">Права администратора</h4>
+              <button
+                type="button"
+                className="btn btn-warning btn-sm mt-3"
+                onClick={() => setConfirmAction("demote-admin")}
+              >
+                Перестать быть админом
+              </button>
+            </section>
+          ) : null}
+
+          <section className="rounded-box border border-base-300 p-4">
+            <h4 className="font-medium">Завершить сессию</h4>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => setConfirmAction("remove-current-session")}
+                disabled={!currentServerId}
+              >
+                Завершить текущую сессию
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => setConfirmAction("remove-all-sessions")}
+                disabled={allSessions.length === 0}
+              >
+                Завершить все сессии
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={() => setConfirmAction("remove-all-except-current")}
+                disabled={!currentServerId}
+              >
+                Завершить все сессии, кроме текущей
+              </button>
+            </div>
+
+            <div className="mt-4 overflow-x-auto">
+              <table className="table table-zebra">
+                <thead>
+                  <tr>
+                    <th>Сессия</th>
+                    <th>Сервер</th>
+                    <th>Активна</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {sessionsSorted.map((session) => {
+                    const isCurrent = isCurrentSession(session, currentServerId);
+                    return (
+                      <tr key={session.id}>
+                        <td>{session.id}</td>
+                        <td>{session.serverId}</td>
+                        <td>{formatSessionLifetime(session.createdAt)}</td>
+                        <td>
+                          {isCurrent ? null : (
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-xs"
+                              aria-label={`Удалить сессию ${session.id}`}
+                              onClick={() => {
+                                setSessionToDelete(session.id);
+                                setConfirmAction("remove-session");
+                              }}
+                            >
+                              X
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
     return null;
   }
 
@@ -523,6 +780,44 @@ export function SettingsOverlay() {
                 </button>
               </div>
             </form>
+          </section>
+        </div>
+      ) : null}
+
+      {confirmAction ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-base-content/40 p-4">
+          <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
+            <h4 className="text-lg font-semibold">Подтверждение</h4>
+            <p className="mt-3 text-base-content/80">
+              {confirmAction === "demote-admin"
+                ? "После подтверждения ваша роль изменится на USER."
+                : confirmAction === "remove-session"
+                  ? "Завершить выбранную сессию?"
+                  : confirmAction === "remove-current-session"
+                    ? "Завершить текущую сессию?"
+                    : confirmAction === "remove-all-sessions"
+                      ? "Завершить все активные сессии?"
+                      : "Завершить все сессии, кроме текущей?"}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => {
+                  setConfirmAction(null);
+                  setSessionToDelete(null);
+                }}
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onConfirmAccountAction}
+              >
+                Подтвердить
+              </button>
+            </div>
           </section>
         </div>
       ) : null}

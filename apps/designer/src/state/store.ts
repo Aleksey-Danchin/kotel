@@ -181,10 +181,16 @@ export interface CreateServerUserInput {
 }
 
 export const usersDataRevisionAtom = atom(0);
+export const sessionsDataRevisionAtom = atom(0);
 
 function bumpUsersDataRevision(): void {
   const revision = defaultStore.get(usersDataRevisionAtom);
   defaultStore.set(usersDataRevisionAtom, revision + 1);
+}
+
+function bumpSessionsDataRevision(): void {
+  const revision = defaultStore.get(sessionsDataRevisionAtom);
+  defaultStore.set(sessionsDataRevisionAtom, revision + 1);
 }
 
 export function updateServerUser(input: UpdateServerUserInput): void {
@@ -225,6 +231,52 @@ export function createServerUser(input: CreateServerUserInput): MockUser {
 
 export function getSessionsForServer(serverId: string): MockSession[] {
   return MOCK_SESSIONS.filter((session) => session.serverId === serverId);
+}
+
+export function getAllSessions(): MockSession[] {
+  return [...MOCK_SESSIONS];
+}
+
+export function isCurrentSession(
+  session: { serverId: string },
+  currentServerId: string | null,
+): boolean {
+  return currentServerId !== null && session.serverId === currentServerId;
+}
+
+export function removeSessionById(sessionId: string): void {
+  const sessionIndex = MOCK_SESSIONS.findIndex((session) => session.id === sessionId);
+  if (sessionIndex === -1) {
+    return;
+  }
+  MOCK_SESSIONS.splice(sessionIndex, 1);
+  bumpSessionsDataRevision();
+}
+
+export function removeCurrentSession(serverId: string): void {
+  const nextSessions = MOCK_SESSIONS.filter((session) => session.serverId !== serverId);
+  if (nextSessions.length === MOCK_SESSIONS.length) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length, ...nextSessions);
+  bumpSessionsDataRevision();
+}
+
+export function removeAllSessions(): void {
+  if (MOCK_SESSIONS.length === 0) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length);
+  bumpSessionsDataRevision();
+}
+
+export function removeAllSessionsExcept(serverId: string): void {
+  const nextSessions = MOCK_SESSIONS.filter((session) => session.serverId === serverId);
+  if (nextSessions.length === MOCK_SESSIONS.length) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length, ...nextSessions);
+  bumpSessionsDataRevision();
 }
 
 export function resolvePersonChatPeer(
@@ -392,9 +444,15 @@ export const allUsersForSelectedServerAtom = atom((get) => {
 
 export const sessionsForSelectedServerAtom = atom((get) => {
   const selectedServer = get(selectedServerAtom);
+  get(sessionsDataRevisionAtom);
   if (!selectedServer) return [];
   const serverId = catalogServerId(selectedServer);
   return getSessionsForServer(serverId);
+});
+
+export const allSessionsAtom = atom((get) => {
+  get(sessionsDataRevisionAtom);
+  return getAllSessions();
 });
 
 export const selectedPersonChatPeerAtom = atom((get) => {

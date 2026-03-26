@@ -62,6 +62,9 @@ Account tab includes:
 - Vitest for session action reducers/selectors and current-session detection.
 - Manual UI verification for modal confirmations and role transition effects.
 - Browser validation must be executed via MCP `cursor-ide-browser` at `http://localhost:5173`; keep a 1-second delay between each interaction step and the following analysis/check so the page can load and react.
+<CORRECTION by="step-executor" reason="testing policy requires automated verification">
+Runtime behavior in this step must be verified by automated Vitest tests (unit/component) where feasible; `cursor-ide-browser` can be used only for selector reconnaissance/debugging and not as acceptance verification.
+</CORRECTION>
 
 ## Notes
 - Keep all behavior sandbox-local and persistence-compatible.

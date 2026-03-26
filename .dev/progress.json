@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T11:45:39.028Z",
+  "updatedAt": "2026-03-26T11:49:46.371Z",
   "steps": [
     {
       "order": 1,
@@ -279,10 +279,10 @@
     {
       "order": 4,
       "file": "04-build-settings-overlay-shell-and-role-based-tab-entry.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "f61836b",
       "startedAt": "2026-03-26T11:41:08.879Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T11:46:31.326Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -368,12 +368,91 @@
     {
       "order": 5,
       "file": "05-implement-settings-general-and-configurator-tabs.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T11:46:46.272Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed",
+          "note": "Re-validation found required implementation already present; no code fixes needed."
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "No source edits during this re-validation run."
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No code changes in this run; existing documentation remains accurate for step scope."
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: general tab edits and saves server name",
+          "status": "completed",
+          "note": "Verified by servers.test.ts and SettingsOverlay onGeneralSave implementation."
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: server card reflects saved name after refresh",
+          "status": "completed",
+          "note": "Verified by servers.test.ts persistence and ServerCard.test.ts title fallback/priority."
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: configurator has disabled frequency field and save",
+          "status": "completed",
+          "note": "Verified by SettingsOverlay configurator form and save button presence (code inspection)."
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: tab accessibility follows step 4 role policy",
+          "status": "completed",
+          "note": "Verified by settingsOverlay.test.ts and browser scenario showing account-only tabs for non-privileged sessions."
+        }
+      ]
     },
     {
       "order": 6,

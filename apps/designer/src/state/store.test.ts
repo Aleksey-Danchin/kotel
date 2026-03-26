@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  createServerUser,
   findOrCreatePersonChat,
+  getServerUsers,
   getServerChats,
   resolvePersonChatPeer,
+  updateServerUser,
   type ChatPreview,
   type MockUser,
 } from "./store";
@@ -59,5 +62,43 @@ describe("resolvePersonChatPeer", () => {
       unread: 1,
     };
     expect(resolvePersonChatPeer(personChat, users)?.id).toBe("peer-1");
+  });
+});
+
+describe("settings users mutations", () => {
+  it("creates user and links it to server", () => {
+    const serverId = "srv_local";
+    const beforeCount = getServerUsers(serverId).length;
+    const created = createServerUser({
+      serverId,
+      login: "new-user",
+      fullname: "New User",
+      password: "AbCdEf123456",
+    });
+
+    const serverUsers = getServerUsers(serverId);
+    expect(serverUsers.length).toBe(beforeCount + 1);
+    expect(serverUsers.some((user) => user.id === created.id)).toBe(true);
+  });
+
+  it("updates editable fields of existing user", () => {
+    const existing = getServerUsers("srv_local")[0];
+    expect(existing).toBeDefined();
+
+    updateServerUser({
+      id: existing.id,
+      login: "updated-login",
+      fullname: "Updated User",
+      password: "QwErTy123456",
+      blocked: true,
+      role: "ADMIN",
+    });
+
+    const updated = getServerUsers("srv_local").find((user) => user.id === existing.id);
+    expect(updated?.login).toBe("updated-login");
+    expect(updated?.fullname).toBe("Updated User");
+    expect(updated?.password).toBe("QwErTy123456");
+    expect(updated?.blocked).toBe(true);
+    expect(updated?.role).toBe("ADMIN");
   });
 });

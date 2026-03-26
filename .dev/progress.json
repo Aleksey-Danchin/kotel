@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T10:48:12.322Z",
+  "updatedAt": "2026-03-26T10:53:35.358Z",
   "steps": [
     {
       "order": 1,
@@ -367,10 +367,10 @@
     {
       "order": 5,
       "file": "05-implement-settings-general-and-configurator-tabs.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "88e607f",
       "startedAt": "2026-03-26T10:44:06.729Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T10:48:25.147Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -455,12 +455,91 @@
     {
       "order": 6,
       "file": "06-implement-settings-users-tab-and-user-creation-flow.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-03-26T10:48:32.090Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "scripts/prettier.sh отсутствует, форматирование обеспечено локальными правками"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены sandbox UI и state в apps/designer; документация домена/API не затронута"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: users tab two-column UI with add button",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: editor fields and role dropdown values implemented",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: ROOT role never changeable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: admin/root editability matrix enforced",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: add-user modal creates server-linked user with valid password generator",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 7,

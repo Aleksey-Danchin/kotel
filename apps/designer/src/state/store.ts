@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 
+import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
 import type { ServerSession } from "./servers";
 import { serversAtom } from "./servers";
@@ -54,6 +55,9 @@ export type MockUser = {
   fullname: string;
   login: string;
   role: string;
+  password?: string;
+  blocked?: boolean;
+  requestFrequency?: number;
   isOnline: boolean;
   lastSeenAt: string;
 };
@@ -80,6 +84,15 @@ const SERVER_ID_BY_URL = new Map(
 );
 const USER_BY_ID = new Map(MOCK_USERS.map((user) => [user.id, user]));
 const PERSON_CHAT_BY_SERVER_AND_PEER = new Map<string, string>();
+
+function normalizeMockUser(user: MockUser): MockUser {
+  return {
+    ...user,
+    password: user.password ?? "",
+    blocked: user.blocked ?? false,
+    requestFrequency: user.requestFrequency ?? 0,
+  };
+}
 
 function personChatKey(serverId: string, peerUserId: string): string {
   return `${serverId}:${peerUserId}`;
@@ -127,7 +140,87 @@ export function getUsersForServer(
   return SERVER_USERS.filter(([linkServerId]) => linkServerId === serverId)
     .map(([, userId]) => USER_BY_ID.get(userId))
     .filter((user): user is MockUser => user !== undefined)
+    .map(normalizeMockUser)
     .filter((user) => user.id !== currentUserId);
+}
+
+export function getServerUsers(serverId: string): MockUser[] {
+  return SERVER_USERS.filter(([linkServerId]) => linkServerId === serverId)
+    .map(([, userId]) => USER_BY_ID.get(userId))
+    .filter((user): user is MockUser => user !== undefined)
+    .map(normalizeMockUser);
+}
+
+export function resolveCatalogServerId(session: ServerSession): string {
+  return (
+    SERVER_ID_BY_URL.get(session.serverUrl) ?? session.id ?? session.serverUrl
+  );
+}
+
+function nextUserId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `mock-user-${crypto.randomUUID()}`;
+  }
+  return `mock-user-${Date.now()}`;
+}
+
+export interface UpdateServerUserInput {
+  id: string;
+  login: string;
+  fullname: string;
+  password: string;
+  blocked: boolean;
+  role: string;
+}
+
+export interface CreateServerUserInput {
+  serverId: string;
+  login: string;
+  fullname: string;
+  password: string;
+}
+
+export const usersDataRevisionAtom = atom(0);
+
+function bumpUsersDataRevision(): void {
+  const revision = defaultStore.get(usersDataRevisionAtom);
+  defaultStore.set(usersDataRevisionAtom, revision + 1);
+}
+
+export function updateServerUser(input: UpdateServerUserInput): void {
+  const target = USER_BY_ID.get(input.id);
+  if (!target) {
+    return;
+  }
+
+  target.login = input.login;
+  target.fullname = input.fullname;
+  target.password = input.password;
+  target.blocked = input.blocked;
+  target.role = input.role;
+
+  bumpUsersDataRevision();
+}
+
+export function createServerUser(input: CreateServerUserInput): MockUser {
+  const created = normalizeMockUser({
+    id: nextUserId(),
+    login: input.login,
+    fullname: input.fullname,
+    password: input.password,
+    role: "USER",
+    blocked: false,
+    requestFrequency: 0,
+    isOnline: false,
+    lastSeenAt: new Date().toISOString(),
+  });
+
+  MOCK_USERS.push(created);
+  USER_BY_ID.set(created.id, created);
+  SERVER_USERS.push([input.serverId, created.id]);
+  bumpUsersDataRevision();
+
+  return created;
 }
 
 export function getSessionsForServer(serverId: string): MockSession[] {
@@ -208,9 +301,7 @@ export type RouteResolution =
   | { kind: "chat"; serverUrl: string; chatId: string };
 
 function catalogServerId(session: ServerSession): string {
-  return (
-    SERVER_ID_BY_URL.get(session.serverUrl) ?? session.id ?? session.serverUrl
-  );
+  return resolveCatalogServerId(session);
 }
 
 function pickServerUrlForChat(
@@ -290,6 +381,13 @@ export const usersForSelectedServerAtom = atom((get) => {
   if (!selectedServer) return [];
   const serverId = catalogServerId(selectedServer);
   return getUsersForServer(serverId, selectedServer.user.id);
+});
+
+export const allUsersForSelectedServerAtom = atom((get) => {
+  const selectedServer = get(selectedServerAtom);
+  if (!selectedServer) return [];
+  const serverId = catalogServerId(selectedServer);
+  return getServerUsers(serverId);
 });
 
 export const sessionsForSelectedServerAtom = atom((get) => {

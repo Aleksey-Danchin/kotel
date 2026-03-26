@@ -137,7 +137,7 @@ function RootLayout() {
           <ChatsColumn isLoading={startupLoading} />
         </div>
 
-        <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-base-300">
+        <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-[gray]">
           <ChatColumn isLoading={startupLoading}>
             <Outlet />
           </ChatColumn>

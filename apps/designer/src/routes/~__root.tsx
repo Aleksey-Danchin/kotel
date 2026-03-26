@@ -82,11 +82,19 @@ function RootLayout() {
         return;
       }
       const target = event.target;
-      if (
-        target instanceof Element &&
-        target.closest("input, textarea, select, [contenteditable=true]")
-      ) {
-        return;
+      if (target instanceof Element) {
+        // Add a "blur" step to the ESC exit chain for the chat composer.
+        // First ESC removes focus from the textarea; the next ESC can navigate.
+        const composer = target.closest("#designer-chat-composer");
+        if (composer && composer instanceof HTMLTextAreaElement) {
+          event.preventDefault();
+          composer.blur();
+          return;
+        }
+
+        if (target.closest("input, textarea, select, [contenteditable=true]")) {
+          return;
+        }
       }
 
       const id = selectionIdFromPathname(pathnameRef.current);

@@ -7,6 +7,8 @@ export type ChatThreadScrollContextValue = {
     messages: ChatMessage[],
     sessionUserId: string,
   ) => void;
+  /** После скелетона/смены контента — прокрутить к низу и вернуть липкий режим. */
+  syncThreadScrollToBottom: () => void;
 };
 
 const ChatThreadScrollContext =

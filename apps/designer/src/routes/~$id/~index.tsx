@@ -29,6 +29,7 @@ function IdShellPage() {
   const [streamLoading, setStreamLoading] = useState(false);
   const initializedRef = useRef(false);
   const transitionIdRef = useRef(0);
+  const prevStreamLoadingRef = useRef(streamLoading);
   const routeTransitionId = routeCtx.type === "id" ? routeCtx.id : null;
 
   useEffect(() => {
@@ -69,6 +70,14 @@ function IdShellPage() {
 
     return () => window.clearTimeout(timer);
   }, [selectedServer?.serverUrl, routeTransitionId]);
+
+  useEffect(() => {
+    const wasLoading = prevStreamLoadingRef.current;
+    prevStreamLoadingRef.current = streamLoading;
+    if (wasLoading !== true || streamLoading !== false) return;
+    if (!chatScroll || !selectedServer || !selectedChat) return;
+    chatScroll.syncThreadScrollToBottom();
+  }, [streamLoading, chatScroll, selectedServer, selectedChat]);
 
   useEffect(() => {
     if (

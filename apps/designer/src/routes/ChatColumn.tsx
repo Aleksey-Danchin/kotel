@@ -10,6 +10,8 @@ import {
 } from "react";
 import { useAtomValue } from "jotai";
 import clsx from "clsx";
+import { FaArrowDownLong } from "react-icons/fa6";
+import { GrSend } from "react-icons/gr";
 
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatColumnSkeleton } from "../components/ChatColumnSkeleton";
@@ -45,6 +47,24 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const [unreadBelow, setUnreadBelow] = useState(0);
   const prevSeenIdsRef = useRef<Set<string>>(new Set());
   const needsInitialSeedRef = useRef(true);
+  const scrollInnerRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, []);
+
+  // When messages arrive or render is still settling (layout shifts),
+  // a single rAF can be too early; do it twice to land at the true bottom.
+  const scrollToBottomStable = useCallback(() => {
+    requestAnimationFrame(() => {
+      scrollToBottom();
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
+    });
+  }, [scrollToBottom]);
 
   useLayoutEffect(() => {
     stickyRef.current = sticky;
@@ -59,29 +79,48 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     setSticky(true);
     stickyRef.current = true;
     setUnreadBelow(0);
-    const raf = requestAnimationFrame(() => {
-      const el = scrollRef.current;
-      if (el) {
-        el.scrollTop = el.scrollHeight;
-      }
-    });
-    return () => cancelAnimationFrame(raf);
-  }, [hasSelectedChat, selectedChatId]);
+    // Start from bottom even before the first message snapshot arrives.
+    // Two-frame settling avoids "scroll bar jumps to top" on large threads.
+    scrollToBottomStable();
+  }, [hasSelectedChat, selectedChatId, scrollToBottomStable]);
 
   useLayoutEffect(() => {
     if (!hasSelectedChat || !selectedChatId) return;
     composerRef.current?.focus();
   }, [hasSelectedChat, selectedChatId]);
 
-  const scrollToBottom = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, []);
+  // Пока тред растёт (скелетон → сообщения, ленивый layout), держим низ при липком режиме.
+  useLayoutEffect(() => {
+    if (!hasSelectedChat || !selectedChatId) return;
+    const inner = scrollInnerRef.current;
+    if (!inner) return;
+
+    const ro = new ResizeObserver(() => {
+      if (!stickyRef.current) return;
+      requestAnimationFrame(() => {
+        if (!stickyRef.current) return;
+        scrollToBottom();
+      });
+    });
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, [hasSelectedChat, selectedChatId, scrollToBottom]);
+
+  const syncThreadScrollToBottom = useCallback(() => {
+    setSticky(true);
+    stickyRef.current = true;
+    setUnreadBelow(0);
+    scrollToBottomStable();
+  }, [scrollToBottomStable]);
 
   const onScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
+
+    // While we haven't seeded initial "at bottom" yet, don't flip sticky based on
+    // intermediate scroll metrics (message list may still be growing).
+    if (needsInitialSeedRef.current) return;
+
     const atBottom = isNearBottom(el, DESIGNER_CHAT_STICKY_THRESHOLD_PX);
     setSticky(atBottom);
     if (atBottom) setUnreadBelow(0);
@@ -92,26 +131,27 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     stickyRef.current = true;
     setUnreadBelow(0);
     requestAnimationFrame(() => {
-      scrollToBottom();
+      scrollToBottomStable();
       composerRef.current?.focus();
     });
-  }, [scrollToBottom]);
+  }, [scrollToBottomStable]);
 
   const jumpToBottom = useCallback(() => {
     setSticky(true);
     stickyRef.current = true;
     setUnreadBelow(0);
-    scrollToBottom();
-  }, [scrollToBottom]);
+    scrollToBottomStable();
+  }, [scrollToBottomStable]);
 
   const notifyThreadMessagesSnapshot = useCallback(
     (messages: ChatMessage[], sessionUserId: string) => {
       if (needsInitialSeedRef.current) {
         prevSeenIdsRef.current = new Set(messages.map((m) => m.id));
         needsInitialSeedRef.current = false;
-        requestAnimationFrame(() => {
-          scrollToBottom();
-        });
+        setSticky(true);
+        stickyRef.current = true;
+        setUnreadBelow(0);
+        scrollToBottomStable();
         return;
       }
 
@@ -124,9 +164,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       if (newMsgs.length === 0) return;
 
       if (stickyRef.current) {
-        requestAnimationFrame(() => {
-          scrollToBottom();
-        });
+        scrollToBottomStable();
         return;
       }
 
@@ -138,12 +176,15 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
         setUnreadBelow((c) => c + incomingNew);
       }
     },
-    [scrollToBottom],
+    [scrollToBottomStable],
   );
 
   const scrollApi = useMemo(
-    () => ({ notifyThreadMessagesSnapshot }),
-    [notifyThreadMessagesSnapshot],
+    () => ({
+      notifyThreadMessagesSnapshot,
+      syncThreadScrollToBottom,
+    }),
+    [notifyThreadMessagesSnapshot, syncThreadScrollToBottom],
   );
 
   const trySend = useCallback(() => {
@@ -178,7 +219,10 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       className="min-h-0 flex-1 overflow-y-auto p-4"
       onScroll={onScroll}
     >
-      <div className="flex min-h-full flex-col justify-end">
+      <div
+        ref={scrollInnerRef}
+        className="flex min-h-full flex-col justify-end"
+      >
         <ChatThreadScrollProvider value={scrollApi}>
           {children}
         </ChatThreadScrollProvider>
@@ -206,30 +250,9 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       {scrollBody}
 
       {hasSelectedChat ? (
-        <footer className="shrink-0 border-t border-base-300 bg-base-100 p-3">
-          {!sticky ? (
-            <div className="mb-2 flex flex-col items-end gap-1">
-              {unreadBelow > 0 ? (
-                <span className="badge badge-primary badge-sm tabular-nums">
-                  +{unreadBelow}
-                </span>
-              ) : null}
-              <button
-                type="button"
-                className={clsx(
-                  "btn btn-ghost btn-sm shrink-0 border-2",
-                  unreadBelow > 0
-                    ? "border-primary text-primary"
-                    : "border-base-300",
-                )}
-                onClick={jumpToBottom}
-              >
-                Вниз чата
-              </button>
-            </div>
-          ) : null}
+        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 p-3">
           <form
-            className="flex flex-col gap-2 sm:flex-row sm:items-end"
+            className="relative flex flex-col items-center gap-2 sm:flex-row sm:items-center"
             onSubmit={onComposerSubmit}
           >
             <label className="min-w-0 flex-1" htmlFor="designer-chat-composer">
@@ -246,13 +269,33 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                 disabled={!selectedChat || !selectedServer}
               />
             </label>
-            <button
-              type="submit"
-              className="btn btn-primary shrink-0"
-              disabled={!selectedChat || !selectedServer}
-            >
-              Отправить
-            </button>
+            <div className="relative flex shrink-0 flex-col items-center">
+              {!sticky ? (
+                <div
+                  className="cursor-pointer absolute bottom-full left-1/2 z-20 mb-2 flex -translate-x-1/2 flex-col items-center gap-1 drop-shadow-md"
+                  onClick={jumpToBottom}
+                >
+                  {unreadBelow > 0 && (
+                    <span className="badge badge-primary badge-sm tabular-nums">
+                      +{unreadBelow}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    className="btn btn-xl btn-circle btn-primary shrink-0 border-2"
+                  >
+                    <FaArrowDownLong />
+                  </button>
+                </div>
+              ) : null}
+              <button
+                type="submit"
+                className="btn btn-primary shrink-0 btn-circle btn-xl"
+                disabled={!selectedChat || !selectedServer}
+              >
+                <GrSend />
+              </button>
+            </div>
           </form>
         </footer>
       ) : null}

@@ -1,17 +1,25 @@
 import { useRef, useState, type SubmitEventHandler } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useNavigate } from "@tanstack/react-router";
+import { useAtomValue } from "jotai";
 import {
   serversAtom,
   setServerSession,
   removeServerSession,
   type ServerSession,
 } from "../state/servers";
+import { enterServer } from "../state/designerNavigation";
 import {
   getTotalUnreadForServerSession,
-  resolvedSelectedServerUrlAtom,
-  selectedServerUrlAtom,
+  selectedServerAtom,
 } from "../state/store";
+import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ServerCard } from "../components/ServerCard";
+import { ServicesColumnSkeleton } from "../components/ServicesColumnSkeleton";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
+
+export interface ServicesColumnProps {
+  isLoading?: boolean;
+}
 
 function displayServerHost(serverUrl: string): string {
   try {
@@ -42,10 +50,10 @@ function normalizeServerAddressInput(raw: string): string {
   }
 }
 
-export function ServicesColumn() {
+export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
+  const navigate = useNavigate();
   const serversMap = useAtomValue(serversAtom);
-  const resolvedSelectedServerUrl = useAtomValue(resolvedSelectedServerUrlAtom);
-  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
+  const selectedServer = useAtomValue(selectedServerAtom);
   const servers = Array.from(serversMap.values());
   const [newServerUrl, setNewServerUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,7 +94,8 @@ export function ServicesColumn() {
       };
 
       setServerSession(nextSession);
-      setSelectedServerUrl(normalized);
+      const rid = serverRouteIdFromServerUrl(normalized);
+      enterServer(navigate, rid);
       setNewServerUrl("");
       addServerDialogRef.current?.close();
     } catch (addError) {
@@ -105,11 +114,24 @@ export function ServicesColumn() {
     removeServerSession(serverUrl);
   }
 
+  if (isLoading) {
+    return <ServicesColumnSkeleton />;
+  }
+
   return (
-    <aside className="flex h-full min-h-screen w-full flex-col border-r border-base-200 bg-base-300 p-1">
+    <aside className="flex h-full min-h-0 w-full flex-col border-r border-base-200 bg-base-300 p-1">
+      <header className="shrink-0 min-h-12 border-b border-base-200 px-2">
+        <div className="flex h-full items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-base-content">Сервера</h2>
+          <ColumnHeaderGear />
+        </div>
+      </header>
+
       <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
         {servers.map((session) => {
-          const isActive = session.serverUrl === resolvedSelectedServerUrl;
+          const isActive =
+            selectedServer != null &&
+            session.serverUrl === selectedServer.serverUrl;
 
           return (
             <ServerCard
@@ -117,23 +139,28 @@ export function ServicesColumn() {
               state={session}
               active={isActive}
               unreadCount={getTotalUnreadForServerSession(session)}
-              onSelect={() => setSelectedServerUrl(session.serverUrl)}
+              onSelect={() => {
+                const rid = serverRouteIdFromServerUrl(session.serverUrl);
+                enterServer(navigate, rid);
+              }}
               onDelete={() => onDisconnect(session.serverUrl)}
             />
           );
         })}
       </div>
 
-      <button
-        type="button"
-        className="btn btn-primary btn-outline mt-4 w-full shrink-0"
-        onClick={() => {
-          setError(null);
-          addServerDialogRef.current?.showModal();
-        }}
-      >
-        Добавить сервер
-      </button>
+      <footer className="shrink-0 pt-2">
+        <button
+          type="button"
+          className="btn btn-primary btn-outline w-full"
+          onClick={() => {
+            setError(null);
+            addServerDialogRef.current?.showModal();
+          }}
+        >
+          Добавить сервер
+        </button>
+      </footer>
 
       <dialog
         ref={addServerDialogRef}

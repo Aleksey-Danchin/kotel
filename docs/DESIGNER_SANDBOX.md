@@ -47,6 +47,10 @@
 - `apps/designer/src/state/**`: общий `jotai`-граф (design contract)
 - `apps/designer/src/global/**`: общие UI-утилиты, не содержащие business/runtime интеграций
 
+## Трёхколоночный чат-шелл (верстка)
+
+Стабильные решения по flex-шеллу, скроллу и визуальной иерархии сообщений зафиксированы в **[`docs/designer-chat-styling.md`](./designer-chat-styling.md)**. При изменении этих соглашений обновляйте этот документ и правила `.cursor/rules/designer.mdc` / `frontend.mdc` в том же изменении.
+
 ## Checklist перед коммитом в `designer`
 - Нет реальных запросов к backend (нет `fetch`/`axios` к бизнес-эндпоинтам)
 - Mock-данные объявлены внутри компонентов/обработчиков, а не как модульные константы

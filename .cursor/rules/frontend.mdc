@@ -26,3 +26,15 @@ alwaysApply: false
 - Token and cookie policy: `docs/auth/tokens.md`
 - Session refresh and SharedWorker: `docs/auth/sessions.md`
 - Stack overview: `docs/STACK.md`
+- Designer chat shell layout/styling contract: `docs/designer-chat-styling.md`
+
+## Designer-to-frontend UI parity (chat shell)
+- When implementing or migrating chat UI from `apps/designer`, preserve the accepted structural contract in `docs/designer-chat-styling.md` unless a product decision explicitly changes it.
+- Required column structure for chat shell:
+  - Flexbox-first (`flex flex-col`) per column with `h-full min-h-0` on the column shell.
+  - Fixed header/footer via `shrink-0` (empty footer allowed when there is no footer UI).
+  - Scrollable body via `flex-1 min-h-0 overflow-y-auto`.
+- Shell-level: fixed viewport height and no page scroll for the chat layout; scroll only inside column bodies (match designer `h-dvh` / `overflow-hidden` pattern on outer wrappers).
+- Preserve column-level borders and in-column header/footer dividers as in the designer shell (see doc).
+- Preserve subtle incoming/outgoing message visual distinction and fixed message composer behavior in chat column.
+- If frontend intentionally diverges from designer styling contract, update `docs/designer-chat-styling.md` and `.cursor/rules` in the same PR and explain the rationale.

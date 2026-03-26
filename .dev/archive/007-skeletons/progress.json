@@ -1,0 +1,403 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-25T20:38:11.724Z",
+  "updatedAt": "2026-03-25T21:10:57.898Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-update-mocks-and-gear-host-rule-data.md",
+      "status": "completed",
+      "commitHash": "09684de",
+      "startedAt": "2026-03-25T20:38:20.905Z",
+      "completedAt": "2026-03-25T20:48:58.149Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped: orchestrator verified dev containers"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории; JSON отформатирован вручную/уже соответствует текущему стилю"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Модификаций тестов не требуется: обновлены только фикстуры mocks.json"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "vitest (apps/designer): 5 test files, 16 passed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Для изменения только mocks.json регрессия автоматизированными наборами не требуется"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Data-only change in apps/designer mocks; no API/model/domain docs affected"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test containers stopped; dev containers healthy"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: local designer host satisfies gear visibility rule",
+          "status": "completed",
+          "note": "Code inspection: shouldShowColumnHeaderGear keeps strict host equality; mocks.json provides serverUrl http://localhost:5173 with role admin/root, so gear can appear on localhost:5173"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: dedicated server exists with no linked chats",
+          "status": "completed",
+          "note": "Code inspection: added srv_no_chats server but no entries in serverChats for it; getServerChats returns empty and ChatsColumn shows 'Нет начатых чатов.'"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: dedicated chat exists in srv_main with no linked messages",
+          "status": "completed",
+          "note": "Code inspection: added chat_empty_messages under srv_main in serverChats, but no entries in chatMessages for it; ChatMessageList shows 'В этом чате пока нет сообщений.'"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: existing rendering and route resolution works for old entities",
+          "status": "completed",
+          "note": "Code inspection: no old ids removed; route resolution works because it relies on chatIds and serverId links plus deterministic serverUrl->routeId mapping"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-add-startup-and-server-switch-skeletons.md",
+      "status": "completed",
+      "commitHash": "be0903e",
+      "startedAt": "2026-03-25T20:49:05.070Z",
+      "completedAt": "2026-03-25T21:03:38.495Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped (verified by orchestrator)"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed",
+          "note": "Identified current timer logic in IdShellPage and missing column skeletons"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed",
+          "note": "Unified DESIGNER_LOADING_DELAY_MS=1200ms and added startup/server skeletons"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует; прогнал eslint"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг только для apps/designer (sandbox), авто-тесты не предусмотрены; делаем lint + code inspection"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Без добавления/обновления тестов в этом шаге"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "Нет релевантных авто-регрессионных тестов для designer sandbox"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed",
+          "note": "ACs verified via code inspection + lint"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения UI в apps/designer: документация не требуется в рамках шага"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Dev containers healthy; test containers stopped"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: all three columns show loading skeletons on initial load",
+          "status": "completed",
+          "note": "Root startupLoading mounts skeletons in all columns"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: normal UI replaces skeletons after 1200ms",
+          "status": "completed",
+          "note": "startupLoading=false after 1200ms; IdShellPage/ChatsColumn suppress initial timers"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: server change shows skeletons in chats and messages",
+          "status": "completed",
+          "note": "ChatsColumn serverSwitchLoading + IdShellPage streamLoading both use 1200ms"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: loading delay is consistently 1200ms",
+          "status": "completed",
+          "note": "Single constant DESIGNER_LOADING_DELAY_MS=1200ms used everywhere"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: rapid switching never leaves stale skeletons",
+          "status": "completed",
+          "note": "transitionIdRef token guards prevent stale skeleton state"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "file": "03-refine-empty-states-and-column-visuals.md",
+      "status": "completed",
+      "commitHash": "d275ca3",
+      "startedAt": "2026-03-25T21:03:45.822Z",
+      "completedAt": "2026-03-25T21:08:35.202Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Шаг не требует добавления/изменения тестов"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены визуалом designer, документация не требуется"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: no selected chat => right main area is visually empty",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: all three column headers equal visible height",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: third column has clearly visible right border",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: column backgrounds visually distinguishable",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: server without chats shows 'Чатов нет'",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: empty chat shows 'Сообщений нет'",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "file": "04-implement-composer-focus-and-sticky-scroll-controls.md",
+      "status": "completed",
+      "commitHash": "7170f95",
+      "startedAt": "2026-03-25T21:08:42.525Z",
+      "completedAt": "2026-03-25T21:10:57.898Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "skipped: orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "no scripts/prettier.sh in repo root"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "no API/domain doc changes"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: switching/opening chat autofocus composer textarea",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: sending message keeps focus in composer",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: message area bottom-anchored in resting state",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: sticky mode auto-scrolls new messages to bottom",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: scrolling up disables sticky and reveals 'вниз чата'",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: incoming messages while sticky off increase counter & primary border",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: clicking 'вниз чата' clears counter and hides control",
+          "status": "completed"
+        },
+        {
+          "id": "ac-8",
+          "label": "AC: sending own message while sticky off re-enables sticky",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

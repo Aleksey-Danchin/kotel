@@ -1,0 +1,591 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-03-25T19:22:46.892Z",
+  "updatedAt": "2026-03-25T19:36:22.342Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-unify-url-id-and-selection-state.md",
+      "status": "completed",
+      "commitHash": "57f0d80",
+      "startedAt": "2026-03-25T19:22:59.481Z",
+      "completedAt": "2026-03-25T19:27:11.497Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer-only; no docs/ API or architecture change"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: /kotel.localhost selects server, no chat unless lastChatByServerId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: /chat_xxx selects chat and server",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: unknown id unselected, empty main and chats list",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: / with empty storage no selection",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: legacy selected-chat persistence removed",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: active server persists as serverId not serverUrl",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: static routes reachable, not intercepted by /:id",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-implement-url-driven-navigation-and-exit-flows.md",
+      "status": "completed",
+      "commitHash": "2195f1f",
+      "startedAt": "2026-03-25T19:27:14.763Z",
+      "completedAt": "2026-03-25T19:30:37.344Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped: orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer-only UX; no API/docs impact"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test stack down; dev ps skipped (compose env not loaded here); orchestrator pre-verified dev health"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: server card navigates to /:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: chat card navigates to /:chatId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Esc on chat -> /:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Esc on server -> /",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: exit chat to server clears lastChatByServerId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: back/forward coherent with URL",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "file": "03-build-fixed-three-column-shell.md",
+      "status": "completed",
+      "commitHash": "1be7cd2",
+      "startedAt": "2026-03-25T19:30:40.697Z",
+      "completedAt": "2026-03-25T19:32:32.775Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not in repo"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Step: manual verification only"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed",
+          "note": "designer vitest 10 passed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No doc impact"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "test compose down"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: page background does not scroll document",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: three columns scroll independently",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: fixed header and footer per column visible",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: server/chats column header/footer and slots",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: chat border on main chat container not chats column",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: no modal/control regression",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: flexbox column layout per spec",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "file": "04-enrich-chat-mocks-and-render-message-stream.md",
+      "status": "completed",
+      "commitHash": "547df7e",
+      "startedAt": "2026-03-25T19:32:35.027Z",
+      "completedAt": "2026-03-25T19:34:07.762Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified dev health"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh not in repo; designer build OK"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "Step specifies manual-only verification, no new tests"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "Explicit product decision: no Vitest/Playwright"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "N/A"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer sandbox only; no docs/ change"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "docker ps: kotel dev containers healthy; test compose down attempted"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: every chat has at least one message",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: one chat enough items for scroll",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: person chat header peer name",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: incoming/outgoing subtle color difference",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: loader on server and chat switch",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: no placeholder in normal selected-chat flow",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 5,
+      "file": "05-add-composer-autoreply-and-header-gear-rules.md",
+      "status": "completed",
+      "commitHash": "34e5f90",
+      "startedAt": "2026-03-25T19:34:10.207Z",
+      "completedAt": "2026-03-25T19:35:36.794Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Designer UI-only; no docs/api change"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Test compose down; dev ps skipped (PROJECT_ROOT)"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: composer in footer fixed while list scrolls",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Enter submit Shift+Enter newline",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: whitespace-only not submitted",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: sent message immediate",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: auto-reply ~2s duplicate text",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: gear only when server/role rule",
+          "status": "completed"
+        },
+        {
+          "id": "ac-7",
+          "label": "AC: gear click no nav/errors",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "file": "06-document-chat-styling-guidelines.md",
+      "status": "completed",
+      "commitHash": "7e0a56c",
+      "startedAt": "2026-03-25T19:35:40.094Z",
+      "completedAt": "2026-03-25T19:36:22.342Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "orchestrator verified"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "no scripts/prettier.sh in repo"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "manual review only per step"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "N/A"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "N/A"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "completed"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: docs artifact for chat styling and layout",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: designer.mdc flex header/body/footer pattern",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: frontend.mdc migration preserves structure",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: docs and rules consistent",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { setServerSession } from "../../state/servers";
-import { selectedServerUrlAtom } from "../../state/store";
+import { activeServerIdAtom } from "../../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 
 type AvailabilityState =
   | "idle"
@@ -16,12 +18,13 @@ export const Route = createFileRoute("/setup/")({
 });
 
 function SetupPage() {
+  const navigate = useNavigate();
   const [serverUrl, setServerUrl] = useState("");
   const [availability, setAvailability] = useState<AvailabilityState>("idle");
   const [setupError, setSetupError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [created, setCreated] = useState(false);
-  const setSelectedServerUrl = useSetAtom(selectedServerUrlAtom);
+  const setActiveServerId = useSetAtom(activeServerIdAtom);
   const [form, setForm] = useState({
     login: "",
     password: "",
@@ -111,7 +114,10 @@ function SetupPage() {
           role: "designer",
         },
       });
-      setSelectedServerUrl(new URL(normalizedUrl).toString());
+      const url = new URL(normalizedUrl).toString();
+      const rid = serverRouteIdFromServerUrl(url);
+      setActiveServerId(rid);
+      void navigate({ to: "/$id", params: { id: rid } });
       setSetupError(null);
     } catch (e) {
       setSetupError(e instanceof Error ? e.message : "Неверный URL сервера");

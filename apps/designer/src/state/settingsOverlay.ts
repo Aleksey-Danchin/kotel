@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 
-import { clientMatchesServerUrl, roleAllowsHeaderGear } from "./headerGear";
+import { roleAllowsHeaderGear } from "./headerGear";
 import type { ServerSession } from "./servers";
 
 export type SettingsTabId = "main" | "configurator" | "users" | "account";
@@ -38,8 +38,7 @@ export function resolveSettingsTabsForSession(
   }
 
   const isPrivilegedRole = roleAllowsHeaderGear(session.user.role);
-  const isCurrentServer = clientMatchesServerUrl(session.serverUrl);
-  if (isPrivilegedRole && isCurrentServer) {
+  if (isPrivilegedRole) {
     return SETTINGS_TABS;
   }
 

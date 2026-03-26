@@ -92,14 +92,24 @@ function RootLayout() {
       if (document.querySelector("dialog[open]")) {
         return;
       }
+      const id = selectionIdFromPathname(pathnameRef.current);
+      const serversMap = defaultStore.get(serversAtom);
+      const activeId = defaultStore.get(activeServerIdAtom);
+      const routeResolution = id
+        ? resolveRouteParam(id, serversMap, activeId)
+        : { kind: "unknown" as const };
+
       const target = event.target;
       if (target instanceof Element) {
-        // Add a "blur" step to the ESC exit chain for the chat composer.
-        // First ESC removes focus from the textarea; the next ESC can navigate.
-        const composer = target.closest("#designer-chat-composer");
-        if (composer && composer instanceof HTMLTextAreaElement) {
+        if (
+          routeResolution.kind === "chat" &&
+          target.closest("[data-chat-composer='true']")
+        ) {
           event.preventDefault();
-          composer.blur();
+          exitChatToServer(
+            navigate,
+            serverRouteIdFromServerUrl(routeResolution.serverUrl),
+          );
           return;
         }
 
@@ -108,15 +118,13 @@ function RootLayout() {
         }
       }
 
-      const id = selectionIdFromPathname(pathnameRef.current);
-      const serversMap = defaultStore.get(serversAtom);
-      const activeId = defaultStore.get(activeServerIdAtom);
-
       if (id) {
-        const r = resolveRouteParam(id, serversMap, activeId);
-        if (r.kind === "chat") {
+        if (routeResolution.kind === "chat") {
           event.preventDefault();
-          exitChatToServer(navigate, serverRouteIdFromServerUrl(r.serverUrl));
+          exitChatToServer(
+            navigate,
+            serverRouteIdFromServerUrl(routeResolution.serverUrl),
+          );
           return;
         }
         event.preventDefault();

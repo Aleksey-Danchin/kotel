@@ -78,7 +78,8 @@ export function SettingsOverlay() {
   const allSessions = useAtomValue(allSessionsAtom);
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
   const safeActiveTab =
-    availableTabs.find((tab) => tab.id === activeTab)?.id ?? availableTabs[0]?.id;
+    availableTabs.find((tab) => tab.id === activeTab)?.id ??
+    availableTabs[0]?.id;
   const [serverNameDraft, setServerNameDraft] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userDraft, setUserDraft] = useState({
@@ -100,7 +101,8 @@ export function SettingsOverlay() {
     fullname: "",
     password: "",
   });
-  const [confirmAction, setConfirmAction] = useState<AccountConfirmAction | null>(null);
+  const [confirmAction, setConfirmAction] =
+    useState<AccountConfirmAction | null>(null);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,7 +132,7 @@ export function SettingsOverlay() {
 
   const selectedUser =
     safeActiveTab === "users"
-      ? serverUsers.find((user) => user.id === selectedUserId) ?? null
+      ? (serverUsers.find((user) => user.id === selectedUserId) ?? null)
       : null;
   const selectedUserRole = normalizeRole(selectedUser?.role ?? "");
   const editability = resolveUserEditability(
@@ -280,7 +282,10 @@ export function SettingsOverlay() {
       removeCurrentSession(currentServerId);
     } else if (confirmAction === "remove-all-sessions") {
       removeAllSessions();
-    } else if (confirmAction === "remove-all-except-current" && currentServerId) {
+    } else if (
+      confirmAction === "remove-all-except-current" &&
+      currentServerId
+    ) {
       removeAllSessionsExcept(currentServerId);
     } else if (confirmAction === "remove-session" && sessionToDelete) {
       removeSessionById(sessionToDelete);
@@ -404,7 +409,10 @@ export function SettingsOverlay() {
                     type="text"
                     value={userDraft.login}
                     onChange={(event) =>
-                      setUserDraft((prev) => ({ ...prev, login: event.target.value }))
+                      setUserDraft((prev) => ({
+                        ...prev,
+                        login: event.target.value,
+                      }))
                     }
                     disabled={!editability.canEdit}
                   />
@@ -419,7 +427,10 @@ export function SettingsOverlay() {
                     type="text"
                     value={userDraft.fullname}
                     onChange={(event) =>
-                      setUserDraft((prev) => ({ ...prev, fullname: event.target.value }))
+                      setUserDraft((prev) => ({
+                        ...prev,
+                        fullname: event.target.value,
+                      }))
                     }
                     disabled={!editability.canEdit}
                   />
@@ -434,7 +445,10 @@ export function SettingsOverlay() {
                     type="text"
                     value={userDraft.password}
                     onChange={(event) =>
-                      setUserDraft((prev) => ({ ...prev, password: event.target.value }))
+                      setUserDraft((prev) => ({
+                        ...prev,
+                        password: event.target.value,
+                      }))
                     }
                     disabled={!editability.canEdit}
                   />
@@ -448,7 +462,10 @@ export function SettingsOverlay() {
                     className="select select-bordered w-full"
                     value={userDraft.role}
                     onChange={(event) =>
-                      setUserDraft((prev) => ({ ...prev, role: event.target.value }))
+                      setUserDraft((prev) => ({
+                        ...prev,
+                        role: event.target.value,
+                      }))
                     }
                     disabled={!editability.canChangeRole}
                   >
@@ -467,7 +484,10 @@ export function SettingsOverlay() {
                     type="checkbox"
                     checked={userDraft.blocked}
                     onChange={(event) =>
-                      setUserDraft((prev) => ({ ...prev, blocked: event.target.checked }))
+                      setUserDraft((prev) => ({
+                        ...prev,
+                        blocked: event.target.checked,
+                      }))
                     }
                     disabled={!editability.canEdit}
                   />
@@ -522,7 +542,10 @@ export function SettingsOverlay() {
                 type="text"
                 value={accountDraft.login}
                 onChange={(event) =>
-                  setAccountDraft((prev) => ({ ...prev, login: event.target.value }))
+                  setAccountDraft((prev) => ({
+                    ...prev,
+                    login: event.target.value,
+                  }))
                 }
                 disabled={!selectedServer}
               />
@@ -537,7 +560,10 @@ export function SettingsOverlay() {
                 type="text"
                 value={accountDraft.fullname}
                 onChange={(event) =>
-                  setAccountDraft((prev) => ({ ...prev, fullname: event.target.value }))
+                  setAccountDraft((prev) => ({
+                    ...prev,
+                    fullname: event.target.value,
+                  }))
                 }
                 disabled={!selectedServer}
               />
@@ -552,7 +578,10 @@ export function SettingsOverlay() {
                 type="password"
                 value={accountDraft.password}
                 onChange={(event) =>
-                  setAccountDraft((prev) => ({ ...prev, password: event.target.value }))
+                  setAccountDraft((prev) => ({
+                    ...prev,
+                    password: event.target.value,
+                  }))
                 }
                 disabled={!selectedServer}
               />
@@ -623,7 +652,10 @@ export function SettingsOverlay() {
                 </thead>
                 <tbody>
                   {sessionsSorted.map((session) => {
-                    const isCurrent = isCurrentSession(session, currentServerId);
+                    const isCurrent = isCurrentSession(
+                      session,
+                      currentServerId,
+                    );
                     return (
                       <tr key={session.id}>
                         <td>{session.id}</td>
@@ -660,12 +692,12 @@ export function SettingsOverlay() {
 
   return (
     <div
-      className="absolute inset-0 z-20 flex items-center justify-center bg-base-content/40 p-6"
+      className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-base-200"
       role="dialog"
       aria-modal="true"
       aria-label="Настройки"
     >
-      <section className="flex h-full w-full flex-col overflow-hidden rounded-box border border-base-300 bg-base-100 shadow-xl">
+      <section className="flex h-full w-full flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-base-300 px-4 py-3">
           <h2 className="text-lg font-semibold text-base-content">Настройки</h2>
           <button
@@ -695,9 +727,13 @@ export function SettingsOverlay() {
             </ul>
           </nav>
 
-          <div className="min-h-0 flex-1 overflow-y-auto p-6">
-            <h3 className="text-xl font-semibold capitalize">{safeActiveTab}</h3>
-            <p className="mt-2 text-base-content/70">{titleForTab(safeActiveTab)}</p>
+          <div className="min-h-0 flex-1 overflow-y-auto p-0">
+            <h3 className="text-xl font-semibold capitalize">
+              {safeActiveTab}
+            </h3>
+            <p className="mt-2 text-base-content/70">
+              {titleForTab(safeActiveTab)}
+            </p>
             <div className="mt-6">{renderTabContent()}</div>
           </div>
         </div>
@@ -717,7 +753,10 @@ export function SettingsOverlay() {
                   type="text"
                   value={addUserDraft.login}
                   onChange={(event) =>
-                    setAddUserDraft((prev) => ({ ...prev, login: event.target.value }))
+                    setAddUserDraft((prev) => ({
+                      ...prev,
+                      login: event.target.value,
+                    }))
                   }
                 />
               </label>
@@ -730,7 +769,10 @@ export function SettingsOverlay() {
                   type="text"
                   value={addUserDraft.fullname}
                   onChange={(event) =>
-                    setAddUserDraft((prev) => ({ ...prev, fullname: event.target.value }))
+                    setAddUserDraft((prev) => ({
+                      ...prev,
+                      fullname: event.target.value,
+                    }))
                   }
                 />
               </label>
@@ -744,7 +786,10 @@ export function SettingsOverlay() {
                     type="text"
                     value={addUserDraft.password}
                     onChange={(event) =>
-                      setAddUserDraft((prev) => ({ ...prev, password: event.target.value }))
+                      setAddUserDraft((prev) => ({
+                        ...prev,
+                        password: event.target.value,
+                      }))
                     }
                   />
                   <button

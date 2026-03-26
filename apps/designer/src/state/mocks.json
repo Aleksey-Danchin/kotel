@@ -1248,13 +1248,10 @@
     ["srv_main", "chat_backend"],
     ["srv_main", "chat_long_history"],
     ["srv_main", "chat_empty_messages"],
-    ["srv_eu", "chat_general"],
     ["srv_eu", "chat_eu_ops"],
     ["srv_eu", "chat_eu_support"],
-    ["srv_ru", "chat_general"],
     ["srv_ru", "chat_ru_sales"],
     ["srv_ru", "chat_ru_support"],
-    ["srv_local", "chat_general"],
     ["srv_local", "chat_local_debug"],
     ["srv_local", "chat_local_qa"]
   ],

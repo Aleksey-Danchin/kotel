@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
+import { FaLongArrowAltDown } from "react-icons/fa";
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatCard } from "../components/ChatCard";
 import { UserCard } from "../components/UserCard";
@@ -121,9 +122,11 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
             />
           );
         })}
-        <div className="mt-2 pt-2 border-t border-base-300">
-          <h3 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-base-content/70">
-            Пользователи
+        <div className="mt-5 pt-4 border-t border-base-300">
+          <h3 className="flex items-center justify-center gap-1 px-1 pb-2 text-lg">
+            <FaLongArrowAltDown aria-hidden="true" />
+            <span>Пользователи</span>
+            <FaLongArrowAltDown aria-hidden="true" />
           </h3>
           <div className="flex flex-col gap-2">
             {filteredUsers.map((user) => (

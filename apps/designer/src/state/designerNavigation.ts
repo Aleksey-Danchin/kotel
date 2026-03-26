@@ -67,6 +67,23 @@ export function enterServer(
   navigate: DesignerNavigate,
   serverRouteId: string,
 ): void {
+  // Ensure server context switches even when URL stays the same chat id.
+  defaultStore.set(activeServerIdAtom, serverRouteId);
+
+  const lastByServer = defaultStore.get(lastChatByServerIdAtom);
+  const lastChatId = lastByServer[serverRouteId];
+  if (lastChatId) {
+    const serversMap = defaultStore.get(serversAtom);
+    const route = resolveRouteParam(lastChatId, serversMap, serverRouteId);
+    if (
+      route.kind === "chat" &&
+      serverRouteIdFromServerUrl(route.serverUrl) === serverRouteId
+    ) {
+      void navigate({ to: "/$id", params: { id: lastChatId } });
+      return;
+    }
+  }
+
   void navigate({ to: "/$id", params: { id: serverRouteId } });
 }
 
@@ -75,7 +92,7 @@ export function exitChatToServer(
   navigate: DesignerNavigate,
   serverRouteId: string,
 ): void {
-  enterServer(navigate, serverRouteId);
+  void navigate({ to: "/$id", params: { id: serverRouteId } });
 }
 
 export function enterChat(

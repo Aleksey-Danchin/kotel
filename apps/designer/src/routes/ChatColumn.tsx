@@ -331,6 +331,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
           {/* Ширина треда и композера — крутите max-w-[…px] (дублируйте то же число в ChatMessageList). */}
           <div className="mx-auto w-full max-w-[600px] px-3">
             <form
+              data-chat-composer="true"
               className="relative flex flex-col items-center gap-2 sm:flex-row sm:items-center"
               onSubmit={onComposerSubmit}
             >

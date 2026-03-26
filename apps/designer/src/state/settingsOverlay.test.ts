@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import {
   initialSettingsTabForSource,
@@ -28,12 +28,7 @@ describe("initialSettingsTabForSource", () => {
 });
 
 describe("resolveSettingsTabsForSession", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("returns all tabs for root/admin on current server", () => {
-    vi.stubGlobal("window", { location: { host: "app.example:3000" } });
+  it("returns all tabs for root/admin", () => {
     const rootSession = makeSession("https://app.example:3000", "root");
     const adminSession = makeSession("https://app.example:3000", "ADMIN");
 
@@ -52,17 +47,7 @@ describe("resolveSettingsTabsForSession", () => {
   });
 
   it("returns only account tab for non-privileged role", () => {
-    vi.stubGlobal("window", { location: { host: "app.example:3000" } });
     const session = makeSession("https://app.example:3000", "designer");
-
-    expect(resolveSettingsTabsForSession(session).map((tab) => tab.label)).toEqual([
-      "аккаунт",
-    ]);
-  });
-
-  it("returns only account tab for admin/root on non-current server", () => {
-    vi.stubGlobal("window", { location: { host: "app.example:3000" } });
-    const session = makeSession("https://other.example:3000", "root");
 
     expect(resolveSettingsTabsForSession(session).map((tab) => tab.label)).toEqual([
       "аккаунт",

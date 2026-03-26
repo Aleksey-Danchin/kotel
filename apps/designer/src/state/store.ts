@@ -45,6 +45,9 @@ export const routeContextAtom = atom<
   { type: "index" } | { type: "id"; id: string }
 >({ type: "index" });
 
+/** Идёт ли временная имитация загрузки треда при переходах внутри `/$id`. */
+export const threadTransitionLoadingAtom = atom(false);
+
 type MockServer = { id: string; serverUrl: string };
 type ServerChatLink = [serverId: string, chatId: string];
 type ChatMessageLink = [chatId: string, messageId: string];

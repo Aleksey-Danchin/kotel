@@ -12,7 +12,12 @@ import {
 import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
 import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 import { useChatThreadScroll } from "../../state/chatThreadScrollContext";
-import { routeContextAtom, selectedChatAtom, selectedServerAtom } from "../../state/store";
+import {
+  routeContextAtom,
+  selectedChatAtom,
+  selectedServerAtom,
+  threadTransitionLoadingAtom,
+} from "../../state/store";
 
 export const Route = createFileRoute("/$id/")({
   component: IdShellPage,
@@ -24,6 +29,7 @@ function IdShellPage() {
   const routeCtx = useAtomValue(routeContextAtom);
   const appendedByChat = useAtomValue(designerAppendedChatMessagesAtom);
   const setLastByServer = useSetAtom(lastChatByServerIdAtom);
+  const setThreadTransitionLoading = useSetAtom(threadTransitionLoadingAtom);
   const chatScroll = useChatThreadScroll();
 
   const [streamLoading, setStreamLoading] = useState(false);
@@ -70,6 +76,11 @@ function IdShellPage() {
 
     return () => window.clearTimeout(timer);
   }, [selectedServer?.serverUrl, routeTransitionId]);
+
+  useEffect(() => {
+    setThreadTransitionLoading(streamLoading);
+    return () => setThreadTransitionLoading(false);
+  }, [streamLoading, setThreadTransitionLoading]);
 
   useEffect(() => {
     const wasLoading = prevStreamLoadingRef.current;

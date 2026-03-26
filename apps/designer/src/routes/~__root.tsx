@@ -69,7 +69,10 @@ function RootLayout() {
   }, [pathname]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setStartupLoading(false), DESIGNER_LOADING_DELAY_MS);
+    const timer = window.setTimeout(
+      () => setStartupLoading(false),
+      DESIGNER_LOADING_DELAY_MS,
+    );
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -105,10 +108,7 @@ function RootLayout() {
         const r = resolveRouteParam(id, serversMap, activeId);
         if (r.kind === "chat") {
           event.preventDefault();
-          exitChatToServer(
-            navigate,
-            serverRouteIdFromServerUrl(r.serverUrl),
-          );
+          exitChatToServer(navigate, serverRouteIdFromServerUrl(r.serverUrl));
           return;
         }
         event.preventDefault();

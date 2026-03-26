@@ -25,6 +25,7 @@ import {
   chatHeaderTitle,
   selectedChatAtom,
   selectedServerAtom,
+  threadTransitionLoadingAtom,
 } from "../state/store";
 
 export interface ChatColumnProps {
@@ -36,7 +37,10 @@ export interface ChatColumnProps {
 export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const selectedChat = useAtomValue(selectedChatAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
+  const threadTransitionLoading = useAtomValue(threadTransitionLoadingAtom);
   const hasSelectedChat = Boolean(selectedChat && selectedServer);
+  const showSkeletonComposer =
+    Boolean(selectedServer) && !hasSelectedChat && threadTransitionLoading;
   const [draft, setDraft] = useState("");
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -231,7 +235,12 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       </div>
     </div>
   ) : (
-    <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+    <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-4">
+      <div className="flex min-h-full flex-col justify-end">
+        {/* Держим ту же ширину треда, что и в режиме выбранного чата. */}
+        <div className="mx-auto w-full max-w-[600px] px-3">{children}</div>
+      </div>
+    </div>
   );
 
   return (
@@ -304,6 +313,21 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                   <GrSend />
                 </button>
               </div>
+            </form>
+          </div>
+        </footer>
+      ) : showSkeletonComposer ? (
+        <footer className="shrink-0 border-t border-base-300 bg-base-100 py-3">
+          <div className="mx-auto w-full max-w-[600px] px-3">
+            <form className="flex flex-col gap-2 sm:flex-row sm:items-end">
+              <label className="min-w-0 flex-1" aria-hidden="true">
+                <span className="sr-only">Текст сообщения</span>
+                <div className="skeleton h-16 w-full rounded-box" />
+              </label>
+              <div
+                className="skeleton h-12 w-12 shrink-0 rounded-full"
+                aria-hidden="true"
+              />
             </form>
           </div>
         </footer>

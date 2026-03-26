@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { defaultStore } from "../global/defaultStore";
 import {
+  allUsersForSelectedServerAtom,
   createServerUser,
   findOrCreatePersonChat,
   getServerUsers,
   getServerChats,
+  routeContextAtom,
   resolvePersonChatPeer,
   updateServerUser,
   type ChatPreview,
@@ -100,5 +103,20 @@ describe("settings users mutations", () => {
     expect(updated?.password).toBe("QwErTy123456");
     expect(updated?.blocked).toBe(true);
     expect(updated?.role).toBe("ADMIN");
+  });
+
+  it("updates allUsersForSelectedServerAtom after creating user", () => {
+    defaultStore.set(routeContextAtom, { type: "id", id: "localhost.5173" });
+    const before = defaultStore.get(allUsersForSelectedServerAtom).length;
+
+    createServerUser({
+      serverId: "srv_local",
+      login: "reactive-user",
+      fullname: "Reactive User",
+      password: "QwErTy123456",
+    });
+
+    const after = defaultStore.get(allUsersForSelectedServerAtom).length;
+    expect(after).toBe(before + 1);
   });
 });

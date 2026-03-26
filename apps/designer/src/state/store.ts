@@ -429,6 +429,7 @@ export const chatsForSelectedServerAtom = atom((get) => {
 });
 
 export const usersForSelectedServerAtom = atom((get) => {
+  get(usersDataRevisionAtom);
   const selectedServer = get(selectedServerAtom);
   if (!selectedServer) return [];
   const serverId = catalogServerId(selectedServer);
@@ -436,6 +437,7 @@ export const usersForSelectedServerAtom = atom((get) => {
 });
 
 export const allUsersForSelectedServerAtom = atom((get) => {
+  get(usersDataRevisionAtom);
   const selectedServer = get(selectedServerAtom);
   if (!selectedServer) return [];
   const serverId = catalogServerId(selectedServer);

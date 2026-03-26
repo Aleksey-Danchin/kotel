@@ -24,3 +24,27 @@
 
 ### Discoveries
 - `scripts/prettier.sh` is not present in repository; step formatting had to rely on local formatting discipline plus test/lint validation.
+
+---
+
+## step-imp — 2026-03-26T11:57:53Z
+
+**Result**: SUCCESS
+
+### Changed Files
+- `apps/designer/src/state/store.ts` — added `usersDataRevisionAtom` dependency to user selector atoms so UI list re-renders after user mutations.
+- `apps/designer/src/state/store.test.ts` — added regression test verifying `allUsersForSelectedServerAtom` updates after `createServerUser`.
+
+### Tests
+- Task-specific: 14 passed, 0 failed (`settingsUsers`, `store`, `settingsOverlay`).
+- Regression: 51 passed, 0 failed (`apps/designer` full Vitest suite).
+
+### Acceptance Criteria
+- [x] AC-1: Users tab renders two-column management UI with add button — verified by: cursor-ide-browser scenario on `http://localhost:5173/localhost.5173`.
+- [x] AC-2: Editor includes login/fullname/password/blocked/role with role options — verified by: browser scenario + `settingsUsers`/`store` tests.
+- [x] AC-3: ROOT role cannot be changed by anyone — verified by: `settingsUsers.test.ts` (`resolveUserEditability`).
+- [x] AC-4: ADMIN cannot edit ROOT; ROOT can edit ROOT except role — verified by: browser check for ADMIN->ROOT lock + unit matrix test.
+- [x] AC-5: Add-user modal creates server-linked user; generator matches `[A-Za-z0-9]{12}` — verified by: browser create flow after fix + unit tests for generator and store updates.
+
+### Discoveries
+- Browser re-validation revealed a reactive gap: mutating mock users was not enough for Jotai selectors without explicit revision atom dependency.

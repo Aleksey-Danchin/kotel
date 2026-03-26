@@ -5,9 +5,9 @@
       "serverUrl": "https://kotel.localhost",
       "user": {
         "id": "mock-user-1",
-        "fullname": "Mock User",
+        "fullname": "Илья Соколов",
         "login": "mock",
-        "role": "root"
+        "role": "ROOT"
       },
       "name": "Main"
     },
@@ -16,9 +16,9 @@
       "serverUrl": "https://kotel-eu.localhost",
       "user": {
         "id": "mock-user-2",
-        "fullname": "EU Operator",
+        "fullname": "Егор Лебедев",
         "login": "eu-operator",
-        "role": "operator"
+        "role": "USER"
       },
       "name": "EU"
     },
@@ -27,9 +27,9 @@
       "serverUrl": "https://kotel-ru.localhost",
       "user": {
         "id": "mock-user-3",
-        "fullname": "RU Viewer",
+        "fullname": "Дмитрий Орлов",
         "login": "ru-viewer",
-        "role": "viewer"
+        "role": "USER"
       },
       "name": "RU"
     },
@@ -38,9 +38,9 @@
       "serverUrl": "http://localhost:5173",
       "user": {
         "id": "mock-user-4",
-        "fullname": "Local Dev",
+        "fullname": "Павел Морозов",
         "login": "local-dev",
-        "role": "admin"
+        "role": "ADMIN"
       },
       "name": "Local"
     },
@@ -49,9 +49,9 @@
       "serverUrl": "https://no-chats.localhost",
       "user": {
         "id": "mock-user-5",
-        "fullname": "No Chats Server",
+        "fullname": "Никита Волков",
         "login": "no-chats",
-        "role": "viewer"
+        "role": "USER"
       },
       "name": "No chats"
     }
@@ -67,8 +67,8 @@
     {
       "id": "chat_design",
       "type": "person",
-      "title": "Мария Волкова",
-      "peerName": "Мария Волкова",
+      "title": "Алина Смирнова",
+      "peerName": "Алина Смирнова",
       "subtitle": "Личные сообщения · дизайн",
       "unread": 0
     },
@@ -1447,113 +1447,113 @@
   "users": [
     {
       "id": "mock-user-1",
-      "fullname": "Mock User",
+      "fullname": "Илья Соколов",
       "login": "mock",
-      "role": "root",
+      "role": "ROOT",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:30:00.000Z"
     },
     {
       "id": "mock-user-2",
-      "fullname": "EU Operator",
+      "fullname": "Егор Лебедев",
       "login": "eu-operator",
-      "role": "operator",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:20:00.000Z"
     },
     {
       "id": "mock-user-3",
-      "fullname": "RU Viewer",
+      "fullname": "Дмитрий Орлов",
       "login": "ru-viewer",
-      "role": "viewer",
+      "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-26T07:55:00.000Z"
     },
     {
       "id": "mock-user-4",
-      "fullname": "Local Dev",
+      "fullname": "Павел Морозов",
       "login": "local-dev",
-      "role": "admin",
+      "role": "ADMIN",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:29:00.000Z"
     },
     {
       "id": "mock-user-5",
-      "fullname": "No Chats Server",
+      "fullname": "Никита Волков",
       "login": "no-chats",
-      "role": "viewer",
+      "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-25T16:00:00.000Z"
     },
     {
       "id": "peer-designer",
-      "fullname": "Дизайнер",
+      "fullname": "Андрей Крылов",
       "login": "peer-designer",
-      "role": "designer",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:27:00.000Z"
     },
     {
       "id": "peer-backend",
-      "fullname": "Backend коллега",
+      "fullname": "Роман Федоров",
       "login": "peer-backend",
-      "role": "developer",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:26:00.000Z"
     },
     {
       "id": "peer-ops",
-      "fullname": "Ops коллега",
+      "fullname": "Олег Никитин",
       "login": "peer-ops",
-      "role": "operator",
+      "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-26T07:40:00.000Z"
     },
     {
       "id": "peer-maria",
-      "fullname": "Мария Волкова",
+      "fullname": "Алина Смирнова",
       "login": "maria.volkova",
-      "role": "designer",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:25:00.000Z"
     },
     {
       "id": "peer-support-eu",
-      "fullname": "EU Support",
+      "fullname": "Тимур Кузнецов",
       "login": "peer-support-eu",
-      "role": "support",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:10:00.000Z"
     },
     {
       "id": "peer-sales",
-      "fullname": "RU Sales",
+      "fullname": "Максим Белов",
       "login": "peer-sales",
-      "role": "sales",
+      "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-26T07:45:00.000Z"
     },
     {
       "id": "peer-support-ru",
-      "fullname": "RU Support",
+      "fullname": "Сергей Попов",
       "login": "peer-support-ru",
-      "role": "support",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:05:00.000Z"
     },
     {
       "id": "peer-local-buddy",
-      "fullname": "Local Buddy",
+      "fullname": "Кирилл Зайцев",
       "login": "peer-local-buddy",
-      "role": "developer",
+      "role": "USER",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:00:00.000Z"
     },
     {
       "id": "peer-qa",
-      "fullname": "QA коллега",
+      "fullname": "Владислав Козлов",
       "login": "peer-qa",
-      "role": "qa",
+      "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-26T07:35:00.000Z"
     }
@@ -1567,25 +1567,10 @@
     ["srv_main", "peer-designer"],
     ["srv_main", "peer-backend"],
     ["srv_main", "peer-ops"],
-    ["srv_main", "mock-user-2"],
     ["srv_main", "peer-maria"],
-    ["srv_eu", "mock-user-1"],
-    ["srv_eu", "peer-designer"],
-    ["srv_eu", "peer-backend"],
-    ["srv_eu", "peer-ops"],
     ["srv_eu", "peer-support-eu"],
-    ["srv_ru", "mock-user-1"],
-    ["srv_ru", "peer-designer"],
-    ["srv_ru", "peer-backend"],
-    ["srv_ru", "peer-ops"],
-    ["srv_ru", "mock-user-2"],
     ["srv_ru", "peer-sales"],
     ["srv_ru", "peer-support-ru"],
-    ["srv_local", "mock-user-1"],
-    ["srv_local", "peer-designer"],
-    ["srv_local", "peer-backend"],
-    ["srv_local", "peer-ops"],
-    ["srv_local", "mock-user-2"],
     ["srv_local", "peer-local-buddy"],
     ["srv_local", "peer-qa"]
   ],

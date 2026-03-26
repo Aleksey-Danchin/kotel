@@ -111,7 +111,7 @@ function SetupPage() {
               .replace(/[^a-zA-Z0-9]+/g, "_")
               .toLowerCase()
               .slice(0, 24) || "user",
-          role: "designer",
+          role: "USER",
         },
       });
       const url = new URL(normalizedUrl).toString();

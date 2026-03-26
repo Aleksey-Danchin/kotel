@@ -2,6 +2,7 @@ import { atom } from "jotai";
 
 import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
+import { normalizeDesignerRole } from "./roles";
 import type { ServerSession } from "./servers";
 import { serversAtom } from "./servers";
 import stateMocks from "./mocks.json";
@@ -88,6 +89,7 @@ const PERSON_CHAT_BY_SERVER_AND_PEER = new Map<string, string>();
 function normalizeMockUser(user: MockUser): MockUser {
   return {
     ...user,
+    role: normalizeDesignerRole(user.role),
     password: user.password ?? "",
     blocked: user.blocked ?? false,
     requestFrequency: user.requestFrequency ?? 0,

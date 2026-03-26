@@ -7,6 +7,7 @@ import {
   setServerSession,
   removeServerSession,
 } from "../../state/servers";
+import { normalizeDesignerRole } from "../../state/roles";
 import { activeServerIdAtom } from "../../state/selectionAtoms";
 import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
 
@@ -63,7 +64,7 @@ function SessionTestPage() {
               .replace(/[^a-zA-Z0-9]+/g, "_")
               .toLowerCase()
               .slice(0, 24) || "user",
-          role: "designer",
+          role: "USER",
         },
       });
       const rid = serverRouteIdFromServerUrl(normalized);
@@ -157,7 +158,7 @@ function SessionTestPage() {
                       <p className="font-medium">{session.serverUrl}</p>
                       <p className="text-sm text-base-content/80">
                         {session.user.fullname} ({session.user.login}) -{" "}
-                        {session.user.role}
+                        {normalizeDesignerRole(session.user.role)}
                       </p>
                       {status ? (
                         <p className="text-xs text-base-content/70">

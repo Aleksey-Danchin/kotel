@@ -2,6 +2,7 @@ import { atom } from "jotai";
 
 import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom } from "./selectionAtoms";
+import { normalizeDesignerRole } from "./roles";
 import { serverRouteIdFromServerUrl } from "./serverRouteId";
 import stateMocks from "./mocks.json";
 
@@ -37,6 +38,10 @@ function normalizeServerSession(session: ServerSession): ServerSession {
     ...session,
     id: session.id ?? makeServerId(session.serverUrl),
     name: normalizedName,
+    user: {
+      ...session.user,
+      role: normalizeDesignerRole(session.user.role),
+    },
   };
 }
 

@@ -89,7 +89,7 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
               .replace(/[^a-zA-Z0-9]+/g, "_")
               .toLowerCase()
               .slice(0, 24) || "user",
-          role: "designer",
+          role: "USER",
         },
       };
 

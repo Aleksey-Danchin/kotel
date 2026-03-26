@@ -327,7 +327,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       {scrollBody}
 
       {hasSelectedChat ? (
-        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 py-3">
+        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 pt-3 pb-1">
           {/* Ширина треда и композера — крутите max-w-[…px] (дублируйте то же число в ChatMessageList). */}
           <div className="mx-auto w-full max-w-[600px] px-3">
             <form
@@ -401,7 +401,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
           </div>
         </footer>
       ) : showSkeletonComposer ? (
-        <footer className="shrink-0 border-t border-base-300 bg-base-100 py-3">
+        <footer className="shrink-0 border-t border-base-300 bg-base-100 pt-3 pb-1">
           <div className="mx-auto w-full max-w-[600px] px-3">
             <form className="flex flex-col gap-2 sm:flex-row sm:items-end">
               <label className="min-w-0 flex-1" aria-hidden="true">

@@ -26,6 +26,7 @@ import {
   normalizeRole,
   resolveUserEditability,
 } from "../state/settingsUsers";
+import { shouldShowDesignerRoleBadge } from "../state/roles";
 import { setServerSession } from "../state/servers";
 
 type AccountConfirmAction =
@@ -376,9 +377,11 @@ export function SettingsOverlay() {
                     >
                       <span className="flex w-full items-center justify-between gap-2">
                         <span className="truncate">{user.fullname}</span>
-                        <span className="badge badge-ghost badge-sm">
-                          {normalizeRole(user.role) ?? user.role.toUpperCase()}
-                        </span>
+                        {shouldShowDesignerRoleBadge(user.role) ? (
+                          <span className="badge badge-ghost badge-sm">
+                            {normalizeRole(user.role) ?? "USER"}
+                          </span>
+                        ) : null}
                       </span>
                     </button>
                   </li>

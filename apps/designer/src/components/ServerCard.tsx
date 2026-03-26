@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { normalizeDesignerRole, shouldShowDesignerRoleBadge } from "../state/roles";
 import type { ServerSession } from "../state/servers";
 
 function displayServerHost(serverUrl: string): string {
@@ -40,6 +41,8 @@ export function ServerCard({
   const host = displayServerHost(state.serverUrl);
   const disconnectLabel = `Отключить ${host}`;
   const showUnread = unreadCount > 0;
+  const normalizedRole = normalizeDesignerRole(state.user.role);
+  const showRoleBadge = shouldShowDesignerRoleBadge(state.user.role);
 
   return (
     <div
@@ -76,11 +79,11 @@ export function ServerCard({
           {state.user.fullname}
         </div>
 
-        <div>
-          <span className="mt-1 badge badge-outline badge-sm">
-            {state.user.role.toUpperCase()}
-          </span>
-        </div>
+        {showRoleBadge ? (
+          <div>
+            <span className="mt-1 badge badge-outline badge-sm">{normalizedRole}</span>
+          </div>
+        ) : null}
 
         <button
           type="button"

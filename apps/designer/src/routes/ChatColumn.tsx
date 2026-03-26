@@ -124,6 +124,8 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
     scrollToBottomStable();
   }, [scrollToBottomStable]);
 
+  const getScrollElement = useCallback(() => scrollRef.current, []);
+
   const onScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -193,10 +195,11 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
 
   const scrollApi = useMemo(
     () => ({
+      getScrollElement,
       notifyThreadMessagesSnapshot,
       syncThreadScrollToBottom,
     }),
-    [notifyThreadMessagesSnapshot, syncThreadScrollToBottom],
+    [getScrollElement, notifyThreadMessagesSnapshot, syncThreadScrollToBottom],
   );
 
   const trySend = useCallback(() => {

@@ -29,3 +29,26 @@
 
 ### Discoveries
 - `scripts/prettier.sh` отсутствует в репозитории; отдельный этап prettier в step-queue отмечен как cancelled.
+
+---
+
+## step-imp — 2026-03-26T14:45:45+03:00
+
+**Result**: SUCCESS
+
+### Changed Files
+- none — проведена повторная валидация существующей реализации, правки кода не потребовались.
+
+### Tests
+- Task-specific: 6 passed, 0 failed (`src/state/headerGear.test.ts`, `src/state/settingsOverlay.test.ts`).
+- Regression: 50 passed, 0 failed (`npm test` в `apps/designer`).
+
+### Acceptance Criteria
+- [x] AC-1: all three headers always show clickable gear — verified by: browser validation (`http://localhost:5173/chat_design`, видны три кнопки "Настройки колонки").
+- [x] AC-2: each gear opens settings with correct initial tab — verified by: unit test `initialSettingsTabForSource` + browser validation открытия overlay из services/chats/chat gear.
+- [x] AC-3: non-root/admin restricted to account tab — verified by: unit test `resolveSettingsTabsForSession` + browser validation (в overlay доступна только `аккаунт` на non-current host).
+- [x] AC-4: root/admin current server gets all tabs, non-current restricted — verified by: unit test `resolveSettingsTabsForSession` (оба сценария current/non-current покрыты).
+- [x] AC-5: Esc closes settings before existing navigation — verified by: browser validation (1-й Esc закрывает overlay, 2-й Esc выполняет навигацию `chat -> server`).
+
+### Discoveries
+- Browser validation на `https://kotel.localhost` недоступна в MCP-среде (`chrome-error://chromewebdata/`), поэтому runtime-проверка выполнена на `http://localhost:5173` с 1s cadence между интеракциями.

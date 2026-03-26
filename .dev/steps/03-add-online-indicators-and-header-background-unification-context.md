@@ -25,3 +25,26 @@
 
 ### Discoveries
 - `infra/compose/test.yml` requires `PROJECT_ROOT`; direct `docker compose -f ...` may fail in this workspace, while `scripts/test-start.sh` / `scripts/test-stop.sh` works reliably.
+
+---
+
+## step-imp — 2026-03-26T11:40:21Z
+
+**Result**: SUCCESS
+
+### Changed Files
+- none — re-validation confirmed step implementation already present and matching specification.
+
+### Tests
+- Task-specific: 5 passed, 0 failed (`docker exec kris-frontend-test sh -lc "cd /apps/designer && npx vitest run src/state/store.test.ts"`).
+- Regression: 50 passed, 0 failed (`docker exec kris-frontend-test sh -lc "cd /apps/designer && npm test"`).
+
+### Acceptance Criteria
+- [x] AC-1: Personal chat cards display marker; groups do not — verified by browser validation on `http://localhost:5173` (group card without marker, person card with marker).
+- [x] AC-2: User cards display marker and last-seen value — verified by browser validation (`Пользователи` list cards show marker and `Был(а) в сети`).
+- [x] AC-3: Selected person chat header displays marker — verified by browser validation after selecting `Мария Волкова`.
+- [x] AC-4: Services/Chats/Chat headers use `bg-base-300` — verified by browser validation and existing class usage in route components.
+- [x] AC-5: No role-based rendering regression in cards/header — verified by passing full designer regression suite.
+
+### Discoveries
+- Dev health check via `docker compose -f infra/compose/dev.yml ps` may require env vars in this workspace; `docker ps` was used to confirm all required dev containers are healthy.

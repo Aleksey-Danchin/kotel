@@ -8,7 +8,7 @@ export function ServicesColumnSkeleton() {
       aria-busy="true"
       aria-label="Загрузка серверов"
     >
-      <header className="shrink-0 min-h-12 border-b border-base-200 px-2">
+      <header className="shrink-0 min-h-16 border-b border-base-200 px-2">
         <div className="flex h-full items-center justify-between gap-2">
           <div className="min-w-0">
             <div className="skeleton h-4 w-24 rounded" />
@@ -30,7 +30,7 @@ export function ServicesColumnSkeleton() {
         ))}
       </div>
 
-      <footer className="shrink-0 pt-2">
+      <footer className="shrink-0 pt-2 pb-2">
         <div className="skeleton h-10 w-full rounded-box" aria-hidden="true" />
       </footer>
     </aside>

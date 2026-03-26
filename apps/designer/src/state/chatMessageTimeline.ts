@@ -25,9 +25,19 @@ function isSameDay(a: Date, b: Date): boolean {
   );
 }
 
-const dayBadgeFormatter = new Intl.DateTimeFormat("ru-RU", {
+const dayBadgeCurrentYearFormatter = new Intl.DateTimeFormat("ru-RU", {
   day: "numeric",
   month: "short",
+});
+
+const dayBadgeOtherYearsFormatter = new Intl.DateTimeFormat("ru-RU", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+const dayBadgeWeekdayFormatter = new Intl.DateTimeFormat("ru-RU", {
+  weekday: "short",
 });
 
 const timeTodayFormatter = new Intl.DateTimeFormat("ru-RU", {
@@ -50,7 +60,10 @@ const timeOtherYearsFormatter = new Intl.DateTimeFormat("ru-RU", {
   minute: "2-digit",
 });
 
-export function formatMessageTimestamp(iso: string, now: Date = new Date()): string {
+export function formatMessageTimestamp(
+  iso: string,
+  now: Date = new Date(),
+): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   if (isSameDay(date, now)) return timeTodayFormatter.format(date);
@@ -60,7 +73,24 @@ export function formatMessageTimestamp(iso: string, now: Date = new Date()): str
   return timeOtherYearsFormatter.format(date);
 }
 
-export function buildChatTimelineRows(messages: ChatMessage[]): ChatTimelineRow[] {
+function formatDayBadgeLabel(date: Date, now: Date): string {
+  const weekday = dayBadgeWeekdayFormatter
+    .format(date)
+    .toLowerCase()
+    .replace(".", "")
+    .trim()
+    .slice(0, 2);
+  const dateLabel =
+    date.getFullYear() === now.getFullYear()
+      ? dayBadgeCurrentYearFormatter.format(date)
+      : dayBadgeOtherYearsFormatter.format(date);
+  return `${dateLabel} (${weekday})`;
+}
+
+export function buildChatTimelineRows(
+  messages: ChatMessage[],
+  now: Date = new Date(),
+): ChatTimelineRow[] {
   const rows: ChatTimelineRow[] = [];
   let lastDayKey: string | null = null;
 
@@ -81,7 +111,7 @@ export function buildChatTimelineRows(messages: ChatMessage[]): ChatTimelineRow[
         kind: "day-badge",
         key: `day:${dayKey}`,
         dayKey,
-        label: dayBadgeFormatter.format(d),
+        label: formatDayBadgeLabel(d, now),
       });
       lastDayKey = dayKey;
     }

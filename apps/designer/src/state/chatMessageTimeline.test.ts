@@ -55,5 +55,34 @@ describe("chatMessageTimeline", () => {
       expect(rows[0]).toMatchObject({ kind: "day-badge", key: "day:2026-2-25" });
       expect(rows[3]).toMatchObject({ kind: "day-badge", key: "day:2026-2-26" });
     });
+
+    it("formats day badge without year for current year", () => {
+      const now = new Date("2026-10-15T12:00:00.000Z");
+      const rows = buildChatTimelineRows(
+        [message("m-1", "2026-03-25T08:00:00.000Z")],
+        now,
+      );
+
+      const dayBadge = rows[0];
+      expect(dayBadge).toMatchObject({ kind: "day-badge" });
+      if (dayBadge?.kind !== "day-badge") return;
+      expect(dayBadge.label).toMatch(/^[а-яё]{2}\s/u);
+      expect(dayBadge.label).toContain("мар");
+      expect(dayBadge.label).not.toContain("2026");
+    });
+
+    it("formats day badge with year for other years", () => {
+      const now = new Date("2026-10-15T12:00:00.000Z");
+      const rows = buildChatTimelineRows(
+        [message("m-1", "2024-03-25T08:00:00.000Z")],
+        now,
+      );
+
+      const dayBadge = rows[0];
+      expect(dayBadge).toMatchObject({ kind: "day-badge" });
+      if (dayBadge?.kind !== "day-badge") return;
+      expect(dayBadge.label).toMatch(/^[а-яё]{2}\s/u);
+      expect(dayBadge.label).toContain("2024");
+    });
   });
 });

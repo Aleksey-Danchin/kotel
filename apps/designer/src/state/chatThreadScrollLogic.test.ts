@@ -17,20 +17,20 @@ describe("chatThreadScrollLogic", () => {
     ).toBe(100);
   });
 
-  it("isNearBottom uses default threshold in 24–32px range", () => {
-    expect(DESIGNER_CHAT_STICKY_THRESHOLD_PX).toBeGreaterThanOrEqual(24);
-    expect(DESIGNER_CHAT_STICKY_THRESHOLD_PX).toBeLessThanOrEqual(32);
+  it("isNearBottom uses increased default threshold in 80–88px range", () => {
+    expect(DESIGNER_CHAT_STICKY_THRESHOLD_PX).toBeGreaterThanOrEqual(80);
+    expect(DESIGNER_CHAT_STICKY_THRESHOLD_PX).toBeLessThanOrEqual(88);
     expect(
       isNearBottom({
         scrollHeight: 400,
-        scrollTop: 72,
+        scrollTop: 16,
         clientHeight: 300,
       }),
     ).toBe(true);
     expect(
       isNearBottom({
         scrollHeight: 400,
-        scrollTop: 71,
+        scrollTop: 15,
         clientHeight: 300,
       }),
     ).toBe(false);

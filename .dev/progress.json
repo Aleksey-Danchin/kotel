@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-03-26T10:25:08.248Z",
-  "updatedAt": "2026-03-26T12:15:14.215Z",
+  "updatedAt": "2026-03-26T12:15:53.022Z",
   "steps": [
     {
       "order": 1,
@@ -730,10 +730,10 @@
     {
       "order": 9,
       "file": "09-add-message-date-badges-timestamp-rules-and-virtualized-thread.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "aca7a3a",
       "startedAt": "2026-03-26T12:09:40.339Z",
-      "completedAt": null,
+      "completedAt": "2026-03-26T12:15:53.022Z",
       "error": null,
       "retryCount": 0,
       "progress": [

@@ -34,6 +34,7 @@ import {
   selectedServerAtom,
   threadTransitionLoadingAtom,
 } from "../state/store";
+import { formatUserPresenceSubtitle } from "../state/userPresence";
 
 export interface ChatColumnProps {
   children: ReactNode;
@@ -226,6 +227,13 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
 
   const remainingChars = remainingComposerChars(draft);
   const showComposerCounter = shouldShowComposerCounter(remainingChars);
+  const personChatPresenceSubtitle =
+    selectedChat?.type === "person" && selectedPersonChatPeer
+      ? formatUserPresenceSubtitle(
+          selectedPersonChatPeer.isOnline,
+          selectedPersonChatPeer.lastSeenAt,
+        )
+      : null;
 
   useLayoutEffect(() => {
     const composer = composerRef.current;
@@ -284,7 +292,7 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col border-l-2 border-base-content/20 bg-base-100">
       {hasSelectedChat ? (
-        <header className="shrink-0 min-h-12 border-b border-base-300 bg-base-300 px-2">
+        <header className="shrink-0 min-h-16 border-b border-base-300 bg-base-300 px-2">
           <div className="flex h-full items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
               <h1 className="flex items-center gap-2 text-lg font-semibold text-base-content">
@@ -305,6 +313,11 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                 ) : null}
                 <span className="truncate">{chatHeaderTitle(selectedChat!)}</span>
               </h1>
+              {personChatPresenceSubtitle ? (
+                <p className="truncate text-xs text-base-content/70">
+                  {personChatPresenceSubtitle}
+                </p>
+              ) : null}
             </div>
             <ColumnHeaderGear source="chat" />
           </div>

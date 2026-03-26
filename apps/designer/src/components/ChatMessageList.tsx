@@ -63,8 +63,12 @@ export function ChatMessageList({
           return (
             <div key={virtualRow.key} {...rowWrapperProps}>
               <div className="w-full px-3 py-2">
-                <div className="flex justify-center">
-                  <span className="badge badge-neutral badge-outline rounded-full px-3">
+                <div className="relative flex items-center justify-center">
+                  <span
+                    className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[#80808082]"
+                    aria-hidden="true"
+                  />
+                  <span className="badge badge-outline relative z-10 rounded-full bg-[#80808082] border-[#80808082] px-3 text-base-content/70">
                     {row.label}
                   </span>
                 </div>
@@ -90,7 +94,7 @@ export function ChatMessageList({
                 */}
                 <div
                   className={clsx(
-                    "chat-bubble max-w-[min(100%,448px)] text-sm shadow-sm",
+                    "chat-bubble flex max-w-[min(100%,448px)] flex-col gap-3 text-sm shadow-sm",
                     outgoing
                       ? "me-[10px] chat-bubble-primary border border-primary/20"
                       : "ms-[10px] chat-bubble-neutral border border-base-300/80",
@@ -100,7 +104,7 @@ export function ChatMessageList({
                     {message.text}
                   </p>
                   <time
-                    className="mt-1.5 block text-end text-xs text-base-content/55"
+                    className="block text-end text-xs text-base-content/55"
                     dateTime={message.createdAt}
                   >
                     {formatMessageTimestamp(message.createdAt)}

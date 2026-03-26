@@ -66,11 +66,16 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
   }, [isLoading, selectedServer?.serverUrl]);
 
   const content = (() => {
-    if (serverSwitchLoading && selectedServer) return <ChatsColumnBodySkeleton />;
+    if (serverSwitchLoading && selectedServer)
+      return <ChatsColumnBodySkeleton />;
     if (!selectedServer) return null;
 
     if (chats.length === 0) {
-      return <div className="p-2 text-sm text-base-content/80">Чатов нет</div>;
+      return (
+        <div className="p-2 text-base-content/80 w-full h-full flex justify-center items-center text-2xl">
+          Чатов нет
+        </div>
+      );
     }
 
     return (

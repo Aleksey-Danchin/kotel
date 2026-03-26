@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from "react";
 import { useAtomValue } from "jotai";
-import clsx from "clsx";
 import { FaArrowDownLong } from "react-icons/fa6";
 import { GrSend } from "react-icons/gr";
 
@@ -216,16 +215,19 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
   const scrollBody = hasSelectedChat ? (
     <div
       ref={scrollRef}
-      className="min-h-0 flex-1 overflow-y-auto p-4"
+      className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-4"
       onScroll={onScroll}
     >
       <div
         ref={scrollInnerRef}
         className="flex min-h-full flex-col justify-end"
       >
-        <ChatThreadScrollProvider value={scrollApi}>
-          {children}
-        </ChatThreadScrollProvider>
+        {/* Ширина треда и композера — крутите max-w-[…px] (дублируйте то же число в ChatMessageList). */}
+        <div className="mx-auto w-full max-w-[600px] px-3">
+          <ChatThreadScrollProvider value={scrollApi}>
+            {children}
+          </ChatThreadScrollProvider>
+        </div>
       </div>
     </div>
   ) : (
@@ -250,53 +252,60 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
       {scrollBody}
 
       {hasSelectedChat ? (
-        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 p-3">
-          <form
-            className="relative flex flex-col items-center gap-2 sm:flex-row sm:items-center"
-            onSubmit={onComposerSubmit}
-          >
-            <label className="min-w-0 flex-1" htmlFor="designer-chat-composer">
-              <span className="sr-only">Текст сообщения</span>
-              <textarea
-                ref={composerRef}
-                id="designer-chat-composer"
-                className="textarea textarea-bordered min-h-16 max-h-40 w-full resize-y"
-                placeholder="Сообщение..."
-                rows={2}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={onComposerKeyDown}
-                disabled={!selectedChat || !selectedServer}
-              />
-            </label>
-            <div className="relative flex shrink-0 flex-col items-center">
-              {!sticky ? (
-                <div
-                  className="cursor-pointer absolute bottom-full left-1/2 z-20 mb-2 flex -translate-x-1/2 flex-col items-center gap-1 drop-shadow-md"
-                  onClick={jumpToBottom}
-                >
-                  {unreadBelow > 0 && (
-                    <span className="badge badge-primary badge-sm tabular-nums">
-                      +{unreadBelow}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-xl btn-circle btn-primary shrink-0 border-2"
-                  >
-                    <FaArrowDownLong />
-                  </button>
-                </div>
-              ) : null}
-              <button
-                type="submit"
-                className="btn btn-primary shrink-0 btn-circle btn-xl"
-                disabled={!selectedChat || !selectedServer}
+        <footer className="relative z-10 shrink-0 border-t border-base-300 bg-base-100 py-3">
+          {/* Ширина треда и композера — крутите max-w-[…px] (дублируйте то же число в ChatMessageList). */}
+          <div className="mx-auto w-full max-w-[600px] px-3">
+            <form
+              className="relative flex flex-col items-center gap-2 sm:flex-row sm:items-center"
+              onSubmit={onComposerSubmit}
+            >
+              <label
+                className="min-w-0 flex-1"
+                htmlFor="designer-chat-composer"
               >
-                <GrSend />
-              </button>
-            </div>
-          </form>
+                <span className="sr-only">Текст сообщения</span>
+                <textarea
+                  ref={composerRef}
+                  id="designer-chat-composer"
+                  className="textarea textarea-bordered min-h-16 max-h-40 w-full resize-y"
+                  placeholder="Сообщение..."
+                  rows={2}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={onComposerKeyDown}
+                  disabled={!selectedChat || !selectedServer}
+                />
+              </label>
+              <div className="relative flex shrink-0 flex-col items-center">
+                {!sticky ? (
+                  <div
+                    className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 flex -translate-x-1/2 flex-col items-center gap-1 drop-shadow-md"
+                    role="presentation"
+                  >
+                    {unreadBelow > 0 ? (
+                      <span className="badge badge-primary badge-sm pointer-events-auto tabular-nums">
+                        +{unreadBelow}
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="btn btn-xl btn-circle btn-primary shrink-0 border-2 pointer-events-auto"
+                      onClick={jumpToBottom}
+                    >
+                      <FaArrowDownLong />
+                    </button>
+                  </div>
+                ) : null}
+                <button
+                  type="submit"
+                  className="btn btn-primary shrink-0 btn-circle btn-xl"
+                  disabled={!selectedChat || !selectedServer}
+                >
+                  <GrSend />
+                </button>
+              </div>
+            </form>
+          </div>
         </footer>
       ) : null}
     </div>

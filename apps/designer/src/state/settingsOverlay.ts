@@ -12,10 +12,10 @@ export interface SettingsTabDefinition {
 }
 
 export const SETTINGS_TABS: SettingsTabDefinition[] = [
-  { id: "main", label: "основной" },
-  { id: "configurator", label: "конфигуратор" },
-  { id: "users", label: "пользователи" },
-  { id: "account", label: "аккаунт" },
+  { id: "main", label: "Основной" },
+  { id: "configurator", label: "Конфигуратор" },
+  { id: "users", label: "Пользователи" },
+  { id: "account", label: "Аккаунт" },
 ];
 
 const DEFAULT_TAB_BY_SOURCE: Record<SettingsOpenSource, SettingsTabId> = {

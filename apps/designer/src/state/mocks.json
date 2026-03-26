@@ -2,7 +2,7 @@
   "servers": [
     {
       "id": "srv_main",
-      "serverUrl": "https://kotel.localhost",
+      "serverUrl": "https://kotel-main.localhost",
       "user": {
         "id": "mock-user-1",
         "fullname": "Илья Соколов",
@@ -54,6 +54,17 @@
         "role": "USER"
       },
       "name": "No chats"
+    },
+    {
+      "id": "srv_root_ops",
+      "serverUrl": "https://kotel.localhost",
+      "user": {
+        "id": "mock-user-6",
+        "fullname": "Константин Романов",
+        "login": "root-ops",
+        "role": "ROOT"
+      },
+      "name": "Root Ops"
     }
   ],
   "chats": [
@@ -1553,6 +1564,14 @@
       "role": "USER",
       "isOnline": false,
       "lastSeenAt": "2026-03-26T07:35:00.000Z"
+    },
+    {
+      "id": "mock-user-6",
+      "fullname": "Константин Романов",
+      "login": "root-ops",
+      "role": "ROOT",
+      "isOnline": true,
+      "lastSeenAt": "2026-03-26T08:32:00.000Z"
     }
   ],
   "serverUsers": [
@@ -1569,7 +1588,8 @@
     ["srv_ru", "peer-sales"],
     ["srv_ru", "peer-support-ru"],
     ["srv_local", "peer-local-buddy"],
-    ["srv_local", "peer-qa"]
+    ["srv_local", "peer-qa"],
+    ["srv_root_ops", "mock-user-6"]
   ],
   "sessions": [
     {
@@ -1596,6 +1616,11 @@
       "id": "sess_srv_no_chats",
       "serverId": "srv_no_chats",
       "createdAt": "2026-03-24T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_root_ops",
+      "serverId": "srv_root_ops",
+      "createdAt": "2026-03-25T08:00:00.000Z"
     }
   ]
 }

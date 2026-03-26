@@ -1,5 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
+import {
+  PiGearSix,
+  PiSlidersHorizontal,
+  PiUserCircle,
+  PiUsersThree,
+} from "react-icons/pi";
 
 import {
   allSessionsAtom,
@@ -67,6 +73,25 @@ function titleForTab(tabId: SettingsTabId): string {
   return "Профиль пользователя и личные настройки";
 }
 
+function displayServerHost(serverUrl: string): string {
+  try {
+    return new URL(serverUrl).hostname;
+  } catch {
+    return serverUrl;
+  }
+}
+
+function tabIcon(tabId: SettingsTabId) {
+  if (tabId === "main")
+    return <PiGearSix className="text-base" aria-hidden="true" />;
+  if (tabId === "configurator") {
+    return <PiSlidersHorizontal className="text-base" aria-hidden="true" />;
+  }
+  if (tabId === "users")
+    return <PiUsersThree className="text-base" aria-hidden="true" />;
+  return <PiUserCircle className="text-base" aria-hidden="true" />;
+}
+
 export function SettingsOverlay() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const isOpen = useAtomValue(isSettingsOpenAtom);
@@ -77,9 +102,29 @@ export function SettingsOverlay() {
   const serverUsers = useAtomValue(allUsersForSelectedServerAtom);
   const allSessions = useAtomValue(allSessionsAtom);
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
+  const settingsServerName =
+    selectedServer?.name?.trim() ||
+    (selectedServer ? displayServerHost(selectedServer.serverUrl) : "сервер");
+  const settingsServerHost = selectedServer
+    ? displayServerHost(selectedServer.serverUrl)
+    : null;
   const safeActiveTab =
     availableTabs.find((tab) => tab.id === activeTab)?.id ??
     availableTabs[0]?.id;
+  const saveFormId =
+    safeActiveTab === "main"
+      ? "settings-main-form"
+      : safeActiveTab === "configurator"
+        ? "settings-configurator-form"
+        : safeActiveTab === "users"
+          ? "settings-users-form"
+          : safeActiveTab === "account"
+            ? "settings-account-form"
+            : null;
+  const hasPinnedSectionHeader =
+    safeActiveTab === "main" ||
+    safeActiveTab === "configurator" ||
+    safeActiveTab === "account";
   const [serverNameDraft, setServerNameDraft] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userDraft, setUserDraft] = useState({
@@ -104,6 +149,7 @@ export function SettingsOverlay() {
   const [confirmAction, setConfirmAction] =
     useState<AccountConfirmAction | null>(null);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
 
   useEffect(() => {
     setServerNameDraft(selectedServer?.name ?? "");
@@ -139,6 +185,11 @@ export function SettingsOverlay() {
     selectedServer?.user.role ?? "",
     selectedUser?.role ?? "",
   );
+  const saveDisabled =
+    !saveFormId ||
+    (safeActiveTab === "main" && !selectedServer) ||
+    (safeActiveTab === "users" && (!selectedUser || !editability.canEdit)) ||
+    (safeActiveTab === "account" && !selectedServer);
 
   useEffect(() => {
     if (!selectedUser) {
@@ -295,229 +346,253 @@ export function SettingsOverlay() {
     setConfirmAction(null);
   }
 
+  function onRequestSave(): void {
+    if (saveDisabled) return;
+    setSaveConfirmOpen(true);
+  }
+
+  function onConfirmSave(): void {
+    if (!saveFormId) return;
+    const form = document.getElementById(saveFormId);
+    if (form instanceof HTMLFormElement) {
+      form.requestSubmit();
+    }
+    setSaveConfirmOpen(false);
+  }
+
   function renderTabContent() {
     if (safeActiveTab === "main") {
       return (
-        <form className="flex max-w-xl flex-col gap-4" onSubmit={onGeneralSave}>
-          <label className="form-control w-full" htmlFor="settings-server-name">
-            <span className="label">
-              <span className="label-text">Название сервера</span>
-            </span>
-            <input
-              id="settings-server-name"
-              className="input input-bordered w-full"
-              type="text"
-              placeholder="Введите название"
-              value={serverNameDraft}
-              onChange={(event) => setServerNameDraft(event.target.value)}
-              disabled={!selectedServer}
-            />
-          </label>
-          <div>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={!selectedServer}
+        <section className="card border border-base-300 bg-base-100">
+          <div className="card-body">
+            <h4 className="card-title text-base">Сервер</h4>
+            <form
+              id="settings-main-form"
+              className="flex max-w-xl flex-col gap-4"
+              onSubmit={onGeneralSave}
             >
-              Сохранить
-            </button>
+              <label
+                className="form-control w-full"
+                htmlFor="settings-server-name"
+              >
+                <span className="label">
+                  <span className="label-text">Название сервера</span>
+                </span>
+                <input
+                  id="settings-server-name"
+                  className="input input-bordered w-full"
+                  type="text"
+                  placeholder="Введите название"
+                  value={serverNameDraft}
+                  onChange={(event) => setServerNameDraft(event.target.value)}
+                  disabled={!selectedServer}
+                />
+              </label>
+            </form>
           </div>
-        </form>
+        </section>
       );
     }
 
     if (safeActiveTab === "configurator") {
       return (
-        <form
-          className="flex max-w-xl flex-col gap-4"
-          onSubmit={onConfiguratorSave}
-        >
-          <label
-            className="form-control w-full"
-            htmlFor="settings-configurator-frequency"
-          >
-            <span className="label">
-              <span className="label-text">Частота отправки запросов</span>
-            </span>
-            <input
-              id="settings-configurator-frequency"
-              className="input input-bordered w-full"
-              type="text"
-              value="Скоро будет доступно"
-              disabled
-              readOnly
-            />
-          </label>
-          <div>
-            <button type="submit" className="btn btn-primary">
-              Сохранить
-            </button>
+        <section className="card border border-base-300 bg-base-100">
+          <div className="card-body">
+            <h4 className="card-title text-base">Параметры конфигуратора</h4>
+            <form
+              id="settings-configurator-form"
+              className="flex max-w-xl flex-col gap-4"
+              onSubmit={onConfiguratorSave}
+            >
+              <label
+                className="form-control w-full"
+                htmlFor="settings-configurator-frequency"
+              >
+                <span className="label">
+                  <span className="label-text">Частота отправки запросов</span>
+                </span>
+                <input
+                  id="settings-configurator-frequency"
+                  className="input input-bordered w-full"
+                  type="text"
+                  value="Скоро будет доступно"
+                  disabled
+                  readOnly
+                />
+              </label>
+            </form>
           </div>
-        </form>
+        </section>
       );
     }
 
     if (safeActiveTab === "users") {
       return (
-        <div className="flex min-h-[420px] gap-4">
-          <section className="w-72 shrink-0 rounded-box border border-base-300">
-            <header className="flex items-center justify-between border-b border-base-300 px-3 py-2">
-              <h4 className="font-medium">Пользователи</h4>
-              <button
-                type="button"
-                className="btn btn-primary btn-xs"
-                onClick={() => setIsAddUserModalOpen(true)}
-              >
-                Добавить пользователя
-              </button>
-            </header>
-            <div className="max-h-[360px] overflow-y-auto p-2">
-              <ul className="menu gap-1">
-                {serverUsers.map((user) => (
-                  <li key={user.id}>
-                    <button
-                      type="button"
-                      className={user.id === selectedUserId ? "active" : ""}
-                      onClick={() => setSelectedUserId(user.id)}
-                    >
-                      <span className="flex w-full items-center justify-between gap-2">
-                        <span className="truncate">{user.fullname}</span>
-                        {shouldShowDesignerRoleBadge(user.role) ? (
-                          <span className="badge badge-ghost badge-sm">
-                            {normalizeRole(user.role) ?? "USER"}
-                          </span>
-                        ) : null}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+        <div className="space-y-4">
+          <section className="card border border-base-300 bg-base-100">
+            <div className="card-body p-3">
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-xs"
+                  onClick={() => setIsAddUserModalOpen(true)}
+                >
+                  Добавить пользователя
+                </button>
+              </div>
             </div>
           </section>
+          <div className="flex min-h-[420px] gap-4">
+            <section className="card w-72 shrink-0 border border-base-300 bg-base-100">
+              <header className="flex items-center justify-between border-b border-base-300 px-3 py-2">
+                <h4 className="font-medium">Пользователи</h4>
+              </header>
+              <div className="overflow-y-auto p-2">
+                <ul className="menu gap-1">
+                  {serverUsers.map((user) => (
+                    <li key={user.id}>
+                      <button
+                        type="button"
+                        className={
+                          user.id === selectedUserId
+                            ? "bg-primary/20 text-primary font-semibold"
+                            : "text-base-content"
+                        }
+                        onClick={() => setSelectedUserId(user.id)}
+                      >
+                        <span className="flex w-full items-center justify-between gap-2">
+                          <span className="truncate">{user.fullname}</span>
+                          {shouldShowDesignerRoleBadge(user.role) ? (
+                            <span className="badge badge-ghost badge-sm">
+                              {normalizeRole(user.role) ?? "USER"}
+                            </span>
+                          ) : null}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
 
-          <section className="min-w-0 flex-1 rounded-box border border-base-300 p-4">
-            {!selectedUser ? (
-              <p className="text-base-content/70">Пользователь не выбран</p>
-            ) : (
-              <form className="grid gap-4 md:grid-cols-2" onSubmit={onUserSave}>
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Логин</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value={userDraft.login}
-                    onChange={(event) =>
-                      setUserDraft((prev) => ({
-                        ...prev,
-                        login: event.target.value,
-                      }))
-                    }
-                    disabled={!editability.canEdit}
-                  />
-                </label>
+            <section className="card min-w-0 flex-1 border border-base-300 bg-base-100 p-4">
+              {!selectedUser ? (
+                <p className="text-base-content/70">Пользователь не выбран</p>
+              ) : (
+                <form
+                  id="settings-users-form"
+                  className="grid gap-4 md:grid-cols-2"
+                  onSubmit={onUserSave}
+                >
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Логин</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value={userDraft.login}
+                      onChange={(event) =>
+                        setUserDraft((prev) => ({
+                          ...prev,
+                          login: event.target.value,
+                        }))
+                      }
+                      disabled={!editability.canEdit}
+                    />
+                  </label>
 
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">ФИО</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value={userDraft.fullname}
-                    onChange={(event) =>
-                      setUserDraft((prev) => ({
-                        ...prev,
-                        fullname: event.target.value,
-                      }))
-                    }
-                    disabled={!editability.canEdit}
-                  />
-                </label>
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">ФИО</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value={userDraft.fullname}
+                      onChange={(event) =>
+                        setUserDraft((prev) => ({
+                          ...prev,
+                          fullname: event.target.value,
+                        }))
+                      }
+                      disabled={!editability.canEdit}
+                    />
+                  </label>
 
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Пароль</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value={userDraft.password}
-                    onChange={(event) =>
-                      setUserDraft((prev) => ({
-                        ...prev,
-                        password: event.target.value,
-                      }))
-                    }
-                    disabled={!editability.canEdit}
-                  />
-                </label>
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Пароль</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value={userDraft.password}
+                      onChange={(event) =>
+                        setUserDraft((prev) => ({
+                          ...prev,
+                          password: event.target.value,
+                        }))
+                      }
+                      disabled={!editability.canEdit}
+                    />
+                  </label>
 
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Роль</span>
-                  </span>
-                  <select
-                    className="select select-bordered w-full"
-                    value={userDraft.role}
-                    onChange={(event) =>
-                      setUserDraft((prev) => ({
-                        ...prev,
-                        role: event.target.value,
-                      }))
-                    }
-                    disabled={!editability.canChangeRole}
-                  >
-                    <option value="ADMIN">ADMIN</option>
-                    <option value="USER">USER</option>
-                    <option value="ROOT">ROOT</option>
-                  </select>
-                </label>
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Роль</span>
+                    </span>
+                    <select
+                      className="select select-bordered w-full"
+                      value={userDraft.role}
+                      onChange={(event) =>
+                        setUserDraft((prev) => ({
+                          ...prev,
+                          role: event.target.value,
+                        }))
+                      }
+                      disabled={!editability.canChangeRole}
+                    >
+                      <option value="ADMIN">ADMIN</option>
+                      <option value="USER">USER</option>
+                      <option value="ROOT">ROOT</option>
+                    </select>
+                  </label>
 
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Статус блокировки</span>
-                  </span>
-                  <input
-                    className="toggle"
-                    type="checkbox"
-                    checked={userDraft.blocked}
-                    onChange={(event) =>
-                      setUserDraft((prev) => ({
-                        ...prev,
-                        blocked: event.target.checked,
-                      }))
-                    }
-                    disabled={!editability.canEdit}
-                  />
-                </label>
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Статус блокировки</span>
+                    </span>
+                    <input
+                      className="toggle"
+                      type="checkbox"
+                      checked={userDraft.blocked}
+                      onChange={(event) =>
+                        setUserDraft((prev) => ({
+                          ...prev,
+                          blocked: event.target.checked,
+                        }))
+                      }
+                      disabled={!editability.canEdit}
+                    />
+                  </label>
 
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Частота запросов</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value="Скоро будет доступно"
-                    disabled
-                    readOnly
-                  />
-                </label>
-
-                <div className="md:col-span-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={!editability.canEdit}
-                  >
-                    Сохранить
-                  </button>
-                </div>
-              </form>
-            )}
-          </section>
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Частота запросов</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value="Скоро будет доступно"
+                      disabled
+                      readOnly
+                    />
+                  </label>
+                </form>
+              )}
+            </section>
+          </div>
         </div>
       );
     }
@@ -532,74 +607,73 @@ export function SettingsOverlay() {
 
       return (
         <div className="space-y-6">
-          <form className="grid gap-4 md:grid-cols-2" onSubmit={onSaveAccount}>
-            <label className="form-control w-full">
-              <span className="label">
-                <span className="label-text">Логин</span>
-              </span>
-              <input
-                className="input input-bordered w-full"
-                type="text"
-                value={accountDraft.login}
-                onChange={(event) =>
-                  setAccountDraft((prev) => ({
-                    ...prev,
-                    login: event.target.value,
-                  }))
-                }
-                disabled={!selectedServer}
-              />
-            </label>
-
-            <label className="form-control w-full">
-              <span className="label">
-                <span className="label-text">ФИО</span>
-              </span>
-              <input
-                className="input input-bordered w-full"
-                type="text"
-                value={accountDraft.fullname}
-                onChange={(event) =>
-                  setAccountDraft((prev) => ({
-                    ...prev,
-                    fullname: event.target.value,
-                  }))
-                }
-                disabled={!selectedServer}
-              />
-            </label>
-
-            <label className="form-control w-full">
-              <span className="label">
-                <span className="label-text">Пароль</span>
-              </span>
-              <input
-                className="input input-bordered w-full"
-                type="password"
-                value={accountDraft.password}
-                onChange={(event) =>
-                  setAccountDraft((prev) => ({
-                    ...prev,
-                    password: event.target.value,
-                  }))
-                }
-                disabled={!selectedServer}
-              />
-            </label>
-
-            <div className="flex items-end">
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={!selectedServer}
+          <section className="card border border-base-300 bg-base-100">
+            <div className="card-body">
+              <h4 className="card-title text-base">Профиль</h4>
+              <form
+                id="settings-account-form"
+                className="grid gap-4 md:grid-cols-2"
+                onSubmit={onSaveAccount}
               >
-                Сохранить
-              </button>
+                <label className="form-control w-full">
+                  <span className="label">
+                    <span className="label-text">Логин</span>
+                  </span>
+                  <input
+                    className="input input-bordered w-full"
+                    type="text"
+                    value={accountDraft.login}
+                    onChange={(event) =>
+                      setAccountDraft((prev) => ({
+                        ...prev,
+                        login: event.target.value,
+                      }))
+                    }
+                    disabled={!selectedServer}
+                  />
+                </label>
+
+                <label className="form-control w-full">
+                  <span className="label">
+                    <span className="label-text">ФИО</span>
+                  </span>
+                  <input
+                    className="input input-bordered w-full"
+                    type="text"
+                    value={accountDraft.fullname}
+                    onChange={(event) =>
+                      setAccountDraft((prev) => ({
+                        ...prev,
+                        fullname: event.target.value,
+                      }))
+                    }
+                    disabled={!selectedServer}
+                  />
+                </label>
+
+                <label className="form-control w-full">
+                  <span className="label">
+                    <span className="label-text">Пароль</span>
+                  </span>
+                  <input
+                    className="input input-bordered w-full"
+                    type="password"
+                    value={accountDraft.password}
+                    onChange={(event) =>
+                      setAccountDraft((prev) => ({
+                        ...prev,
+                        password: event.target.value,
+                      }))
+                    }
+                    disabled={!selectedServer}
+                  />
+                </label>
+              </form>
             </div>
-          </form>
+          </section>
 
           {selectedServer?.user.role.trim().toUpperCase() === "ADMIN" ? (
-            <section className="rounded-box border border-warning/30 bg-warning/10 p-4">
+            <section className="card border border-warning/30 bg-warning/10 p-4">
               <h4 className="font-medium">Права администратора</h4>
               <button
                 type="button"
@@ -611,7 +685,7 @@ export function SettingsOverlay() {
             </section>
           ) : null}
 
-          <section className="rounded-box border border-base-300 p-4">
+          <section className="card border border-base-300 bg-base-100 p-4">
             <h4 className="font-medium">Завершить сессию</h4>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -698,11 +772,20 @@ export function SettingsOverlay() {
       aria-label="Настройки"
     >
       <section className="flex h-full w-full flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-base-300 px-4 py-3">
-          <h2 className="text-lg font-semibold text-base-content">Настройки</h2>
+        <header className="flex items-center justify-between gap-4 border-b border-gray-400 bg-base-300 p-4">
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold text-base-content">
+              Настройки {settingsServerName}
+            </h2>
+            {settingsServerHost && (
+              <p className="truncate text-xs text-base-content/70">
+                {settingsServerHost}
+              </p>
+            )}
+          </div>
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-square"
+            className="btn btn-primary btn-sm"
             aria-label="Закрыть настройки"
             onClick={() => setIsOpen(false)}
           >
@@ -711,30 +794,69 @@ export function SettingsOverlay() {
         </header>
 
         <div className="flex min-h-0 flex-1">
-          <nav className="w-56 shrink-0 border-r border-base-300 p-2">
-            <ul className="menu gap-1">
+          <nav className="min-h-0 w-56 shrink-0 overflow-y-auto border-r border-gray-400 bg-base-300 p-4">
+            <ul className="menu gap-1 w-full">
               {availableTabs.map((tab) => (
                 <li key={tab.id}>
                   <button
                     type="button"
-                    className={tab.id === safeActiveTab ? "active" : ""}
+                    className={
+                      tab.id === safeActiveTab
+                        ? "bg-primary/20 text-primary"
+                        : "text-base-content"
+                    }
                     onClick={() => setActiveTab(tab.id)}
                   >
-                    {tab.label}
+                    <span className="flex w-full items-center gap-3 px-0 py-0 text-base">
+                      {tabIcon(tab.id)}
+                      {tab.label}
+                    </span>
                   </button>
                 </li>
               ))}
             </ul>
           </nav>
 
-          <div className="min-h-0 flex-1 overflow-y-auto p-0">
-            <h3 className="text-xl font-semibold capitalize">
-              {safeActiveTab}
-            </h3>
-            <p className="mt-2 text-base-content/70">
-              {titleForTab(safeActiveTab)}
-            </p>
-            <div className="mt-6">{renderTabContent()}</div>
+          <div className="flex min-h-0 flex-1 flex-col bg-base-200">
+            {hasPinnedSectionHeader ? (
+              <header className="shrink-0 border-b border-gray-400 bg-base-200 p-4">
+                <h3 className="text-xl font-semibold capitalize">
+                  {safeActiveTab}
+                </h3>
+                <p className="mt-2 text-base-content/70">
+                  {titleForTab(safeActiveTab)}
+                </p>
+              </header>
+            ) : null}
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {hasPinnedSectionHeader ? (
+                renderTabContent()
+              ) : (
+                <>
+                  <h3 className="text-xl font-semibold capitalize">
+                    {safeActiveTab}
+                  </h3>
+                  <p className="mt-2 text-base-content/70">
+                    {titleForTab(safeActiveTab)}
+                  </p>
+                  <div className="mt-6">{renderTabContent()}</div>
+                </>
+              )}
+            </div>
+            <footer className="shrink-0 border-t border-gray-400 bg-base-200 p-4">
+              {saveFormId ? (
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={saveDisabled}
+                    onClick={onRequestSave}
+                  >
+                    Сохранить
+                  </button>
+                </div>
+              ) : null}
+            </footer>
           </div>
         </div>
       </section>
@@ -864,6 +986,32 @@ export function SettingsOverlay() {
                 type="button"
                 className="btn btn-primary"
                 onClick={onConfirmAccountAction}
+              >
+                Подтвердить
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+      {saveConfirmOpen ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-base-content/40 p-4">
+          <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
+            <h4 className="text-lg font-semibold">Подтверждение сохранения</h4>
+            <p className="mt-3 text-base-content/80">
+              Сохранить изменения в разделе "{titleForTab(safeActiveTab)}"?
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setSaveConfirmOpen(false)}
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onConfirmSave}
               >
                 Подтвердить
               </button>

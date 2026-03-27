@@ -3,7 +3,12 @@ import { atom } from "jotai";
 import { roleAllowsHeaderGear } from "./headerGear";
 import type { ServerSession } from "./servers";
 
-export type SettingsTabId = "main" | "configurator" | "users" | "account";
+export type SettingsTabId =
+  | "main"
+  | "configurator"
+  | "users"
+  | "account"
+  | "sessions";
 export type SettingsOpenSource = "services" | "chats" | "chat";
 
 export interface SettingsTabDefinition {
@@ -16,6 +21,7 @@ export const SETTINGS_TABS: SettingsTabDefinition[] = [
   { id: "configurator", label: "Конфигуратор" },
   { id: "users", label: "Пользователи" },
   { id: "account", label: "Аккаунт" },
+  { id: "sessions", label: "Сессии" },
 ];
 
 const DEFAULT_TAB_BY_SOURCE: Record<SettingsOpenSource, SettingsTabId> = {
@@ -34,7 +40,9 @@ export function resolveSettingsTabsForSession(
   session: ServerSession | null,
 ): SettingsTabDefinition[] {
   if (!session) {
-    return SETTINGS_TABS.filter((tab) => tab.id === "account");
+    return SETTINGS_TABS.filter(
+      (tab) => tab.id === "account" || tab.id === "sessions",
+    );
   }
 
   const isPrivilegedRole = roleAllowsHeaderGear(session.user.role);
@@ -42,7 +50,9 @@ export function resolveSettingsTabsForSession(
     return SETTINGS_TABS;
   }
 
-  return SETTINGS_TABS.filter((tab) => tab.id === "account");
+  return SETTINGS_TABS.filter(
+    (tab) => tab.id === "account" || tab.id === "sessions",
+  );
 }
 
 export const isSettingsOpenAtom = atom(false);

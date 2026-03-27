@@ -1505,7 +1505,7 @@
       "id": "peer-backend",
       "fullname": "Роман Федоров",
       "login": "peer-backend",
-      "role": "USER",
+      "role": "ADMIN",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:26:00.000Z"
     },
@@ -1593,34 +1593,274 @@
   ],
   "sessions": [
     {
-      "id": "sess_srv_main",
+      "id": "sess_srv_main_mock-user-1_primary",
       "serverId": "srv_main",
-      "createdAt": "2026-03-20T08:00:00.000Z"
+      "userId": "mock-user-1",
+      "createdAt": "2026-03-26T08:00:00.000Z"
     },
     {
-      "id": "sess_srv_eu",
+      "id": "sess_srv_main_mock-user-1_web",
+      "serverId": "srv_main",
+      "userId": "mock-user-1",
+      "createdAt": "2026-03-26T06:40:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_mock-user-1_app",
+      "serverId": "srv_main",
+      "userId": "mock-user-1",
+      "createdAt": "2026-03-25T22:10:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-designer_primary",
+      "serverId": "srv_main",
+      "userId": "peer-designer",
+      "createdAt": "2026-03-26T08:05:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-designer_web",
+      "serverId": "srv_main",
+      "userId": "peer-designer",
+      "createdAt": "2026-03-26T06:20:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-designer_app",
+      "serverId": "srv_main",
+      "userId": "peer-designer",
+      "createdAt": "2026-03-25T21:50:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-backend_primary",
+      "serverId": "srv_main",
+      "userId": "peer-backend",
+      "createdAt": "2026-03-26T08:10:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-backend_web",
+      "serverId": "srv_main",
+      "userId": "peer-backend",
+      "createdAt": "2026-03-26T05:55:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-backend_app",
+      "serverId": "srv_main",
+      "userId": "peer-backend",
+      "createdAt": "2026-03-25T20:30:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-ops_primary",
+      "serverId": "srv_main",
+      "userId": "peer-ops",
+      "createdAt": "2026-03-26T07:45:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-ops_web",
+      "serverId": "srv_main",
+      "userId": "peer-ops",
+      "createdAt": "2026-03-26T05:10:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-ops_app",
+      "serverId": "srv_main",
+      "userId": "peer-ops",
+      "createdAt": "2026-03-25T19:40:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-maria_primary",
+      "serverId": "srv_main",
+      "userId": "peer-maria",
+      "createdAt": "2026-03-26T07:25:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-maria_web",
+      "serverId": "srv_main",
+      "userId": "peer-maria",
+      "createdAt": "2026-03-26T04:55:00.000Z"
+    },
+    {
+      "id": "sess_srv_main_peer-maria_app",
+      "serverId": "srv_main",
+      "userId": "peer-maria",
+      "createdAt": "2026-03-25T18:20:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu_mock-user-2_primary",
       "serverId": "srv_eu",
-      "createdAt": "2026-03-21T08:00:00.000Z"
+      "userId": "mock-user-2",
+      "createdAt": "2026-03-26T08:00:00.000Z"
     },
     {
-      "id": "sess_srv_ru",
+      "id": "sess_srv_eu_mock-user-2_web",
+      "serverId": "srv_eu",
+      "userId": "mock-user-2",
+      "createdAt": "2026-03-26T05:35:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu_mock-user-2_app",
+      "serverId": "srv_eu",
+      "userId": "mock-user-2",
+      "createdAt": "2026-03-25T21:15:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu_peer-support-eu_primary",
+      "serverId": "srv_eu",
+      "userId": "peer-support-eu",
+      "createdAt": "2026-03-26T07:50:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu_peer-support-eu_web",
+      "serverId": "srv_eu",
+      "userId": "peer-support-eu",
+      "createdAt": "2026-03-26T04:35:00.000Z"
+    },
+    {
+      "id": "sess_srv_eu_peer-support-eu_app",
+      "serverId": "srv_eu",
+      "userId": "peer-support-eu",
+      "createdAt": "2026-03-25T19:25:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_mock-user-3_primary",
       "serverId": "srv_ru",
-      "createdAt": "2026-03-22T08:00:00.000Z"
+      "userId": "mock-user-3",
+      "createdAt": "2026-03-26T08:00:00.000Z"
     },
     {
-      "id": "sess_srv_local",
+      "id": "sess_srv_ru_mock-user-3_web",
+      "serverId": "srv_ru",
+      "userId": "mock-user-3",
+      "createdAt": "2026-03-26T05:15:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_mock-user-3_app",
+      "serverId": "srv_ru",
+      "userId": "mock-user-3",
+      "createdAt": "2026-03-25T20:40:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-sales_primary",
+      "serverId": "srv_ru",
+      "userId": "peer-sales",
+      "createdAt": "2026-03-26T07:40:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-sales_web",
+      "serverId": "srv_ru",
+      "userId": "peer-sales",
+      "createdAt": "2026-03-26T04:45:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-sales_app",
+      "serverId": "srv_ru",
+      "userId": "peer-sales",
+      "createdAt": "2026-03-25T19:55:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-support-ru_primary",
+      "serverId": "srv_ru",
+      "userId": "peer-support-ru",
+      "createdAt": "2026-03-26T07:15:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-support-ru_web",
+      "serverId": "srv_ru",
+      "userId": "peer-support-ru",
+      "createdAt": "2026-03-26T03:55:00.000Z"
+    },
+    {
+      "id": "sess_srv_ru_peer-support-ru_app",
+      "serverId": "srv_ru",
+      "userId": "peer-support-ru",
+      "createdAt": "2026-03-25T18:35:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_mock-user-4_primary",
       "serverId": "srv_local",
-      "createdAt": "2026-03-23T08:00:00.000Z"
+      "userId": "mock-user-4",
+      "createdAt": "2026-03-26T08:00:00.000Z"
     },
     {
-      "id": "sess_srv_no_chats",
+      "id": "sess_srv_local_mock-user-4_web",
+      "serverId": "srv_local",
+      "userId": "mock-user-4",
+      "createdAt": "2026-03-26T03:50:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_mock-user-4_app",
+      "serverId": "srv_local",
+      "userId": "mock-user-4",
+      "createdAt": "2026-03-25T20:50:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-local-buddy_primary",
+      "serverId": "srv_local",
+      "userId": "peer-local-buddy",
+      "createdAt": "2026-03-26T07:35:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-local-buddy_web",
+      "serverId": "srv_local",
+      "userId": "peer-local-buddy",
+      "createdAt": "2026-03-26T02:55:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-local-buddy_app",
+      "serverId": "srv_local",
+      "userId": "peer-local-buddy",
+      "createdAt": "2026-03-25T19:10:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-qa_primary",
+      "serverId": "srv_local",
+      "userId": "peer-qa",
+      "createdAt": "2026-03-26T07:05:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-qa_web",
+      "serverId": "srv_local",
+      "userId": "peer-qa",
+      "createdAt": "2026-03-26T02:25:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_peer-qa_app",
+      "serverId": "srv_local",
+      "userId": "peer-qa",
+      "createdAt": "2026-03-25T18:05:00.000Z"
+    },
+    {
+      "id": "sess_srv_no_chats_mock-user-5_primary",
       "serverId": "srv_no_chats",
-      "createdAt": "2026-03-24T08:00:00.000Z"
+      "userId": "mock-user-5",
+      "createdAt": "2026-03-26T08:00:00.000Z"
     },
     {
-      "id": "sess_srv_root_ops",
+      "id": "sess_srv_no_chats_mock-user-5_web",
+      "serverId": "srv_no_chats",
+      "userId": "mock-user-5",
+      "createdAt": "2026-03-26T01:15:00.000Z"
+    },
+    {
+      "id": "sess_srv_no_chats_mock-user-5_app",
+      "serverId": "srv_no_chats",
+      "userId": "mock-user-5",
+      "createdAt": "2026-03-25T19:45:00.000Z"
+    },
+    {
+      "id": "sess_srv_root_ops_mock-user-6_primary",
       "serverId": "srv_root_ops",
-      "createdAt": "2026-03-25T08:00:00.000Z"
+      "userId": "mock-user-6",
+      "createdAt": "2026-03-26T08:00:00.000Z"
+    },
+    {
+      "id": "sess_srv_root_ops_mock-user-6_web",
+      "serverId": "srv_root_ops",
+      "userId": "mock-user-6",
+      "createdAt": "2026-03-26T07:20:00.000Z"
+    },
+    {
+      "id": "sess_srv_root_ops_mock-user-6_app",
+      "serverId": "srv_root_ops",
+      "userId": "mock-user-6",
+      "createdAt": "2026-03-26T00:35:00.000Z"
     }
   ]
 }

@@ -33,24 +33,27 @@ describe("resolveSettingsTabsForSession", () => {
     const adminSession = makeSession("https://app.example:3000", "ADMIN");
 
     expect(resolveSettingsTabsForSession(rootSession).map((tab) => tab.label)).toEqual([
-      "основной",
-      "конфигуратор",
-      "пользователи",
-      "аккаунт",
+      "Основной",
+      "Конфигуратор",
+      "Пользователи",
+      "Аккаунт",
+      "Сессии",
     ]);
     expect(resolveSettingsTabsForSession(adminSession).map((tab) => tab.label)).toEqual([
-      "основной",
-      "конфигуратор",
-      "пользователи",
-      "аккаунт",
+      "Основной",
+      "Конфигуратор",
+      "Пользователи",
+      "Аккаунт",
+      "Сессии",
     ]);
   });
 
-  it("returns only account tab for non-privileged role", () => {
+  it("returns account and sessions tabs for non-privileged role", () => {
     const session = makeSession("https://app.example:3000", "designer");
 
     expect(resolveSettingsTabsForSession(session).map((tab) => tab.label)).toEqual([
-      "аккаунт",
+      "Аккаунт",
+      "Сессии",
     ]);
   });
 });

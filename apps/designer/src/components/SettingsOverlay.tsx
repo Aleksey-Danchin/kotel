@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
+  PiClockCounterClockwise,
   PiGearSix,
   PiSlidersHorizontal,
   PiUserCircle,
@@ -8,13 +9,13 @@ import {
 } from "react-icons/pi";
 
 import {
-  allSessionsAtom,
   allUsersForSelectedServerAtom,
   createServerUser,
+  getSessionsForServerAndUser,
   isCurrentSession,
-  removeAllSessions,
-  removeAllSessionsExcept,
-  removeCurrentSession,
+  removeAllSessionsForUser,
+  removeAllSessionsExceptForUser,
+  removeCurrentSessionForUser,
   removeSessionById,
   resolveCatalogServerId,
   selectedServerAtom,
@@ -32,6 +33,7 @@ import {
   normalizeRole,
   resolveUserEditability,
 } from "../state/settingsUsers";
+import { formatUserPresenceSubtitle } from "../state/userPresence";
 import { shouldShowDesignerRoleBadge } from "../state/roles";
 import { setServerSession } from "../state/servers";
 
@@ -70,6 +72,7 @@ function titleForTab(tabId: SettingsTabId): string {
   if (tabId === "main") return "Основные настройки сервера и интерфейса";
   if (tabId === "configurator") return "Параметры конфигуратора";
   if (tabId === "users") return "Управление пользователями и ролями";
+  if (tabId === "sessions") return "Управление сессиями на сервере";
   return "Профиль пользователя и личные настройки";
 }
 
@@ -89,7 +92,20 @@ function tabIcon(tabId: SettingsTabId) {
   }
   if (tabId === "users")
     return <PiUsersThree className="text-base" aria-hidden="true" />;
+  if (tabId === "sessions") {
+    return <PiClockCounterClockwise className="text-base" aria-hidden="true" />;
+  }
   return <PiUserCircle className="text-base" aria-hidden="true" />;
+}
+
+type SessionClientType = "web" | "app";
+
+function sessionClientType(sessionId: string): SessionClientType {
+  let sum = 0;
+  for (let index = 0; index < sessionId.length; index += 1) {
+    sum += sessionId.charCodeAt(index) ?? 0;
+  }
+  return sum % 2 === 0 ? "web" : "app";
 }
 
 export function SettingsOverlay() {
@@ -100,7 +116,6 @@ export function SettingsOverlay() {
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
   const usersRevision = useAtomValue(usersDataRevisionAtom);
   const serverUsers = useAtomValue(allUsersForSelectedServerAtom);
-  const allSessions = useAtomValue(allSessionsAtom);
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
   const settingsServerName =
     selectedServer?.name?.trim() ||
@@ -111,6 +126,9 @@ export function SettingsOverlay() {
   const safeActiveTab =
     availableTabs.find((tab) => tab.id === activeTab)?.id ??
     availableTabs[0]?.id;
+  const safeActiveTabLabel =
+    availableTabs.find((tab) => tab.id === safeActiveTab)?.label ??
+    safeActiveTab;
   const saveFormId =
     safeActiveTab === "main"
       ? "settings-main-form"
@@ -124,7 +142,11 @@ export function SettingsOverlay() {
   const hasPinnedSectionHeader =
     safeActiveTab === "main" ||
     safeActiveTab === "configurator" ||
-    safeActiveTab === "account";
+    safeActiveTab === "account" ||
+    safeActiveTab === "users" ||
+    safeActiveTab === "sessions";
+  const usersTabLayout =
+    safeActiveTab === "users" || safeActiveTab === "sessions";
   const [serverNameDraft, setServerNameDraft] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userDraft, setUserDraft] = useState({
@@ -149,6 +171,9 @@ export function SettingsOverlay() {
   const [confirmAction, setConfirmAction] =
     useState<AccountConfirmAction | null>(null);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [sessionActionUserId, setSessionActionUserId] = useState<string | null>(
+    null,
+  );
   const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -181,6 +206,13 @@ export function SettingsOverlay() {
       ? (serverUsers.find((user) => user.id === selectedUserId) ?? null)
       : null;
   const selectedUserRole = normalizeRole(selectedUser?.role ?? "");
+  const currentRole = normalizeRole(selectedServer?.user.role ?? "");
+  const canManageSelectedUserSessions = Boolean(
+    selectedUser &&
+    currentRole &&
+    (currentRole === "ROOT" ||
+      (currentRole === "ADMIN" && selectedUserRole !== "ROOT")),
+  );
   const editability = resolveUserEditability(
     selectedServer?.user.role ?? "",
     selectedUser?.role ?? "",
@@ -252,10 +284,6 @@ export function SettingsOverlay() {
     });
   }
 
-  function onConfiguratorSave(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-  }
-
   function onUserSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedUser || !editability.canEdit) {
@@ -320,6 +348,7 @@ export function SettingsOverlay() {
     const currentServerId = selectedServer
       ? resolveCatalogServerId(selectedServer)
       : null;
+    const actionUserId = sessionActionUserId ?? selectedServer?.user.id ?? null;
 
     if (confirmAction === "demote-admin" && selectedServer) {
       setServerSession({
@@ -329,20 +358,26 @@ export function SettingsOverlay() {
           role: "USER",
         },
       });
-    } else if (confirmAction === "remove-current-session" && currentServerId) {
-      removeCurrentSession(currentServerId);
-    } else if (confirmAction === "remove-all-sessions") {
-      removeAllSessions();
+    } else if (
+      confirmAction === "remove-current-session" &&
+      currentServerId &&
+      actionUserId
+    ) {
+      removeCurrentSessionForUser(currentServerId, actionUserId);
+    } else if (confirmAction === "remove-all-sessions" && actionUserId) {
+      removeAllSessionsForUser(actionUserId);
     } else if (
       confirmAction === "remove-all-except-current" &&
-      currentServerId
+      currentServerId &&
+      actionUserId
     ) {
-      removeAllSessionsExcept(currentServerId);
+      removeAllSessionsExceptForUser(currentServerId, actionUserId);
     } else if (confirmAction === "remove-session" && sessionToDelete) {
       removeSessionById(sessionToDelete);
     }
 
     setSessionToDelete(null);
+    setSessionActionUserId(null);
     setConfirmAction(null);
   }
 
@@ -398,37 +433,24 @@ export function SettingsOverlay() {
       return (
         <section className="card border border-base-300 bg-base-100">
           <div className="card-body">
-            <h4 className="card-title text-base">Параметры конфигуратора</h4>
-            <form
-              id="settings-configurator-form"
-              className="flex max-w-xl flex-col gap-4"
-              onSubmit={onConfiguratorSave}
-            >
-              <label
-                className="form-control w-full"
-                htmlFor="settings-configurator-frequency"
-              >
-                <span className="label">
-                  <span className="label-text">Частота отправки запросов</span>
-                </span>
-                <input
-                  id="settings-configurator-frequency"
-                  className="input input-bordered w-full"
-                  type="text"
-                  value="Скоро будет доступно"
-                  disabled
-                  readOnly
-                />
-              </label>
-            </form>
+            <h4 className="card-title text-base">В разработке</h4>
           </div>
         </section>
       );
     }
 
     if (safeActiveTab === "users") {
+      const currentServerId = selectedServer
+        ? resolveCatalogServerId(selectedServer)
+        : null;
+      const selectedUserSessions =
+        currentServerId && selectedUser
+          ? getSessionsForServerAndUser(currentServerId, selectedUser.id).sort(
+              (left, right) => right.createdAt.localeCompare(left.createdAt),
+            )
+          : [];
       return (
-        <div className="space-y-4">
+        <div className="flex h-full min-h-0 flex-col gap-4">
           <section className="card border border-base-300 bg-base-100">
             <div className="card-body p-3">
               <div className="flex items-center justify-end">
@@ -442,32 +464,44 @@ export function SettingsOverlay() {
               </div>
             </div>
           </section>
-          <div className="flex min-h-[420px] gap-4">
-            <section className="card w-72 shrink-0 border border-base-300 bg-base-100">
+          <div className="flex min-h-0 flex-1 gap-4">
+            <section className="card w-72 shrink-0 min-h-0 border border-base-300 bg-base-100 flex flex-col">
               <header className="flex items-center justify-between border-b border-base-300 px-3 py-2">
                 <h4 className="font-medium">Пользователи</h4>
               </header>
-              <div className="overflow-y-auto p-2">
-                <ul className="menu gap-1">
+              <div className="min-h-0 flex-1 overflow-y-auto p-2">
+                <ul className="menu gap-1 w-full">
                   {serverUsers.map((user) => (
                     <li key={user.id}>
                       <button
                         type="button"
                         className={
                           user.id === selectedUserId
-                            ? "bg-primary/20 text-primary font-semibold"
-                            : "text-base-content"
+                            ? "flex w-full items-center gap-2 bg-primary/20 text-primary font-semibold"
+                            : "flex w-full items-center gap-2 text-base-content"
                         }
                         onClick={() => setSelectedUserId(user.id)}
                       >
-                        <span className="flex w-full items-center justify-between gap-2">
-                          <span className="truncate">{user.fullname}</span>
-                          {shouldShowDesignerRoleBadge(user.role) ? (
-                            <span className="badge badge-ghost badge-sm">
-                              {normalizeRole(user.role) ?? "USER"}
-                            </span>
-                          ) : null}
+                        <span
+                          className={
+                            user.isOnline
+                              ? "h-2.5 w-2.5 shrink-0 rounded-full bg-success"
+                              : "h-2.5 w-2.5 shrink-0 rounded-full bg-base-content/30"
+                          }
+                          aria-label={user.isOnline ? "В сети" : "Не в сети"}
+                          title={user.isOnline ? "В сети" : "Не в сети"}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate">{user.fullname}</span>
+                          <span className="mt-0.5 block truncate text-xs text-base-content/70">
+                            {formatUserPresenceSubtitle(user.isOnline, user.lastSeenAt)}
+                          </span>
                         </span>
+                        {shouldShowDesignerRoleBadge(user.role) ? (
+                          <span className="badge badge-outline badge-primary badge-sm">
+                            {normalizeRole(user.role) ?? "USER"}
+                          </span>
+                        ) : null}
                       </button>
                     </li>
                   ))}
@@ -475,138 +509,234 @@ export function SettingsOverlay() {
               </div>
             </section>
 
-            <section className="card min-w-0 flex-1 border border-base-300 bg-base-100 p-4">
-              {!selectedUser ? (
-                <p className="text-base-content/70">Пользователь не выбран</p>
-              ) : (
-                <form
-                  id="settings-users-form"
-                  className="grid gap-4 md:grid-cols-2"
-                  onSubmit={onUserSave}
-                >
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">Логин</span>
-                    </span>
-                    <input
-                      className="input input-bordered w-full"
-                      type="text"
-                      value={userDraft.login}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({
-                          ...prev,
-                          login: event.target.value,
-                        }))
-                      }
-                      disabled={!editability.canEdit}
-                    />
-                  </label>
-
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">ФИО</span>
-                    </span>
-                    <input
-                      className="input input-bordered w-full"
-                      type="text"
-                      value={userDraft.fullname}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({
-                          ...prev,
-                          fullname: event.target.value,
-                        }))
-                      }
-                      disabled={!editability.canEdit}
-                    />
-                  </label>
-
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">Пароль</span>
-                    </span>
-                    <input
-                      className="input input-bordered w-full"
-                      type="text"
-                      value={userDraft.password}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({
-                          ...prev,
-                          password: event.target.value,
-                        }))
-                      }
-                      disabled={!editability.canEdit}
-                    />
-                  </label>
-
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">Роль</span>
-                    </span>
-                    <select
-                      className="select select-bordered w-full"
-                      value={userDraft.role}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({
-                          ...prev,
-                          role: event.target.value,
-                        }))
-                      }
-                      disabled={!editability.canChangeRole}
+            <div className="min-h-0 min-w-0 flex-1 flex flex-col gap-4">
+              <section className="card border border-base-300 bg-base-100">
+                <div className="p-4">
+                  {!selectedUser ? (
+                    <p className="text-base-content/70">
+                      Пользователь не выбран
+                    </p>
+                  ) : (
+                    <form
+                      id="settings-users-form"
+                      className="grid gap-4 md:grid-cols-2"
+                      onSubmit={onUserSave}
                     >
-                      <option value="ADMIN">ADMIN</option>
-                      <option value="USER">USER</option>
-                      <option value="ROOT">ROOT</option>
-                    </select>
-                  </label>
+                      <label className="form-control w-full">
+                        <span className="label">
+                          <span className="label-text">Логин</span>
+                        </span>
+                        <input
+                          className="input input-bordered w-full"
+                          type="text"
+                          value={userDraft.login}
+                          onChange={(event) =>
+                            setUserDraft((prev) => ({
+                              ...prev,
+                              login: event.target.value,
+                            }))
+                          }
+                          disabled={!editability.canEdit}
+                        />
+                      </label>
 
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">Статус блокировки</span>
-                    </span>
-                    <input
-                      className="toggle"
-                      type="checkbox"
-                      checked={userDraft.blocked}
-                      onChange={(event) =>
-                        setUserDraft((prev) => ({
-                          ...prev,
-                          blocked: event.target.checked,
-                        }))
-                      }
-                      disabled={!editability.canEdit}
-                    />
-                  </label>
+                      <label className="form-control w-full">
+                        <span className="label">
+                          <span className="label-text">ФИО</span>
+                        </span>
+                        <input
+                          className="input input-bordered w-full"
+                          type="text"
+                          value={userDraft.fullname}
+                          onChange={(event) =>
+                            setUserDraft((prev) => ({
+                              ...prev,
+                              fullname: event.target.value,
+                            }))
+                          }
+                          disabled={!editability.canEdit}
+                        />
+                      </label>
 
-                  <label className="form-control w-full">
-                    <span className="label">
-                      <span className="label-text">Частота запросов</span>
-                    </span>
-                    <input
-                      className="input input-bordered w-full"
-                      type="text"
-                      value="Скоро будет доступно"
-                      disabled
-                      readOnly
-                    />
-                  </label>
-                </form>
-              )}
-            </section>
+                      <label className="form-control w-full">
+                        <span className="label">
+                          <span className="label-text">Пароль</span>
+                        </span>
+                        <input
+                          className="input input-bordered w-full"
+                          type="text"
+                          value={userDraft.password}
+                          onChange={(event) =>
+                            setUserDraft((prev) => ({
+                              ...prev,
+                              password: event.target.value,
+                            }))
+                          }
+                          disabled={!editability.canEdit}
+                        />
+                      </label>
+
+                      <label className="form-control w-full">
+                        <span className="label">
+                          <span className="label-text">Роль</span>
+                        </span>
+                        <select
+                          className="select select-bordered w-full"
+                          value={userDraft.role}
+                          onChange={(event) =>
+                            setUserDraft((prev) => ({
+                              ...prev,
+                              role: event.target.value,
+                            }))
+                          }
+                          disabled={!editability.canChangeRole}
+                        >
+                          <option value="ADMIN">ADMIN</option>
+                          <option value="USER">USER</option>
+                          <option value="ROOT">ROOT</option>
+                        </select>
+                      </label>
+
+                    <label className="label justify-start gap-3">
+                      <input
+                        className="toggle toggle-error"
+                        type="checkbox"
+                        checked={userDraft.blocked}
+                        onChange={(event) =>
+                          setUserDraft((prev) => ({
+                            ...prev,
+                            blocked: event.target.checked,
+                          }))
+                        }
+                        disabled={!editability.canEdit}
+                      />
+                      <span className="text-error">Статус блокировки</span>
+                    </label>
+
+                    </form>
+                  )}
+                </div>
+              </section>
+
+              <section className="card border border-base-300 bg-base-100">
+                <div className="card-body p-3">
+                  {!selectedUser ? (
+                    <p className="text-base-content/70">
+                      Пользователь не выбран
+                    </p>
+                  ) : (
+                    <div className="flex items-center justify-end">
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-error btn-sm"
+                        onClick={() => {
+                          setSessionActionUserId(selectedUser.id);
+                          setConfirmAction("remove-all-sessions");
+                        }}
+                        disabled={
+                          selectedUserSessions.length === 0 ||
+                          !canManageSelectedUserSessions
+                        }
+                      >
+                        Завершить все сессии
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="card min-h-0 flex-1 border border-base-300 bg-base-100">
+                <div className="min-h-0 flex-1 overflow-y-auto p-4">
+                  {!selectedUser ? (
+                    <p className="text-base-content/70">
+                      Пользователь не выбран
+                    </p>
+                  ) : (
+                    <>
+                      {!canManageSelectedUserSessions ? (
+                        <p className="mb-2 text-sm text-warning">
+                          ADMIN не может управлять сессиями пользователя ROOT.
+                        </p>
+                      ) : null}
+                      <div className="overflow-x-auto">
+                        <table className="table table-zebra">
+                          <thead>
+                            <tr>
+                              <th>Сервер эммитер</th>
+                              <th>Клиент Тип</th>
+                              <th>Клиент адрес</th>
+                              <th>Активен</th>
+                              <th className="w-12" />
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedUserSessions.map((session) => {
+                              const clientType = sessionClientType(session.id);
+                              const isCurrent = isCurrentSession(
+                                session,
+                                currentServerId,
+                              );
+                              const emitterDomain = selectedServer
+                                ? displayServerHost(selectedServer.serverUrl)
+                                : "—";
+                              return (
+                                <tr key={session.id}>
+                                  <td>{emitterDomain}</td>
+                                  <td>
+                                    <span
+                                      className={
+                                        clientType === "web"
+                                          ? "badge badge-outline badge-primary"
+                                          : "badge badge-outline badge-secondary"
+                                      }
+                                    >
+                                      {clientType}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    {clientType === "web" ? emitterDomain : "—"}
+                                  </td>
+                                  <td>
+                                    {formatSessionLifetime(session.createdAt)}
+                                  </td>
+                                  <td>
+                                    <button
+                                      type="button"
+                                      className={
+                                        isCurrent
+                                          ? "btn btn-primary btn-xs"
+                                          : "btn btn-error btn-xs"
+                                      }
+                                      aria-label={`Удалить сессию ${session.id}`}
+                                      disabled={!canManageSelectedUserSessions}
+                                      onClick={() => {
+                                        setSessionToDelete(session.id);
+                                        setSessionActionUserId(selectedUser.id);
+                                        setConfirmAction("remove-session");
+                                      }}
+                                    >
+                                      X
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       );
     }
 
     if (safeActiveTab === "account") {
-      const currentServerId = selectedServer
-        ? resolveCatalogServerId(selectedServer)
-        : null;
-      const sessionsSorted = [...allSessions].sort((left, right) =>
-        right.createdAt.localeCompare(left.createdAt),
-      );
-
       return (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <section className="card border border-base-300 bg-base-100">
             <div className="card-body">
               <h4 className="card-title text-base">Профиль</h4>
@@ -684,77 +814,126 @@ export function SettingsOverlay() {
               </button>
             </section>
           ) : null}
+        </div>
+      );
+    }
 
+    if (safeActiveTab === "sessions") {
+      const currentServerId = selectedServer
+        ? resolveCatalogServerId(selectedServer)
+        : null;
+      const emitterDomain = selectedServer
+        ? displayServerHost(selectedServer.serverUrl)
+        : "—";
+      const currentUserId = selectedServer?.user.id ?? null;
+      const sessionsSorted =
+        currentServerId && currentUserId
+          ? getSessionsForServerAndUser(currentServerId, currentUserId).sort(
+              (left, right) => right.createdAt.localeCompare(left.createdAt),
+            )
+          : [];
+      return (
+        <div className="flex h-full min-h-0 flex-col gap-4">
           <section className="card border border-base-300 bg-base-100 p-4">
-            <h4 className="font-medium">Завершить сессию</h4>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => setConfirmAction("remove-current-session")}
+                className="btn btn-outline btn-error btn-sm"
+                onClick={() => {
+                  setSessionActionUserId(currentUserId);
+                  setConfirmAction("remove-current-session");
+                }}
                 disabled={!currentServerId}
               >
                 Завершить текущую сессию
               </button>
               <button
                 type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => setConfirmAction("remove-all-sessions")}
-                disabled={allSessions.length === 0}
+                className="btn btn-outline btn-error btn-sm"
+                onClick={() => {
+                  setSessionActionUserId(currentUserId);
+                  setConfirmAction("remove-all-sessions");
+                }}
+                disabled={sessionsSorted.length === 0}
               >
                 Завершить все сессии
               </button>
               <button
                 type="button"
-                className="btn btn-outline btn-sm"
-                onClick={() => setConfirmAction("remove-all-except-current")}
+                className="btn btn-outline btn-error btn-sm"
+                onClick={() => {
+                  setSessionActionUserId(currentUserId);
+                  setConfirmAction("remove-all-except-current");
+                }}
                 disabled={!currentServerId}
               >
-                Завершить все сессии, кроме текущей
+                Завершить все, кроме текущей
               </button>
             </div>
+          </section>
 
-            <div className="mt-4 overflow-x-auto">
-              <table className="table table-zebra">
-                <thead>
-                  <tr>
-                    <th>Сессия</th>
-                    <th>Сервер</th>
-                    <th>Активна</th>
-                    <th className="w-12" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {sessionsSorted.map((session) => {
-                    const isCurrent = isCurrentSession(
-                      session,
-                      currentServerId,
-                    );
-                    return (
-                      <tr key={session.id}>
-                        <td>{session.id}</td>
-                        <td>{session.serverId}</td>
-                        <td>{formatSessionLifetime(session.createdAt)}</td>
-                        <td>
-                          {isCurrent ? null : (
+          <section className="card min-h-0 flex-1 border border-base-300 bg-base-100">
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              <div className="overflow-x-auto">
+                <table className="table table-zebra">
+                  <thead>
+                    <tr>
+                      <th>Родительский сервер</th>
+                      <th>Тип</th>
+                      <th>Клиент</th>
+                      <th>Активен</th>
+                      <th className="w-12" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sessionsSorted.map((session) => {
+                      const isCurrent = isCurrentSession(
+                        session,
+                        currentServerId,
+                      );
+                      const clientType = sessionClientType(session.id);
+                      return (
+                        <tr key={session.id}>
+                          <td>{emitterDomain}</td>
+                          <td>
+                            <span
+                              className={
+                                clientType === "web"
+                                  ? "badge badge-outline badge-primary"
+                                  : "badge badge-outline badge-secondary"
+                              }
+                            >
+                              {clientType}
+                            </span>
+                          </td>
+                          <td>
+                            {clientType === "web" ? emitterDomain : "android"}
+                          </td>
+                          <td>{formatSessionLifetime(session.createdAt)}</td>
+                          <td>
                             <button
                               type="button"
-                              className="btn btn-ghost btn-xs"
+                              className={
+                                isCurrent
+                                  ? "btn btn-primary btn-xs"
+                                  : "btn btn-error btn-xs"
+                              }
                               aria-label={`Удалить сессию ${session.id}`}
                               onClick={() => {
                                 setSessionToDelete(session.id);
+                                setSessionActionUserId(currentUserId);
                                 setConfirmAction("remove-session");
                               }}
                             >
                               X
                             </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
         </div>
@@ -775,7 +954,7 @@ export function SettingsOverlay() {
         <header className="flex items-center justify-between gap-4 border-b border-gray-400 bg-base-300 p-4">
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold text-base-content">
-              Настройки {settingsServerName}
+              Настройки "{settingsServerName}" сервера
             </h2>
             {settingsServerHost && (
               <p className="truncate text-xs text-base-content/70">
@@ -820,21 +999,25 @@ export function SettingsOverlay() {
           <div className="flex min-h-0 flex-1 flex-col bg-base-200">
             {hasPinnedSectionHeader ? (
               <header className="shrink-0 border-b border-gray-400 bg-base-200 p-4">
-                <h3 className="text-xl font-semibold capitalize">
-                  {safeActiveTab}
-                </h3>
+                <h3 className="text-xl font-semibold">{safeActiveTabLabel}</h3>
                 <p className="mt-2 text-base-content/70">
                   {titleForTab(safeActiveTab)}
                 </p>
               </header>
             ) : null}
-            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+            <div
+              className={
+                usersTabLayout
+                  ? "min-h-0 flex-1 overflow-hidden p-4"
+                  : "min-h-0 flex-1 overflow-y-auto p-4"
+              }
+            >
               {hasPinnedSectionHeader ? (
                 renderTabContent()
               ) : (
                 <>
-                  <h3 className="text-xl font-semibold capitalize">
-                    {safeActiveTab}
+                  <h3 className="text-xl font-semibold">
+                    {safeActiveTabLabel}
                   </h3>
                   <p className="mt-2 text-base-content/70">
                     {titleForTab(safeActiveTab)}
@@ -862,7 +1045,7 @@ export function SettingsOverlay() {
       </section>
 
       {isAddUserModalOpen ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-base-content/40 p-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
           <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
             <h4 className="text-lg font-semibold">Добавить пользователя</h4>
             <form className="mt-4 space-y-3" onSubmit={onCreateUser}>
@@ -957,7 +1140,7 @@ export function SettingsOverlay() {
       ) : null}
 
       {confirmAction ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-base-content/40 p-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
           <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
             <h4 className="text-lg font-semibold">Подтверждение</h4>
             <p className="mt-3 text-base-content/80">
@@ -978,6 +1161,7 @@ export function SettingsOverlay() {
                 onClick={() => {
                   setConfirmAction(null);
                   setSessionToDelete(null);
+                  setSessionActionUserId(null);
                 }}
               >
                 Отмена
@@ -994,7 +1178,7 @@ export function SettingsOverlay() {
         </div>
       ) : null}
       {saveConfirmOpen ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-base-content/40 p-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
           <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
             <h4 className="text-lg font-semibold">Подтверждение сохранения</h4>
             <p className="mt-3 text-base-content/80">

@@ -50,7 +50,11 @@ export const routeContextAtom = atom<
 /** Идёт ли временная имитация загрузки треда при переходах внутри `/$id`. */
 export const threadTransitionLoadingAtom = atom(false);
 
-type MockServer = { id: string; serverUrl: string };
+type MockServer = {
+  id: string;
+  serverUrl: string;
+  user?: { id: string };
+};
 export type MockUser = {
   id: string;
   fullname: string;
@@ -62,14 +66,20 @@ export type MockUser = {
   isOnline: boolean;
   lastSeenAt: string;
 };
-type MockSession = { id: string; serverId: string; createdAt: string };
+type MockSession = { id: string; serverId: string; userId?: string; createdAt: string };
 type ServerChatLink = [serverId: string, chatId: string];
 type ChatMessageLink = [chatId: string, messageId: string];
 type ServerUserLink = [serverId: string, userId: string];
 
 const MOCK_SERVERS = stateMocks.servers as MockServer[];
 const MOCK_USERS = stateMocks.users as MockUser[];
-const MOCK_SESSIONS = stateMocks.sessions as MockSession[];
+const SERVER_OWNER_BY_ID = new Map(
+  MOCK_SERVERS.map((server) => [server.id, server.user?.id ?? ""]),
+);
+const MOCK_SESSIONS = (stateMocks.sessions as MockSession[]).map((session) => ({
+  ...session,
+  userId: session.userId ?? SERVER_OWNER_BY_ID.get(session.serverId) ?? "",
+}));
 const MOCK_CHATS = stateMocks.chats as ChatPreview[];
 const MOCK_MESSAGES = stateMocks.messages as ChatMessage[];
 const SERVER_CHATS = stateMocks.serverChats as ServerChatLink[];
@@ -235,6 +245,15 @@ export function getSessionsForServer(serverId: string): MockSession[] {
   return MOCK_SESSIONS.filter((session) => session.serverId === serverId);
 }
 
+export function getSessionsForServerAndUser(
+  serverId: string,
+  userId: string,
+): MockSession[] {
+  return MOCK_SESSIONS.filter(
+    (session) => session.serverId === serverId && session.userId === userId,
+  );
+}
+
 export function getAllSessions(): MockSession[] {
   return [...MOCK_SESSIONS];
 }
@@ -264,6 +283,17 @@ export function removeCurrentSession(serverId: string): void {
   bumpSessionsDataRevision();
 }
 
+export function removeCurrentSessionForUser(serverId: string, userId: string): void {
+  const nextSessions = MOCK_SESSIONS.filter(
+    (session) => !(session.serverId === serverId && session.userId === userId),
+  );
+  if (nextSessions.length === MOCK_SESSIONS.length) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length, ...nextSessions);
+  bumpSessionsDataRevision();
+}
+
 export function removeAllSessions(): void {
   if (MOCK_SESSIONS.length === 0) {
     return;
@@ -272,8 +302,31 @@ export function removeAllSessions(): void {
   bumpSessionsDataRevision();
 }
 
+export function removeAllSessionsForUser(userId: string): void {
+  const nextSessions = MOCK_SESSIONS.filter((session) => session.userId !== userId);
+  if (nextSessions.length === MOCK_SESSIONS.length) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length, ...nextSessions);
+  bumpSessionsDataRevision();
+}
+
 export function removeAllSessionsExcept(serverId: string): void {
   const nextSessions = MOCK_SESSIONS.filter((session) => session.serverId === serverId);
+  if (nextSessions.length === MOCK_SESSIONS.length) {
+    return;
+  }
+  MOCK_SESSIONS.splice(0, MOCK_SESSIONS.length, ...nextSessions);
+  bumpSessionsDataRevision();
+}
+
+export function removeAllSessionsExceptForUser(
+  serverId: string,
+  userId: string,
+): void {
+  const nextSessions = MOCK_SESSIONS.filter(
+    (session) => session.userId !== userId || session.serverId === serverId,
+  );
   if (nextSessions.length === MOCK_SESSIONS.length) {
     return;
   }

@@ -218,7 +218,7 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
             </div>
           </form>
         </div>
-        <form method="dialog" className="modal-backdrop">
+        <form method="dialog" className="modal-backdrop bg-black/50">
           <button type="submit" aria-label="Закрыть" />
         </form>
       </dialog>

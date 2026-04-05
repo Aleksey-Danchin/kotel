@@ -58,3 +58,4 @@ export function resolveSettingsTabsForSession(
 export const isSettingsOpenAtom = atom(false);
 export const settingsInitialTabAtom = atom<SettingsTabId>("main");
 export const settingsActiveTabAtom = atom<SettingsTabId>("main");
+export const settingsServerUrlAtom = atom<string | null>(null);

@@ -1,11 +1,14 @@
 import { useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import {
   isSettingsOpenAtom,
+  settingsServerUrlAtom,
   settingsActiveTabAtom,
   settingsInitialTabAtom,
   type SettingsOpenSource,
   initialSettingsTabForSource,
 } from "../state/settingsOverlay";
+import { selectedServerAtom } from "../state/store";
 
 function GearIcon({ className }: { className?: string }) {
   return (
@@ -37,7 +40,9 @@ interface ColumnHeaderGearProps {
 }
 
 export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
+  const selectedServer = useAtomValue(selectedServerAtom);
   const setIsOpen = useSetAtom(isSettingsOpenAtom);
+  const setSettingsServerUrl = useSetAtom(settingsServerUrlAtom);
   const setInitialTab = useSetAtom(settingsInitialTabAtom);
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
 
@@ -51,6 +56,7 @@ export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
         const initialTab = initialSettingsTabForSource(source);
         setInitialTab(initialTab);
         setActiveTab(initialTab);
+        setSettingsServerUrl(selectedServer?.serverUrl ?? null);
         setIsOpen(true);
       }}
     >

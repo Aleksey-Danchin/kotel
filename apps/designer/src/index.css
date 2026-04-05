@@ -4,10 +4,18 @@
 /* Keep focus border change, remove extra outer focus ring. */
 .input:focus,
 .input:focus-visible,
+.input:focus-within,
 .textarea:focus,
 .textarea:focus-visible,
 .select:focus,
 .select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* For DaisyUI input wrappers: remove native input inner focus outline. */
+.input input:focus,
+.input input:focus-visible {
   outline: none;
   box-shadow: none;
 }

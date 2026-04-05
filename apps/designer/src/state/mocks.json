@@ -1572,6 +1572,15 @@
       "role": "ROOT",
       "isOnline": true,
       "lastSeenAt": "2026-03-26T08:32:00.000Z"
+    },
+    {
+      "id": "mock-user-local-root",
+      "fullname": "Root Local",
+      "login": "root",
+      "role": "ROOT",
+      "blocked": true,
+      "isOnline": false,
+      "lastSeenAt": "2026-03-20T10:00:00.000Z"
     }
   ],
   "serverUsers": [
@@ -1589,6 +1598,7 @@
     ["srv_ru", "peer-support-ru"],
     ["srv_local", "peer-local-buddy"],
     ["srv_local", "peer-qa"],
+    ["srv_local", "mock-user-local-root"],
     ["srv_root_ops", "mock-user-6"]
   ],
   "sessions": [
@@ -1825,6 +1835,24 @@
       "serverId": "srv_local",
       "userId": "peer-qa",
       "createdAt": "2026-03-25T18:05:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_mock-user-local-root_primary",
+      "serverId": "srv_local",
+      "userId": "mock-user-local-root",
+      "createdAt": "2026-03-21T09:10:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_mock-user-local-root_web",
+      "serverId": "srv_local",
+      "userId": "mock-user-local-root",
+      "createdAt": "2026-03-20T17:45:00.000Z"
+    },
+    {
+      "id": "sess_srv_local_mock-user-local-root_app",
+      "serverId": "srv_local",
+      "userId": "mock-user-local-root",
+      "createdAt": "2026-03-20T10:05:00.000Z"
     },
     {
       "id": "sess_srv_no_chats_mock-user-5_primary",

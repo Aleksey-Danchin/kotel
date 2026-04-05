@@ -4,7 +4,6 @@ import { useAtomValue } from "jotai";
 import {
   serversAtom,
   setServerSession,
-  removeServerSession,
   type ServerSession,
 } from "../state/servers";
 import { enterServer } from "../state/designerNavigation";
@@ -109,11 +108,6 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
     }
   };
 
-  function onDisconnect(serverUrl: string) {
-    setError(null);
-    removeServerSession(serverUrl);
-  }
-
   if (isLoading) {
     return <ServicesColumnSkeleton />;
   }
@@ -143,7 +137,6 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
                 const rid = serverRouteIdFromServerUrl(session.serverUrl);
                 enterServer(navigate, rid);
               }}
-              onDelete={() => onDisconnect(session.serverUrl)}
             />
           );
         })}

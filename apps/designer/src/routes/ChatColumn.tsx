@@ -11,6 +11,7 @@ import {
 import { useAtomValue } from "jotai";
 import { FaArrowDownLong } from "react-icons/fa6";
 import { GrSend } from "react-icons/gr";
+import { HiUserGroup } from "react-icons/hi";
 
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatColumnSkeleton } from "../components/ChatColumnSkeleton";
@@ -234,6 +235,8 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
           selectedPersonChatPeer.lastSeenAt,
         )
       : null;
+  const selectedChatSubtitle = selectedChat?.subtitle?.trim() ?? "";
+  const headerSubtitle = selectedChatSubtitle || personChatPresenceSubtitle;
 
   useLayoutEffect(() => {
     const composer = composerRef.current;
@@ -310,12 +313,18 @@ export function ChatColumn({ children, isLoading = false }: ChatColumnProps) {
                       selectedPersonChatPeer?.isOnline ? "В сети" : "Не в сети"
                     }
                   />
+                ) : selectedChat?.type === "group" ? (
+                  <HiUserGroup
+                    className="h-4 w-4 shrink-0 text-base-content/60"
+                    aria-label="Групповой чат"
+                    title="Групповой чат"
+                  />
                 ) : null}
                 <span className="truncate">{chatHeaderTitle(selectedChat!)}</span>
               </h1>
-              {personChatPresenceSubtitle ? (
+              {headerSubtitle ? (
                 <p className="truncate text-xs text-base-content/70">
-                  {personChatPresenceSubtitle}
+                  {headerSubtitle}
                 </p>
               ) : null}
             </div>

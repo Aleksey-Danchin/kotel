@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
   PiClockCounterClockwise,
@@ -7,10 +7,11 @@ import {
   PiUserCircle,
   PiUsersThree,
 } from "react-icons/pi";
+import { BsCheckSquare, BsSquare } from "react-icons/bs";
 
 import {
-  allUsersForSelectedServerAtom,
   createServerUser,
+  getServerUsers,
   getSessionsForServerAndUser,
   isCurrentSession,
   removeAllSessionsForUser,
@@ -18,6 +19,7 @@ import {
   removeCurrentSessionForUser,
   removeSessionById,
   resolveCatalogServerId,
+  serversListAtom,
   selectedServerAtom,
   updateServerUser,
   usersDataRevisionAtom,
@@ -26,6 +28,7 @@ import {
   isSettingsOpenAtom,
   resolveSettingsTabsForSession,
   settingsActiveTabAtom,
+  settingsServerUrlAtom,
   type SettingsTabId,
 } from "../state/settingsOverlay";
 import {
@@ -36,6 +39,7 @@ import {
 import { formatUserPresenceSubtitle } from "../state/userPresence";
 import { shouldShowDesignerRoleBadge } from "../state/roles";
 import { setServerSession } from "../state/servers";
+import { isSearchMatch } from "../state/chatSearch";
 
 type AccountConfirmAction =
   | "demote-admin"
@@ -99,6 +103,7 @@ function tabIcon(tabId: SettingsTabId) {
 }
 
 type SessionClientType = "web" | "app";
+type ReuseReactionMode = "debug" | "isolation" | "quarantine" | "lockdown";
 
 function sessionClientType(sessionId: string): SessionClientType {
   let sum = 0;
@@ -109,26 +114,36 @@ function sessionClientType(sessionId: string): SessionClientType {
 }
 
 export function SettingsOverlay() {
-  const selectedServer = useAtomValue(selectedServerAtom);
+  const routeSelectedServer = useAtomValue(selectedServerAtom);
+  const serversList = useAtomValue(serversListAtom);
+  const settingsServerUrl = useAtomValue(settingsServerUrlAtom);
+  const setSettingsServerUrl = useSetAtom(settingsServerUrlAtom);
+  const selectedServer =
+    (settingsServerUrl
+      ? serversList.find((server) => server.serverUrl === settingsServerUrl) ??
+        null
+      : null) ?? routeSelectedServer;
   const isOpen = useAtomValue(isSettingsOpenAtom);
   const setIsOpen = useSetAtom(isSettingsOpenAtom);
   const activeTab = useAtomValue(settingsActiveTabAtom);
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
   const usersRevision = useAtomValue(usersDataRevisionAtom);
-  const serverUsers = useAtomValue(allUsersForSelectedServerAtom);
   const availableTabs = resolveSettingsTabsForSession(selectedServer);
-  const settingsServerName =
-    selectedServer?.name?.trim() ||
-    (selectedServer ? displayServerHost(selectedServer.serverUrl) : "сервер");
   const settingsServerHost = selectedServer
     ? displayServerHost(selectedServer.serverUrl)
     : null;
+  const settingsServerLabel = selectedServer
+    ? selectedServer.name?.trim() || settingsServerHost || selectedServer.serverUrl
+    : "Сервер не выбран";
+  const selectedServerCatalogId = selectedServer
+    ? resolveCatalogServerId(selectedServer)
+    : null;
+  const serverUsers = selectedServerCatalogId
+    ? getServerUsers(selectedServerCatalogId)
+    : [];
   const safeActiveTab =
     availableTabs.find((tab) => tab.id === activeTab)?.id ??
     availableTabs[0]?.id;
-  const safeActiveTabLabel =
-    availableTabs.find((tab) => tab.id === safeActiveTab)?.label ??
-    safeActiveTab;
   const saveFormId =
     safeActiveTab === "main"
       ? "settings-main-form"
@@ -139,16 +154,14 @@ export function SettingsOverlay() {
           : safeActiveTab === "account"
             ? "settings-account-form"
             : null;
-  const hasPinnedSectionHeader =
-    safeActiveTab === "main" ||
-    safeActiveTab === "configurator" ||
-    safeActiveTab === "account" ||
-    safeActiveTab === "users" ||
-    safeActiveTab === "sessions";
   const usersTabLayout =
     safeActiveTab === "users" || safeActiveTab === "sessions";
   const [serverNameDraft, setServerNameDraft] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [usersSearch, setUsersSearch] = useState("");
+  const [debouncedUsersSearch, setDebouncedUsersSearch] = useState("");
+  const [reuseReactionMode, setReuseReactionMode] =
+    useState<ReuseReactionMode>("debug");
   const [userDraft, setUserDraft] = useState({
     login: "",
     fullname: "",
@@ -163,10 +176,17 @@ export function SettingsOverlay() {
     password: "",
   });
   const [addUserError, setAddUserError] = useState<string | null>(null);
+  const [userPasswordDraft, setUserPasswordDraft] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
   const [accountDraft, setAccountDraft] = useState({
     login: "",
     fullname: "",
-    password: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
   });
   const [confirmAction, setConfirmAction] =
     useState<AccountConfirmAction | null>(null);
@@ -175,6 +195,10 @@ export function SettingsOverlay() {
     null,
   );
   const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
+  const usersDetailsColumnRef = useRef<HTMLDivElement | null>(null);
+  const settingsServerDropdownTriggerRef = useRef<HTMLButtonElement | null>(
+    null,
+  );
 
   useEffect(() => {
     setServerNameDraft(selectedServer?.name ?? "");
@@ -191,15 +215,18 @@ export function SettingsOverlay() {
     if (safeActiveTab !== "users") {
       return;
     }
-    if (serverUsers.length === 0) {
+    const usersForSelection = selectedServerCatalogId
+      ? getServerUsers(selectedServerCatalogId)
+      : [];
+    if (usersForSelection.length === 0) {
       setSelectedUserId(null);
       return;
     }
-    const exists = serverUsers.some((user) => user.id === selectedUserId);
+    const exists = usersForSelection.some((user) => user.id === selectedUserId);
     if (!exists) {
-      setSelectedUserId(serverUsers[0]?.id ?? null);
+      setSelectedUserId(usersForSelection[0]?.id ?? null);
     }
-  }, [safeActiveTab, serverUsers, selectedUserId, usersRevision]);
+  }, [safeActiveTab, selectedServerCatalogId, selectedUserId, usersRevision]);
 
   const selectedUser =
     safeActiveTab === "users"
@@ -207,7 +234,12 @@ export function SettingsOverlay() {
       : null;
   const selectedUserRole = normalizeRole(selectedUser?.role ?? "");
   const currentRole = normalizeRole(selectedServer?.user.role ?? "");
+  const isRootUserHidden =
+    selectedUserRole === "ROOT" &&
+    selectedUser?.id !== undefined &&
+    selectedUser?.id !== selectedServer?.user.id;
   const canManageSelectedUserSessions = Boolean(
+    !isRootUserHidden &&
     selectedUser &&
     currentRole &&
     (currentRole === "ROOT" ||
@@ -220,8 +252,20 @@ export function SettingsOverlay() {
   const saveDisabled =
     !saveFormId ||
     (safeActiveTab === "main" && !selectedServer) ||
-    (safeActiveTab === "users" && (!selectedUser || !editability.canEdit)) ||
+    (safeActiveTab === "users" &&
+      (!selectedUser || !editability.canEdit || isRootUserHidden)) ||
     (safeActiveTab === "account" && !selectedServer);
+  const isSelectedCurrentUser =
+    selectedUser?.id !== undefined &&
+    selectedUser?.id === selectedServer?.user.id;
+  const usersSearchTrimmed = usersSearch.trim();
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedUsersSearch(usersSearch);
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [usersSearch]);
 
   useEffect(() => {
     if (!selectedUser) {
@@ -231,6 +275,11 @@ export function SettingsOverlay() {
         password: "",
         blocked: false,
         role: "USER",
+      });
+      setUserPasswordDraft({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
       });
       return;
     }
@@ -242,6 +291,11 @@ export function SettingsOverlay() {
       blocked: selectedUser.blocked ?? false,
       role: selectedUserRole ?? "USER",
     });
+    setUserPasswordDraft({
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
   }, [
     selectedUser?.id,
     selectedUser?.login,
@@ -252,14 +306,29 @@ export function SettingsOverlay() {
   ]);
 
   useEffect(() => {
+    if (safeActiveTab !== "users") {
+      return;
+    }
+    usersDetailsColumnRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [safeActiveTab, selectedUser?.id]);
+
+  useEffect(() => {
     if (!selectedServer) {
-      setAccountDraft({ login: "", fullname: "", password: "" });
+      setAccountDraft({
+        login: "",
+        fullname: "",
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
       return;
     }
     setAccountDraft({
       login: selectedServer.user.login,
       fullname: selectedServer.user.fullname,
-      password: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
     });
   }, [
     selectedServer?.serverUrl,
@@ -423,6 +492,21 @@ export function SettingsOverlay() {
                   disabled={!selectedServer}
                 />
               </label>
+              <label
+                className="form-control w-full"
+                htmlFor="settings-server-url"
+              >
+                <span className="label">
+                  <span className="label-text">URL сервера</span>
+                </span>
+                <input
+                  id="settings-server-url"
+                  className="input input-bordered w-full"
+                  type="text"
+                  value={selectedServer?.serverUrl ?? ""}
+                  disabled
+                />
+              </label>
             </form>
           </div>
         </section>
@@ -433,7 +517,113 @@ export function SettingsOverlay() {
       return (
         <section className="card border border-base-300 bg-base-100">
           <div className="card-body">
-            <h4 className="card-title text-base">В разработке</h4>
+            <h4 className="card-title text-base">Refresh Reuse Detection</h4>
+            <form
+              id="settings-configurator-form"
+              className="flex max-w-xl flex-col gap-4"
+              onSubmit={(event) => event.preventDefault()}
+            >
+              <div className="flex flex-col gap-4">
+                <div className="join join-vertical w-full">
+                  <button
+                    type="button"
+                    className={`btn join-item h-auto justify-start px-4 py-4 normal-case ${reuseReactionMode === "debug" ? "btn-primary border-primary! z-10" : "btn-outline border-gray-600 text-base-content"}`}
+                    onClick={() => setReuseReactionMode("debug")}
+                  >
+                    <span className="flex w-full items-center gap-3">
+                      <span className="flex w-5 shrink-0 items-center">
+                        {reuseReactionMode === "debug" ? (
+                          <BsCheckSquare
+                            aria-hidden="true"
+                            className="text-base"
+                          />
+                        ) : (
+                          <BsSquare aria-hidden="true" className="text-base" />
+                        )}
+                      </span>
+                      <span className="flex flex-col items-start gap-1.5">
+                        <span className="font-semibold">Отладка</span>
+                        <span className="text-xs font-normal opacity-80">
+                          Минимальные ограничения, расширенные логи для анализа.
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn join-item h-auto justify-start px-4 py-4 normal-case ${reuseReactionMode === "isolation" ? "btn-primary border-primary! z-10" : "btn-outline border-gray-600 text-base-content"}`}
+                    onClick={() => setReuseReactionMode("isolation")}
+                  >
+                    <span className="flex w-full items-center gap-3">
+                      <span className="flex w-5 shrink-0 items-center">
+                        {reuseReactionMode === "isolation" ? (
+                          <BsCheckSquare
+                            aria-hidden="true"
+                            className="text-base"
+                          />
+                        ) : (
+                          <BsSquare aria-hidden="true" className="text-base" />
+                        )}
+                      </span>
+                      <span className="flex flex-col items-start gap-1.5">
+                        <span className="font-semibold">Изоляция</span>
+                        <span className="text-xs font-normal opacity-80">
+                          Ограничение действий в рамках изолированного контура.
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn join-item h-auto justify-start px-4 py-4 normal-case ${reuseReactionMode === "quarantine" ? "btn-primary border-primary! z-10" : "btn-outline border-gray-600 text-base-content"}`}
+                    onClick={() => setReuseReactionMode("quarantine")}
+                  >
+                    <span className="flex w-full items-center gap-3">
+                      <span className="flex w-5 shrink-0 items-center">
+                        {reuseReactionMode === "quarantine" ? (
+                          <BsCheckSquare
+                            aria-hidden="true"
+                            className="text-base"
+                          />
+                        ) : (
+                          <BsSquare aria-hidden="true" className="text-base" />
+                        )}
+                      </span>
+                      <span className="flex flex-col items-start gap-1.5">
+                        <span className="font-semibold">Карантин</span>
+                        <span className="text-xs font-normal opacity-80">
+                          Временная блокировка подозрительных операций и сессий.
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn join-item h-auto justify-start px-4 py-4 normal-case ${reuseReactionMode === "lockdown" ? "btn-primary border-primary! z-10" : "btn-outline border-gray-600 text-base-content"}`}
+                    onClick={() => setReuseReactionMode("lockdown")}
+                  >
+                    <span className="flex w-full items-center gap-3">
+                      <span className="flex w-5 shrink-0 items-center">
+                        {reuseReactionMode === "lockdown" ? (
+                          <BsCheckSquare
+                            aria-hidden="true"
+                            className="text-base"
+                          />
+                        ) : (
+                          <BsSquare aria-hidden="true" className="text-base" />
+                        )}
+                      </span>
+                      <span className="flex flex-col items-start gap-1.5">
+                        <span className="font-semibold">Блокировка</span>
+                        <span className="text-xs font-normal opacity-80">
+                          Максимальные ограничения до ручного подтверждения.
+                        </span>
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </section>
       );
@@ -443,6 +633,9 @@ export function SettingsOverlay() {
       const currentServerId = selectedServer
         ? resolveCatalogServerId(selectedServer)
         : null;
+      const filteredServerUsers = serverUsers.filter((user) => {
+        return isSearchMatch(user.fullname, debouncedUsersSearch);
+      });
       const selectedUserSessions =
         currentServerId && selectedUser
           ? getSessionsForServerAndUser(currentServerId, selectedUser.id).sort(
@@ -467,267 +660,401 @@ export function SettingsOverlay() {
           <div className="flex min-h-0 flex-1 gap-4">
             <section className="card w-72 shrink-0 min-h-0 border border-base-300 bg-base-100 flex flex-col">
               <header className="flex items-center justify-between border-b border-base-300 px-3 py-2">
-                <h4 className="font-medium">Пользователи</h4>
+                <h4 className="card-title text-base">Пользователи</h4>
               </header>
+              <div className="border-b border-base-300 px-3 py-2">
+                <label className="input input-bordered input-sm flex items-center gap-2">
+                  <input
+                    className="grow"
+                    type="text"
+                    placeholder="Поиск"
+                    value={usersSearch}
+                    onChange={(event) => setUsersSearch(event.target.value)}
+                  />
+                  {usersSearchTrimmed ? (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-xs"
+                      aria-label="Очистить поиск"
+                      onClick={() => setUsersSearch("")}
+                    >
+                      X
+                    </button>
+                  ) : null}
+                </label>
+              </div>
               <div className="min-h-0 flex-1 overflow-y-auto p-2">
-                <ul className="menu gap-1 w-full">
-                  {serverUsers.map((user) => (
-                    <li key={user.id}>
-                      <button
-                        type="button"
-                        className={
-                          user.id === selectedUserId
-                            ? "flex w-full items-center gap-2 bg-primary/20 text-primary font-semibold"
-                            : "flex w-full items-center gap-2 text-base-content"
-                        }
-                        onClick={() => setSelectedUserId(user.id)}
-                      >
-                        <span
+                {filteredServerUsers.length === 0 ? (
+                  <p className="px-2 py-1 text-sm text-base-content/70">
+                    Ничего не найдено
+                  </p>
+                ) : (
+                  <ul className="menu gap-1 w-full">
+                    {filteredServerUsers.map((user) => (
+                      <li key={user.id}>
+                        <button
+                          type="button"
                           className={
-                            user.isOnline
-                              ? "h-2.5 w-2.5 shrink-0 rounded-full bg-success"
-                              : "h-2.5 w-2.5 shrink-0 rounded-full bg-base-content/30"
+                            user.id === selectedUserId
+                              ? "flex w-full items-center gap-2 bg-primary/20 text-primary font-semibold"
+                              : "flex w-full items-center gap-2 text-base-content"
                           }
-                          aria-label={user.isOnline ? "В сети" : "Не в сети"}
-                          title={user.isOnline ? "В сети" : "Не в сети"}
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate">{user.fullname}</span>
-                          <span className="mt-0.5 block truncate text-xs text-base-content/70">
-                            {formatUserPresenceSubtitle(user.isOnline, user.lastSeenAt)}
+                          onClick={() => setSelectedUserId(user.id)}
+                        >
+                          <span
+                            className={
+                              user.isOnline
+                                ? "h-2.5 w-2.5 shrink-0 rounded-full bg-success"
+                                : "h-2.5 w-2.5 shrink-0 rounded-full bg-base-content/30"
+                            }
+                            aria-label={user.isOnline ? "В сети" : "Не в сети"}
+                            title={user.isOnline ? "В сети" : "Не в сети"}
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate">
+                              {user.fullname}
+                            </span>
+                            <span className="mt-0.5 block truncate text-xs text-base-content/70">
+                              {formatUserPresenceSubtitle(
+                                user.isOnline,
+                                user.lastSeenAt,
+                              )}
+                            </span>
                           </span>
-                        </span>
-                        {shouldShowDesignerRoleBadge(user.role) ? (
-                          <span className="badge badge-outline badge-primary badge-sm">
-                            {normalizeRole(user.role) ?? "USER"}
-                          </span>
-                        ) : null}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                          {shouldShowDesignerRoleBadge(user.role) ? (
+                            <span className="badge badge-outline badge-primary badge-sm">
+                              {normalizeRole(user.role) ?? "USER"}
+                            </span>
+                          ) : null}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </section>
 
-            <div className="min-h-0 min-w-0 flex-1 flex flex-col gap-4">
-              <section className="card border border-base-300 bg-base-100">
-                <div className="p-4">
-                  {!selectedUser ? (
+            <div
+              ref={usersDetailsColumnRef}
+              className="min-h-0 min-w-0 flex-1 flex flex-col gap-4 overflow-y-auto"
+            >
+              {isRootUserHidden ? (
+                <section className="card border border-base-300 bg-base-100">
+                  <div className="card-body">
                     <p className="text-base-content/70">
-                      Пользователь не выбран
+                      Данные пользователя скрыты
                     </p>
-                  ) : (
-                    <form
-                      id="settings-users-form"
-                      className="grid gap-4 md:grid-cols-2"
-                      onSubmit={onUserSave}
-                    >
-                      <label className="form-control w-full">
-                        <span className="label">
-                          <span className="label-text">Логин</span>
-                        </span>
-                        <input
-                          className="input input-bordered w-full"
-                          type="text"
-                          value={userDraft.login}
-                          onChange={(event) =>
-                            setUserDraft((prev) => ({
-                              ...prev,
-                              login: event.target.value,
-                            }))
-                          }
-                          disabled={!editability.canEdit}
-                        />
-                      </label>
-
-                      <label className="form-control w-full">
-                        <span className="label">
-                          <span className="label-text">ФИО</span>
-                        </span>
-                        <input
-                          className="input input-bordered w-full"
-                          type="text"
-                          value={userDraft.fullname}
-                          onChange={(event) =>
-                            setUserDraft((prev) => ({
-                              ...prev,
-                              fullname: event.target.value,
-                            }))
-                          }
-                          disabled={!editability.canEdit}
-                        />
-                      </label>
-
-                      <label className="form-control w-full">
-                        <span className="label">
-                          <span className="label-text">Пароль</span>
-                        </span>
-                        <input
-                          className="input input-bordered w-full"
-                          type="text"
-                          value={userDraft.password}
-                          onChange={(event) =>
-                            setUserDraft((prev) => ({
-                              ...prev,
-                              password: event.target.value,
-                            }))
-                          }
-                          disabled={!editability.canEdit}
-                        />
-                      </label>
-
-                      <label className="form-control w-full">
-                        <span className="label">
-                          <span className="label-text">Роль</span>
-                        </span>
-                        <select
-                          className="select select-bordered w-full"
-                          value={userDraft.role}
-                          onChange={(event) =>
-                            setUserDraft((prev) => ({
-                              ...prev,
-                              role: event.target.value,
-                            }))
-                          }
-                          disabled={!editability.canChangeRole}
-                        >
-                          <option value="ADMIN">ADMIN</option>
-                          <option value="USER">USER</option>
-                          <option value="ROOT">ROOT</option>
-                        </select>
-                      </label>
-
-                    <label className="label justify-start gap-3">
-                      <input
-                        className="toggle toggle-error"
-                        type="checkbox"
-                        checked={userDraft.blocked}
-                        onChange={(event) =>
-                          setUserDraft((prev) => ({
-                            ...prev,
-                            blocked: event.target.checked,
-                          }))
-                        }
-                        disabled={!editability.canEdit}
-                      />
-                      <span className="text-error">Статус блокировки</span>
-                    </label>
-
-                    </form>
-                  )}
-                </div>
-              </section>
-
-              <section className="card border border-base-300 bg-base-100">
-                <div className="card-body p-3">
-                  {!selectedUser ? (
-                    <p className="text-base-content/70">
-                      Пользователь не выбран
-                    </p>
-                  ) : (
-                    <div className="flex items-center justify-end">
-                      <button
-                        type="button"
-                        className="btn btn-outline btn-error btn-sm"
-                        onClick={() => {
-                          setSessionActionUserId(selectedUser.id);
-                          setConfirmAction("remove-all-sessions");
-                        }}
-                        disabled={
-                          selectedUserSessions.length === 0 ||
-                          !canManageSelectedUserSessions
-                        }
-                      >
-                        Завершить все сессии
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </section>
-
-              <section className="card min-h-0 flex-1 border border-base-300 bg-base-100">
-                <div className="min-h-0 flex-1 overflow-y-auto p-4">
-                  {!selectedUser ? (
-                    <p className="text-base-content/70">
-                      Пользователь не выбран
-                    </p>
-                  ) : (
-                    <>
-                      {!canManageSelectedUserSessions ? (
-                        <p className="mb-2 text-sm text-warning">
-                          ADMIN не может управлять сессиями пользователя ROOT.
+                  </div>
+                </section>
+              ) : (
+                <>
+                  <section className="card border border-base-300 bg-base-100">
+                    <div className="p-4">
+                      {!selectedUser ? (
+                        <p className="text-base-content/70">
+                          Пользователь не выбран
                         </p>
-                      ) : null}
-                      <div className="overflow-x-auto">
-                        <table className="table table-zebra">
-                          <thead>
-                            <tr>
-                              <th>Сервер эммитер</th>
-                              <th>Клиент Тип</th>
-                              <th>Клиент адрес</th>
-                              <th>Активен</th>
-                              <th className="w-12" />
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {selectedUserSessions.map((session) => {
-                              const clientType = sessionClientType(session.id);
-                              const isCurrent = isCurrentSession(
-                                session,
-                                currentServerId,
-                              );
-                              const emitterDomain = selectedServer
-                                ? displayServerHost(selectedServer.serverUrl)
-                                : "—";
-                              return (
-                                <tr key={session.id}>
-                                  <td>{emitterDomain}</td>
-                                  <td>
-                                    <span
-                                      className={
-                                        clientType === "web"
-                                          ? "badge badge-outline badge-primary"
-                                          : "badge badge-outline badge-secondary"
-                                      }
-                                    >
-                                      {clientType}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    {clientType === "web" ? emitterDomain : "—"}
-                                  </td>
-                                  <td>
-                                    {formatSessionLifetime(session.createdAt)}
-                                  </td>
-                                  <td>
-                                    <button
-                                      type="button"
-                                      className={
-                                        isCurrent
-                                          ? "btn btn-primary btn-xs"
-                                          : "btn btn-error btn-xs"
-                                      }
-                                      aria-label={`Удалить сессию ${session.id}`}
-                                      disabled={!canManageSelectedUserSessions}
-                                      onClick={() => {
-                                        setSessionToDelete(session.id);
-                                        setSessionActionUserId(selectedUser.id);
-                                        setConfirmAction("remove-session");
-                                      }}
-                                    >
-                                      X
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                      ) : (
+                        <>
+                          <h4 className="card-title text-base mb-4">Аккаунт</h4>
+                          <form
+                            id="settings-users-form"
+                            className="grid gap-4 md:grid-cols-2"
+                            onSubmit={onUserSave}
+                          >
+                            <label className="form-control w-full">
+                              <span className="label">
+                                <span className="label-text">Логин</span>
+                              </span>
+                              <input
+                                className="input input-bordered w-full"
+                                type="text"
+                                value={userDraft.login}
+                                onChange={(event) =>
+                                  setUserDraft((prev) => ({
+                                    ...prev,
+                                    login: event.target.value,
+                                  }))
+                                }
+                                disabled={!editability.canEdit}
+                              />
+                            </label>
+
+                            <label className="form-control w-full">
+                              <span className="label">
+                                <span className="label-text">ФИО</span>
+                              </span>
+                              <input
+                                className="input input-bordered w-full"
+                                type="text"
+                                value={userDraft.fullname}
+                                onChange={(event) =>
+                                  setUserDraft((prev) => ({
+                                    ...prev,
+                                    fullname: event.target.value,
+                                  }))
+                                }
+                                disabled={!editability.canEdit}
+                              />
+                            </label>
+
+                            <label className="form-control w-full">
+                              <span className="label">
+                                <span className="label-text">Пароль</span>
+                              </span>
+                              <input
+                                className="input input-bordered w-full"
+                                type="password"
+                                value={userDraft.password}
+                                onChange={(event) =>
+                                  setUserDraft((prev) => ({
+                                    ...prev,
+                                    password: event.target.value,
+                                  }))
+                                }
+                                disabled={
+                                  !editability.canEdit || isSelectedCurrentUser
+                                }
+                              />
+                            </label>
+
+                            <label className="form-control w-full">
+                              <span className="label">
+                                <span className="label-text">Роль</span>
+                              </span>
+                              <select
+                                className="select select-bordered w-full"
+                                value={userDraft.role}
+                                onChange={(event) =>
+                                  setUserDraft((prev) => ({
+                                    ...prev,
+                                    role: event.target.value,
+                                  }))
+                                }
+                                disabled={!editability.canChangeRole}
+                              >
+                                <option value="ADMIN">ADMIN</option>
+                                <option value="USER">USER</option>
+                                <option value="ROOT" disabled>
+                                  ROOT
+                                </option>
+                              </select>
+                            </label>
+
+                            <label className="label justify-start gap-3">
+                              <input
+                                className="toggle toggle-error"
+                                type="checkbox"
+                                checked={userDraft.blocked}
+                                onChange={(event) =>
+                                  setUserDraft((prev) => ({
+                                    ...prev,
+                                    blocked: event.target.checked,
+                                  }))
+                                }
+                                disabled={
+                                  !editability.canEdit || isSelectedCurrentUser
+                                }
+                              />
+                              <span className="text-error">Заблокирован</span>
+                            </label>
+                          </form>
+                        </>
+                      )}
+                    </div>
+                  </section>
+
+                  {isSelectedCurrentUser ? (
+                    <section className="card border border-base-300 bg-base-100">
+                      <div className="card-body">
+                        <h4 className="card-title text-base">Смена пароля</h4>
+                        <div className="grid gap-4">
+                          <label className="form-control w-full">
+                            <span className="label">
+                              <span className="label-text">Текущий пароль</span>
+                            </span>
+                            <input
+                              className="input input-bordered w-full"
+                              type="password"
+                              value={userPasswordDraft.currentPassword}
+                              onChange={(event) =>
+                                setUserPasswordDraft((prev) => ({
+                                  ...prev,
+                                  currentPassword: event.target.value,
+                                }))
+                              }
+                              disabled={!selectedServer}
+                            />
+                          </label>
+
+                          <label className="form-control w-full">
+                            <span className="label">
+                              <span className="label-text">Новый пароль</span>
+                            </span>
+                            <input
+                              className="input input-bordered w-full"
+                              type="password"
+                              value={userPasswordDraft.newPassword}
+                              onChange={(event) =>
+                                setUserPasswordDraft((prev) => ({
+                                  ...prev,
+                                  newPassword: event.target.value,
+                                }))
+                              }
+                              disabled={!selectedServer}
+                            />
+                          </label>
+
+                          <label className="form-control w-full">
+                            <span className="label">
+                              <span className="label-text">
+                                Еще раз новый пароль
+                              </span>
+                            </span>
+                            <input
+                              className="input input-bordered w-full"
+                              type="password"
+                              value={userPasswordDraft.confirmNewPassword}
+                              onChange={(event) =>
+                                setUserPasswordDraft((prev) => ({
+                                  ...prev,
+                                  confirmNewPassword: event.target.value,
+                                }))
+                              }
+                              disabled={!selectedServer}
+                            />
+                          </label>
+                        </div>
                       </div>
-                    </>
-                  )}
-                </div>
-              </section>
+                    </section>
+                  ) : null}
+
+                  <section className="card border border-base-300 bg-base-100">
+                    <div className="card-body p-3">
+                      {!selectedUser ? (
+                        <p className="text-base-content/70">
+                          Пользователь не выбран
+                        </p>
+                      ) : (
+                        <div className="flex items-center justify-between gap-3">
+                          <h4 className="card-title text-base">Сессии</h4>
+                          <button
+                            type="button"
+                            className="btn btn-soft btn-error btn-sm"
+                            onClick={() => {
+                              setSessionActionUserId(selectedUser.id);
+                              setConfirmAction("remove-all-sessions");
+                            }}
+                            disabled={
+                              selectedUserSessions.length === 0 ||
+                              !canManageSelectedUserSessions
+                            }
+                          >
+                            Завершить все сессии
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="card border border-base-300 bg-base-100">
+                    <div className="p-4">
+                      {!selectedUser ? (
+                        <p className="text-base-content/70">
+                          Пользователь не выбран
+                        </p>
+                      ) : (
+                        <>
+                          {!canManageSelectedUserSessions ? (
+                            <p className="mb-2 text-sm text-warning">
+                              ADMIN не может управлять сессиями пользователя
+                              ROOT.
+                            </p>
+                          ) : null}
+                          <div className="overflow-x-auto">
+                            <table className="table table-zebra">
+                              <thead>
+                                <tr>
+                                  <th>Сервер эммитер</th>
+                                  <th>Клиент Тип</th>
+                                  <th>Клиент адрес</th>
+                                  <th>Активен</th>
+                                  <th className="w-12" />
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {selectedUserSessions.map((session) => {
+                                  const clientType = sessionClientType(
+                                    session.id,
+                                  );
+                                  const isCurrent = isCurrentSession(
+                                    session,
+                                    currentServerId,
+                                  );
+                                  const emitterDomain = selectedServer
+                                    ? displayServerHost(
+                                        selectedServer.serverUrl,
+                                      )
+                                    : "—";
+                                  return (
+                                    <tr key={session.id}>
+                                      <td>{emitterDomain}</td>
+                                      <td>
+                                        <span
+                                          className={
+                                            clientType === "web"
+                                              ? "badge badge-outline badge-primary"
+                                              : "badge badge-outline badge-secondary"
+                                          }
+                                        >
+                                          {clientType}
+                                        </span>
+                                      </td>
+                                      <td>
+                                        {clientType === "web"
+                                          ? emitterDomain
+                                          : "—"}
+                                      </td>
+                                      <td>
+                                        {formatSessionLifetime(
+                                          session.createdAt,
+                                        )}
+                                      </td>
+                                      <td>
+                                        <button
+                                          type="button"
+                                          className={
+                                            isCurrent
+                                              ? "btn btn-primary btn-xs"
+                                              : "btn btn-error btn-xs"
+                                          }
+                                          aria-label={`Удалить сессию ${session.id}`}
+                                          disabled={
+                                            !canManageSelectedUserSessions
+                                          }
+                                          onClick={() => {
+                                            setSessionToDelete(session.id);
+                                            setSessionActionUserId(
+                                              selectedUser.id,
+                                            );
+                                            setConfirmAction("remove-session");
+                                          }}
+                                        >
+                                          X
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </section>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -737,83 +1064,130 @@ export function SettingsOverlay() {
     if (safeActiveTab === "account") {
       return (
         <div className="space-y-4">
-          <section className="card border border-base-300 bg-base-100">
-            <div className="card-body">
-              <h4 className="card-title text-base">Профиль</h4>
-              <form
-                id="settings-account-form"
-                className="grid gap-4 md:grid-cols-2"
-                onSubmit={onSaveAccount}
-              >
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Логин</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value={accountDraft.login}
-                    onChange={(event) =>
-                      setAccountDraft((prev) => ({
-                        ...prev,
-                        login: event.target.value,
-                      }))
-                    }
-                    disabled={!selectedServer}
-                  />
-                </label>
-
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">ФИО</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="text"
-                    value={accountDraft.fullname}
-                    onChange={(event) =>
-                      setAccountDraft((prev) => ({
-                        ...prev,
-                        fullname: event.target.value,
-                      }))
-                    }
-                    disabled={!selectedServer}
-                  />
-                </label>
-
-                <label className="form-control w-full">
-                  <span className="label">
-                    <span className="label-text">Пароль</span>
-                  </span>
-                  <input
-                    className="input input-bordered w-full"
-                    type="password"
-                    value={accountDraft.password}
-                    onChange={(event) =>
-                      setAccountDraft((prev) => ({
-                        ...prev,
-                        password: event.target.value,
-                      }))
-                    }
-                    disabled={!selectedServer}
-                  />
-                </label>
-              </form>
-            </div>
-          </section>
-
           {selectedServer?.user.role.trim().toUpperCase() === "ADMIN" ? (
-            <section className="card border border-warning/30 bg-warning/10 p-4">
-              <h4 className="font-medium">Права администратора</h4>
-              <button
-                type="button"
-                className="btn btn-warning btn-sm mt-3"
-                onClick={() => setConfirmAction("demote-admin")}
-              >
-                Перестать быть админом
-              </button>
+            <section className="card border border-base-300 bg-base-100">
+              <div className="card-body p-3">
+                <div className="flex items-center justify-end">
+                  <button
+                    type="button"
+                    className="btn btn-warning btn-sm"
+                    onClick={() => setConfirmAction("demote-admin")}
+                  >
+                    Перестать быть админом
+                  </button>
+                </div>
+              </div>
             </section>
           ) : null}
+          <form
+            id="settings-account-form"
+            className="space-y-4"
+            onSubmit={onSaveAccount}
+          >
+            <section className="card border border-base-300 bg-base-100">
+              <div className="card-body">
+                <h4 className="card-title text-base">Профиль</h4>
+                <div className="grid gap-4">
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Логин</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value={accountDraft.login}
+                      onChange={(event) =>
+                        setAccountDraft((prev) => ({
+                          ...prev,
+                          login: event.target.value,
+                        }))
+                      }
+                      disabled={!selectedServer}
+                    />
+                  </label>
+
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">ФИО</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="text"
+                      value={accountDraft.fullname}
+                      onChange={(event) =>
+                        setAccountDraft((prev) => ({
+                          ...prev,
+                          fullname: event.target.value,
+                        }))
+                      }
+                      disabled={!selectedServer}
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <section className="card border border-base-300 bg-base-100">
+              <div className="card-body">
+                <h4 className="card-title text-base">Смена пароля</h4>
+                <div className="grid gap-4">
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Текущий пароль</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="password"
+                      value={accountDraft.currentPassword}
+                      onChange={(event) =>
+                        setAccountDraft((prev) => ({
+                          ...prev,
+                          currentPassword: event.target.value,
+                        }))
+                      }
+                      disabled={!selectedServer}
+                    />
+                  </label>
+
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Новый пароль</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="password"
+                      value={accountDraft.newPassword}
+                      onChange={(event) =>
+                        setAccountDraft((prev) => ({
+                          ...prev,
+                          newPassword: event.target.value,
+                        }))
+                      }
+                      disabled={!selectedServer}
+                    />
+                  </label>
+
+                  <label className="form-control w-full">
+                    <span className="label">
+                      <span className="label-text">Еще раз новый пароль</span>
+                    </span>
+                    <input
+                      className="input input-bordered w-full"
+                      type="password"
+                      value={accountDraft.confirmNewPassword}
+                      onChange={(event) =>
+                        setAccountDraft((prev) => ({
+                          ...prev,
+                          confirmNewPassword: event.target.value,
+                        }))
+                      }
+                      disabled={!selectedServer}
+                    />
+                  </label>
+                </div>
+              </div>
+            </section>
+          </form>
         </div>
       );
     }
@@ -838,7 +1212,7 @@ export function SettingsOverlay() {
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
-                className="btn btn-outline btn-error btn-sm"
+                className="btn btn-soft btn-error btn-sm"
                 onClick={() => {
                   setSessionActionUserId(currentUserId);
                   setConfirmAction("remove-current-session");
@@ -849,7 +1223,7 @@ export function SettingsOverlay() {
               </button>
               <button
                 type="button"
-                className="btn btn-outline btn-error btn-sm"
+                className="btn btn-soft btn-error btn-sm"
                 onClick={() => {
                   setSessionActionUserId(currentUserId);
                   setConfirmAction("remove-all-sessions");
@@ -860,7 +1234,7 @@ export function SettingsOverlay() {
               </button>
               <button
                 type="button"
-                className="btn btn-outline btn-error btn-sm"
+                className="btn btn-soft btn-error btn-sm"
                 onClick={() => {
                   setSessionActionUserId(currentUserId);
                   setConfirmAction("remove-all-except-current");
@@ -952,9 +1326,79 @@ export function SettingsOverlay() {
     >
       <section className="flex h-full w-full flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-gray-400 bg-base-300 p-4">
-          <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold text-base-content">
-              Настройки "{settingsServerName}" сервера
+          <div className="min-w-0 relative z-40">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-base-content">
+              <span className="shrink-0">Настройка</span>
+              <div className="dropdown">
+                <button
+                  type="button"
+                  tabIndex={0}
+                  ref={settingsServerDropdownTriggerRef}
+                  className="btn btn-sm btn-outline min-w-0 max-w-xs justify-between"
+                  aria-label="Выбор сервера для настроек"
+                >
+                  <span className="truncate">{settingsServerLabel}</span>
+                  <span className="ml-2 text-xs opacity-70">v</span>
+                </button>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu z-30 mt-1 w-96 divide-y divide-gray-600 rounded-box border border-base-300 bg-base-100 p-1 shadow"
+                >
+                  {serversList.length === 0 ? (
+                    <li>
+                      <span className="text-sm text-base-content/70">
+                        Серверы не найдены
+                      </span>
+                    </li>
+                  ) : (
+                    serversList.map((server) => {
+                      const serverLabel =
+                        server.name?.trim() || displayServerHost(server.serverUrl);
+                      const isSelected = server.serverUrl === selectedServer?.serverUrl;
+                      const role = normalizeRole(server.user.role);
+                      const hasPrivilegedBadge =
+                        role === "ADMIN" || role === "ROOT";
+                      return (
+                        <li key={server.serverUrl} className="w-full">
+                          <button
+                            type="button"
+                            className={
+                              isSelected
+                                ? "active bg-primary text-primary-content flex! w-full! items-start! justify-start! px-4 py-3"
+                                : "flex! w-full! items-start! justify-start! px-4 py-3"
+                            }
+                            onClick={(event) => {
+                              setSettingsServerUrl(server.serverUrl);
+                              event.currentTarget.blur();
+                              settingsServerDropdownTriggerRef.current?.blur();
+                            }}
+                          >
+                            <span className="flex w-full min-w-0 flex-col items-start gap-1">
+                              <span className="min-w-0 truncate text-base font-bold leading-tight">
+                                {serverLabel}
+                              </span>
+                              <span className="min-w-0 truncate text-xs text-base-content/70">
+                                {displayServerHost(server.serverUrl)}
+                              </span>
+                              <span className="mt-2 flex w-full items-center justify-between gap-2 text-sm text-base-content/80">
+                                <span className="min-w-0 truncate">
+                                  {server.user.fullname}
+                                </span>
+                                {hasPrivilegedBadge ? (
+                                  <span className="badge badge-outline badge-xs uppercase">
+                                    {role?.toLowerCase()}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              </div>
+              <span className="shrink-0">сервера</span>
             </h2>
             {settingsServerHost && (
               <p className="truncate text-xs text-base-content/70">
@@ -997,14 +1441,6 @@ export function SettingsOverlay() {
           </nav>
 
           <div className="flex min-h-0 flex-1 flex-col bg-base-200">
-            {hasPinnedSectionHeader ? (
-              <header className="shrink-0 border-b border-gray-400 bg-base-200 p-4">
-                <h3 className="text-xl font-semibold">{safeActiveTabLabel}</h3>
-                <p className="mt-2 text-base-content/70">
-                  {titleForTab(safeActiveTab)}
-                </p>
-              </header>
-            ) : null}
             <div
               className={
                 usersTabLayout
@@ -1012,22 +1448,10 @@ export function SettingsOverlay() {
                   : "min-h-0 flex-1 overflow-y-auto p-4"
               }
             >
-              {hasPinnedSectionHeader ? (
-                renderTabContent()
-              ) : (
-                <>
-                  <h3 className="text-xl font-semibold">
-                    {safeActiveTabLabel}
-                  </h3>
-                  <p className="mt-2 text-base-content/70">
-                    {titleForTab(safeActiveTab)}
-                  </p>
-                  <div className="mt-6">{renderTabContent()}</div>
-                </>
-              )}
+              {renderTabContent()}
             </div>
-            <footer className="shrink-0 border-t border-gray-400 bg-base-200 p-4">
-              {saveFormId ? (
+            {saveFormId ? (
+              <footer className="shrink-0 border-t border-gray-400 bg-base-200 p-4">
                 <div className="flex justify-end">
                   <button
                     type="button"
@@ -1038,15 +1462,15 @@ export function SettingsOverlay() {
                     Сохранить
                   </button>
                 </div>
-              ) : null}
-            </footer>
+              </footer>
+            ) : null}
           </div>
         </div>
       </section>
 
       {isAddUserModalOpen ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
-          <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
+        <div className="modal modal-open" role="dialog">
+          <section className="modal-box w-full max-w-md">
             <h4 className="text-lg font-semibold">Добавить пользователя</h4>
             <form className="mt-4 space-y-3" onSubmit={onCreateUser}>
               <label className="form-control w-full">
@@ -1088,7 +1512,7 @@ export function SettingsOverlay() {
                 <div className="flex items-center gap-2">
                   <input
                     className="input input-bordered w-full"
-                    type="text"
+                    type="password"
                     value={addUserDraft.password}
                     onChange={(event) =>
                       setAddUserDraft((prev) => ({
@@ -1136,12 +1560,22 @@ export function SettingsOverlay() {
               </div>
             </form>
           </section>
+          <button
+            type="button"
+            className="modal-backdrop bg-black/50"
+            aria-label="Закрыть"
+            onClick={() => {
+              setIsAddUserModalOpen(false);
+              setAddUserError(null);
+              setAddUserDraft({ login: "", fullname: "", password: "" });
+            }}
+          />
         </div>
       ) : null}
 
       {confirmAction ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
-          <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
+        <div className="modal modal-open" role="dialog">
+          <section className="modal-box w-full max-w-md">
             <h4 className="text-lg font-semibold">Подтверждение</h4>
             <p className="mt-3 text-base-content/80">
               {confirmAction === "demote-admin"
@@ -1175,11 +1609,21 @@ export function SettingsOverlay() {
               </button>
             </div>
           </section>
+          <button
+            type="button"
+            className="modal-backdrop bg-black/50"
+            aria-label="Закрыть"
+            onClick={() => {
+              setConfirmAction(null);
+              setSessionToDelete(null);
+              setSessionActionUserId(null);
+            }}
+          />
         </div>
       ) : null}
       {saveConfirmOpen ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 p-4">
-          <section className="w-full max-w-md rounded-box bg-base-100 p-5 shadow-lg">
+        <div className="modal modal-open" role="dialog">
+          <section className="modal-box w-full max-w-md">
             <h4 className="text-lg font-semibold">Подтверждение сохранения</h4>
             <p className="mt-3 text-base-content/80">
               Сохранить изменения в разделе "{titleForTab(safeActiveTab)}"?
@@ -1201,6 +1645,12 @@ export function SettingsOverlay() {
               </button>
             </div>
           </section>
+          <button
+            type="button"
+            className="modal-backdrop bg-black/50"
+            aria-label="Закрыть"
+            onClick={() => setSaveConfirmOpen(false)}
+          />
         </div>
       ) : null}
     </div>

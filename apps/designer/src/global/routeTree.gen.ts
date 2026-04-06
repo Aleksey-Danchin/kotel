@@ -12,9 +12,12 @@ import { Route as rootRouteImport } from './../routes/~__root'
 import { Route as UsersIndexRouteImport } from './../routes/~users/~index'
 import { Route as SetupIndexRouteImport } from './../routes/~setup/~index'
 import { Route as SessionTestIndexRouteImport } from './../routes/~session-test/~index'
+import { Route as ConfigIndexRouteImport } from './../routes/~config/~index'
 import { Route as CallbackIndexRouteImport } from './../routes/~callback/~index'
 import { Route as indexIndexRouteImport } from './../routes/~(index)/~index'
-import { Route as IdIndexRouteImport } from './../routes/~$id/~index'
+import { Route as ServerIdIndexRouteImport } from './../routes/~$serverId/~index'
+import { Route as ConfigServerIdIndexRouteImport } from './../routes/~config/~$serverId/~index'
+import { Route as ServerIdChatIdIndexRouteImport } from './../routes/~$serverId/~$chatId/~index'
 
 const UsersIndexRoute = UsersIndexRouteImport.update({
   id: '/users/',
@@ -31,6 +34,11 @@ const SessionTestIndexRoute = SessionTestIndexRouteImport.update({
   path: '/session-test/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfigIndexRoute = ConfigIndexRouteImport.update({
+  id: '/config/',
+  path: '/config/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CallbackIndexRoute = CallbackIndexRouteImport.update({
   id: '/callback/',
   path: '/callback/',
@@ -41,65 +49,102 @@ const indexIndexRoute = indexIndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IdIndexRoute = IdIndexRouteImport.update({
-  id: '/$id/',
-  path: '/$id/',
+const ServerIdIndexRoute = ServerIdIndexRouteImport.update({
+  id: '/$serverId/',
+  path: '/$serverId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfigServerIdIndexRoute = ConfigServerIdIndexRouteImport.update({
+  id: '/config/$serverId/',
+  path: '/config/$serverId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServerIdChatIdIndexRoute = ServerIdChatIdIndexRouteImport.update({
+  id: '/$serverId/$chatId/',
+  path: '/$serverId/$chatId/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/$id/': typeof IdIndexRoute
+  '/$serverId/': typeof ServerIdIndexRoute
   '/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
+  '/config/': typeof ConfigIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
   '/setup/': typeof SetupIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/$serverId/$chatId/': typeof ServerIdChatIdIndexRoute
+  '/config/$serverId/': typeof ConfigServerIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/$id': typeof IdIndexRoute
+  '/$serverId': typeof ServerIdIndexRoute
   '/': typeof indexIndexRoute
   '/callback': typeof CallbackIndexRoute
+  '/config': typeof ConfigIndexRoute
   '/session-test': typeof SessionTestIndexRoute
   '/setup': typeof SetupIndexRoute
   '/users': typeof UsersIndexRoute
+  '/$serverId/$chatId': typeof ServerIdChatIdIndexRoute
+  '/config/$serverId': typeof ConfigServerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/$id/': typeof IdIndexRoute
+  '/$serverId/': typeof ServerIdIndexRoute
   '/(index)/': typeof indexIndexRoute
   '/callback/': typeof CallbackIndexRoute
+  '/config/': typeof ConfigIndexRoute
   '/session-test/': typeof SessionTestIndexRoute
   '/setup/': typeof SetupIndexRoute
   '/users/': typeof UsersIndexRoute
+  '/$serverId/$chatId/': typeof ServerIdChatIdIndexRoute
+  '/config/$serverId/': typeof ConfigServerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/$id/'
+    | '/$serverId/'
     | '/'
     | '/callback/'
+    | '/config/'
     | '/session-test/'
     | '/setup/'
     | '/users/'
+    | '/$serverId/$chatId/'
+    | '/config/$serverId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$id' | '/' | '/callback' | '/session-test' | '/setup' | '/users'
+  to:
+    | '/$serverId'
+    | '/'
+    | '/callback'
+    | '/config'
+    | '/session-test'
+    | '/setup'
+    | '/users'
+    | '/$serverId/$chatId'
+    | '/config/$serverId'
   id:
     | '__root__'
-    | '/$id/'
+    | '/$serverId/'
     | '/(index)/'
     | '/callback/'
+    | '/config/'
     | '/session-test/'
     | '/setup/'
     | '/users/'
+    | '/$serverId/$chatId/'
+    | '/config/$serverId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IdIndexRoute: typeof IdIndexRoute
+  ServerIdIndexRoute: typeof ServerIdIndexRoute
   indexIndexRoute: typeof indexIndexRoute
   CallbackIndexRoute: typeof CallbackIndexRoute
+  ConfigIndexRoute: typeof ConfigIndexRoute
   SessionTestIndexRoute: typeof SessionTestIndexRoute
   SetupIndexRoute: typeof SetupIndexRoute
   UsersIndexRoute: typeof UsersIndexRoute
+  ServerIdChatIdIndexRoute: typeof ServerIdChatIdIndexRoute
+  ConfigServerIdIndexRoute: typeof ConfigServerIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -125,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SessionTestIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/config/': {
+      id: '/config/'
+      path: '/config'
+      fullPath: '/config/'
+      preLoaderRoute: typeof ConfigIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/callback/': {
       id: '/callback/'
       path: '/callback'
@@ -139,23 +191,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof indexIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$id/': {
-      id: '/$id/'
-      path: '/$id'
-      fullPath: '/$id/'
-      preLoaderRoute: typeof IdIndexRouteImport
+    '/$serverId/': {
+      id: '/$serverId/'
+      path: '/$serverId'
+      fullPath: '/$serverId/'
+      preLoaderRoute: typeof ServerIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/config/$serverId/': {
+      id: '/config/$serverId/'
+      path: '/config/$serverId'
+      fullPath: '/config/$serverId/'
+      preLoaderRoute: typeof ConfigServerIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$serverId/$chatId/': {
+      id: '/$serverId/$chatId/'
+      path: '/$serverId/$chatId'
+      fullPath: '/$serverId/$chatId/'
+      preLoaderRoute: typeof ServerIdChatIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IdIndexRoute: IdIndexRoute,
+  ServerIdIndexRoute: ServerIdIndexRoute,
   indexIndexRoute: indexIndexRoute,
   CallbackIndexRoute: CallbackIndexRoute,
+  ConfigIndexRoute: ConfigIndexRoute,
   SessionTestIndexRoute: SessionTestIndexRoute,
   SetupIndexRoute: SetupIndexRoute,
   UsersIndexRoute: UsersIndexRoute,
+  ServerIdChatIdIndexRoute: ServerIdChatIdIndexRoute,
+  ConfigServerIdIndexRoute: ConfigServerIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

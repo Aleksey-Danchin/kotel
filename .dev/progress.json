@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-04-06T09:52:53.549Z",
+  "updatedAt": "2026-04-06T09:59:00.093Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-introduce-hierarchical-router-structure.md",
+      "status": "in_progress",
+      "commitHash": null,
+      "startedAt": "2026-04-06T09:53:57.161Z",
+      "completedAt": null,
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is missing in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "Full suite run completed with pre-existing failures in chatThreadScrollLogic/chatMessageTimeline/store.sessions"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/domain/model documentation impact; designer route refactor only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Docker postflight health check skipped: orchestrator verified dev health, local env vars for compose are unavailable in this shell"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: explicit routes for /, /:serverId, /:serverId/:chatId, /config, /config/:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: legacy / no longer primary contract",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: static routes keep exact resolution",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: TypeScript route types compile without any workarounds",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-refactor-selection-resolution-for-server-chat-config.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryCount": 0
+    },
+    {
+      "order": 3,
+      "file": "03-implement-configurator-route-mode-layout.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryCount": 0
+    },
+    {
+      "order": 4,
+      "file": "04-wire-navigation-and-ux-regressions-to-new-routes.md",
+      "status": "pending",
+      "commitHash": null,
+      "startedAt": null,
+      "completedAt": null,
+      "error": null,
+      "retryCount": 0
+    }
+  ]
+}

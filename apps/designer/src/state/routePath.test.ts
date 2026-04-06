@@ -1,23 +1,34 @@
 import { describe, expect, it } from "vitest";
 
-import { selectionIdFromPathname } from "./routePath";
+import { resolveDesignerRoutePath } from "./routePath";
 
-describe("selectionIdFromPathname", () => {
-  it("returns null for root", () => {
-    expect(selectionIdFromPathname("/")).toBeNull();
-    expect(selectionIdFromPathname("")).toBeNull();
+describe("resolveDesignerRoutePath", () => {
+  it("resolves index route for root and static pages", () => {
+    expect(resolveDesignerRoutePath("/")).toEqual({ kind: "index" });
+    expect(resolveDesignerRoutePath("")).toEqual({ kind: "index" });
+    expect(resolveDesignerRoutePath("/setup")).toEqual({ kind: "index" });
+    expect(resolveDesignerRoutePath("/session-test")).toEqual({ kind: "index" });
+    expect(resolveDesignerRoutePath("/users")).toEqual({ kind: "index" });
+    expect(resolveDesignerRoutePath("/callback")).toEqual({ kind: "index" });
   });
 
-  it("skips static routes", () => {
-    expect(selectionIdFromPathname("/setup")).toBeNull();
-    expect(selectionIdFromPathname("/setup/")).toBeNull();
-    expect(selectionIdFromPathname("/session-test")).toBeNull();
-    expect(selectionIdFromPathname("/users")).toBeNull();
-    expect(selectionIdFromPathname("/callback")).toBeNull();
+  it("resolves configurator routes before dynamic server segment", () => {
+    expect(resolveDesignerRoutePath("/config")).toEqual({ kind: "config" });
+    expect(resolveDesignerRoutePath("/config/kotel.localhost")).toEqual({
+      kind: "config-server",
+      serverId: "kotel.localhost",
+    });
   });
 
-  it("returns first segment for dynamic selection", () => {
-    expect(selectionIdFromPathname("/kotel.localhost")).toBe("kotel.localhost");
-    expect(selectionIdFromPathname("/chat_general")).toBe("chat_general");
+  it("resolves dynamic server and chat routes", () => {
+    expect(resolveDesignerRoutePath("/kotel.localhost")).toEqual({
+      kind: "server",
+      serverId: "kotel.localhost",
+    });
+    expect(resolveDesignerRoutePath("/kotel.localhost/chat_general")).toEqual({
+      kind: "server-chat",
+      serverId: "kotel.localhost",
+      chatId: "chat_general",
+    });
   });
 });

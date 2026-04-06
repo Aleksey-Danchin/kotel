@@ -1,39 +1,37 @@
 import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
-import { serversAtom, type ServerSession } from "./servers";
-import { resolveRouteParam } from "./store";
-import { selectionIdFromPathname } from "./routePath";
-import { serverRouteIdFromServerUrl } from "./serverRouteId";
+import { serversAtom } from "./servers";
+import { resolveDesignerRoutePath } from "./routePath";
+import { resolveChatForServerRoute } from "./store";
 
 export type DesignerNavigate = (opts: {
-  to: "/$id" | "/";
-  params?: { id: string };
+  to: "/" | "/$serverId" | "/$serverId/$chatId";
+  params?: { serverId?: string; chatId?: string };
 }) => void | Promise<unknown>;
 
-/** If the user left a chat URL (`/:chatId`) to any other URL, return that chat's server route id to clear `lastChatByServerId`. */
 export function serverRouteIdToClearAfterPathChange(
   prevPathname: string,
   nextPathname: string,
-  serversMap: Map<string, ServerSession>,
-  activeServerId: string | null,
 ): string | null {
-  const prevSeg = selectionIdFromPathname(prevPathname);
-  if (!prevSeg) return null;
-  const prevRes = resolveRouteParam(prevSeg, serversMap, activeServerId);
-  if (prevRes.kind !== "chat") return null;
-  const nextSeg = selectionIdFromPathname(nextPathname);
-  if (nextSeg === prevRes.chatId) return null;
-  if (!nextSeg) {
-    return serverRouteIdFromServerUrl(prevRes.serverUrl);
-  }
-  const nextRes = resolveRouteParam(nextSeg, serversMap, activeServerId);
-  if (nextRes.kind === "unknown") {
-    return serverRouteIdFromServerUrl(prevRes.serverUrl);
-  }
-  if (nextRes.kind === "server" && nextRes.serverUrl !== prevRes.serverUrl) {
+  const prevRoute = resolveDesignerRoutePath(prevPathname);
+  if (prevRoute.kind !== "server-chat") {
     return null;
   }
-  return serverRouteIdFromServerUrl(prevRes.serverUrl);
+  const nextRoute = resolveDesignerRoutePath(nextPathname);
+  if (
+    nextRoute.kind === "server-chat" &&
+    nextRoute.serverId === prevRoute.serverId &&
+    nextRoute.chatId === prevRoute.chatId
+  ) {
+    return null;
+  }
+  if (
+    nextRoute.kind === "server" &&
+    nextRoute.serverId !== prevRoute.serverId
+  ) {
+    return null;
+  }
+  return prevRoute.serverId;
 }
 
 /** Applies pathname-driven last-chat cleanup (browser back/forward and all navigations). */
@@ -41,14 +39,7 @@ export function applyLastChatCleanupOnPathnameChange(
   prevPathname: string,
   nextPathname: string,
 ): void {
-  const serversMap = defaultStore.get(serversAtom);
-  const activeId = defaultStore.get(activeServerIdAtom);
-  const rid = serverRouteIdToClearAfterPathChange(
-    prevPathname,
-    nextPathname,
-    serversMap,
-    activeId,
-  );
+  const rid = serverRouteIdToClearAfterPathChange(prevPathname, nextPathname);
   if (rid) {
     clearLastChatForServerRouteId(rid);
   }
@@ -74,17 +65,17 @@ export function enterServer(
   const lastChatId = lastByServer[serverRouteId];
   if (lastChatId) {
     const serversMap = defaultStore.get(serversAtom);
-    const route = resolveRouteParam(lastChatId, serversMap, serverRouteId);
-    if (
-      route.kind === "chat" &&
-      serverRouteIdFromServerUrl(route.serverUrl) === serverRouteId
-    ) {
-      void navigate({ to: "/$id", params: { id: lastChatId } });
+    const chat = resolveChatForServerRoute(serverRouteId, lastChatId, serversMap);
+    if (chat) {
+      void navigate({
+        to: "/$serverId/$chatId",
+        params: { serverId: serverRouteId, chatId: chat.id },
+      });
       return;
     }
   }
 
-  void navigate({ to: "/$id", params: { id: serverRouteId } });
+  void navigate({ to: "/$serverId", params: { serverId: serverRouteId } });
 }
 
 /** From chat-level URL to this server's segment; `lastChat` cleanup runs on pathname transition. */
@@ -92,18 +83,18 @@ export function exitChatToServer(
   navigate: DesignerNavigate,
   serverRouteId: string,
 ): void {
-  void navigate({ to: "/$id", params: { id: serverRouteId } });
+  void navigate({ to: "/$serverId", params: { serverId: serverRouteId } });
 }
 
 export function enterChat(
   navigate: DesignerNavigate,
   chatId: string,
-  _serverRouteId: string,
+  serverRouteId: string,
 ): void {
-  // Аргумент нужен для сигнатуры вызовов/интуитивности переходов,
-  // но в песочнице он не участвует в навигации.
-  void _serverRouteId;
-  void navigate({ to: "/$id", params: { id: chatId } });
+  void navigate({
+    to: "/$serverId/$chatId",
+    params: { serverId: serverRouteId, chatId },
+  });
 }
 
 export function exitServerToRoot(navigate: DesignerNavigate): void {

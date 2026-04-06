@@ -42,12 +42,16 @@ export function chatHeaderTitle(chat: ChatPreview): string {
   return chat.title;
 }
 
-/** Текущий сегмент маршрута: либо главная без id, либо `/$id`. */
+/** Текущий маршрут песочницы: index/config/server/server-chat. */
 export const routeContextAtom = atom<
-  { type: "index" } | { type: "id"; id: string }
+  | { type: "index" }
+  | { type: "config" }
+  | { type: "config-server"; serverId: string }
+  | { type: "server"; serverId: string }
+  | { type: "server-chat"; serverId: string; chatId: string }
 >({ type: "index" });
 
-/** Идёт ли временная имитация загрузки треда при переходах внутри `/$id`. */
+/** Идёт ли временная имитация загрузки треда при переходах внутри chat route. */
 export const threadTransitionLoadingAtom = atom(false);
 
 type MockServer = {
@@ -402,59 +406,39 @@ export const serversListAtom = atom((get) =>
   Array.from(get(serversAtom).values()),
 );
 
-export type RouteResolution =
-  | { kind: "unknown" }
-  | { kind: "server"; serverUrl: string }
-  | { kind: "chat"; serverUrl: string; chatId: string };
-
 function catalogServerId(session: ServerSession): string {
   return resolveCatalogServerId(session);
 }
 
-function pickServerUrlForChat(
-  chatId: string,
-  serversMap: Map<string, ServerSession>,
-  preferredServerRouteId: string | null,
-): string | null {
-  const matching: string[] = [];
-  for (const session of serversMap.values()) {
-    const sid = catalogServerId(session);
-    const chats = getServerChats(sid);
-    if (chats.some((c) => c.id === chatId)) {
-      matching.push(session.serverUrl);
-    }
-  }
-  if (matching.length === 0) return null;
-  if (preferredServerRouteId) {
-    const prefUrl = serverUrlFromServersByRouteId(
-      serversMap,
-      preferredServerRouteId,
-    );
-    if (prefUrl && matching.includes(prefUrl)) {
-      return prefUrl;
-    }
-  }
-  return matching[0] ?? null;
+function hasChatOnServer(session: ServerSession, chatId: string): boolean {
+  const sid = catalogServerId(session);
+  return getServerChats(sid).some((chat) => chat.id === chatId);
 }
 
-export function resolveRouteParam(
-  routeId: string,
+function resolveServerByRouteId(
+  serverRouteId: string,
   serversMap: Map<string, ServerSession>,
-  preferredServerRouteId: string | null,
-): RouteResolution {
-  if (CHAT_BY_ID.has(routeId)) {
-    const serverUrl = pickServerUrlForChat(
-      routeId,
-      serversMap,
-      preferredServerRouteId,
-    );
-    if (!serverUrl) return { kind: "unknown" };
-    return { kind: "chat", serverUrl, chatId: routeId };
+): ServerSession | null {
+  const serverUrl = serverUrlFromServersByRouteId(serversMap, serverRouteId);
+  if (!serverUrl) {
+    return null;
   }
+  return serversMap.get(serverUrl) ?? null;
+}
 
-  const serverUrl = serverUrlFromServersByRouteId(serversMap, routeId);
-  if (serverUrl) return { kind: "server", serverUrl };
-  return { kind: "unknown" };
+export function resolveChatForServerRoute(
+  serverRouteId: string,
+  chatId: string,
+  serversMap: Map<string, ServerSession>,
+): ChatPreview | null {
+  const server = resolveServerByRouteId(serverRouteId, serversMap);
+  if (!server) {
+    return null;
+  }
+  if (!hasChatOnServer(server, chatId)) {
+    return null;
+  }
+  return CHAT_BY_ID.get(chatId) ?? null;
 }
 
 export const selectedServerAtom = atom((get) => {
@@ -462,16 +446,16 @@ export const selectedServerAtom = atom((get) => {
   const serversMap = get(serversAtom);
   const activeId = get(activeServerIdAtom);
 
-  if (ctx.type === "id") {
-    const r = resolveRouteParam(ctx.id, serversMap, activeId);
-    if (r.kind === "unknown") return null;
-    return serversMap.get(r.serverUrl) ?? null;
+  if (ctx.type === "server" || ctx.type === "server-chat") {
+    return resolveServerByRouteId(ctx.serverId, serversMap);
+  }
+
+  if (ctx.type === "config-server") {
+    return resolveServerByRouteId(ctx.serverId, serversMap);
   }
 
   if (!activeId) return null;
-  const url = serverUrlFromServersByRouteId(serversMap, activeId);
-  if (!url) return null;
-  return serversMap.get(url) ?? null;
+  return resolveServerByRouteId(activeId, serversMap);
 });
 
 // Список чатов для выбранного (resolved) сервера.
@@ -523,16 +507,16 @@ export const selectedPersonChatPeerAtom = atom((get) => {
 export const effectiveChatIdAtom = atom((get) => {
   const ctx = get(routeContextAtom);
   const serversMap = get(serversAtom);
-  const activeId = get(activeServerIdAtom);
   const lastMap = get(lastChatByServerIdAtom);
   const chats = get(chatsForSelectedServerAtom);
 
-  if (ctx.type === "id") {
-    const r = resolveRouteParam(ctx.id, serversMap, activeId);
-    if (r.kind === "unknown") return null;
-    if (r.kind === "chat") return r.chatId;
+  if (ctx.type === "server-chat") {
+    const resolved = resolveChatForServerRoute(ctx.serverId, ctx.chatId, serversMap);
+    return resolved?.id ?? null;
+  }
 
-    const last = lastMap[ctx.id];
+  if (ctx.type === "server") {
+    const last = lastMap[ctx.serverId];
     if (last && chats.some((c) => c.id === last)) {
       return last;
     }

@@ -16,10 +16,8 @@ import {
   exitServerToRoot,
 } from "../state/designerNavigation";
 import { activeServerIdAtom } from "../state/selectionAtoms";
-import { serversAtom } from "../state/servers";
-import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
-import { resolveRouteParam, routeContextAtom } from "../state/store";
-import { selectionIdFromPathname } from "../state/routePath";
+import { routeContextAtom } from "../state/store";
+import { resolveDesignerRoutePath } from "../state/routePath";
 import { isSettingsOpenAtom } from "../state/settingsOverlay";
 import { ChatColumn } from "./ChatColumn";
 import { ChatsColumn } from "./ChatsColumn";
@@ -45,26 +43,37 @@ function RootLayout() {
     }
     prevPathnameRef.current = pathname;
 
-    const id = selectionIdFromPathname(pathname);
-    if (id) {
-      setRouteCtx({ type: "id", id });
-      const serversMap = defaultStore.get(serversAtom);
-      const activeId = defaultStore.get(activeServerIdAtom);
-      const r = resolveRouteParam(id, serversMap, activeId);
-      if (r.kind === "server") {
-        defaultStore.set(activeServerIdAtom, id);
-      } else if (r.kind === "chat") {
-        defaultStore.set(
-          activeServerIdAtom,
-          serverRouteIdFromServerUrl(r.serverUrl),
-        );
-      } else {
-        defaultStore.set(activeServerIdAtom, null);
-      }
-    } else {
-      setRouteCtx({ type: "index" });
-      defaultStore.set(activeServerIdAtom, null);
+    const route = resolveDesignerRoutePath(pathname);
+    if (route.kind === "server-chat") {
+      setRouteCtx({
+        type: "server-chat",
+        serverId: route.serverId,
+        chatId: route.chatId,
+      });
+      defaultStore.set(activeServerIdAtom, route.serverId);
+      return;
     }
+    if (route.kind === "server") {
+      setRouteCtx({
+        type: "server",
+        serverId: route.serverId,
+      });
+      defaultStore.set(activeServerIdAtom, route.serverId);
+      return;
+    }
+    if (route.kind === "config-server") {
+      setRouteCtx({ type: "config-server", serverId: route.serverId });
+      defaultStore.set(activeServerIdAtom, route.serverId);
+      return;
+    }
+    if (route.kind === "config") {
+      setRouteCtx({ type: "config" });
+      defaultStore.set(activeServerIdAtom, null);
+      return;
+    }
+
+    setRouteCtx({ type: "index" });
+    defaultStore.set(activeServerIdAtom, null);
   }, [pathname, setRouteCtx]);
 
   useEffect(() => {
@@ -92,24 +101,18 @@ function RootLayout() {
       if (document.querySelector("dialog[open]")) {
         return;
       }
-      const id = selectionIdFromPathname(pathnameRef.current);
-      const serversMap = defaultStore.get(serversAtom);
+      const route = resolveDesignerRoutePath(pathnameRef.current);
       const activeId = defaultStore.get(activeServerIdAtom);
-      const routeResolution = id
-        ? resolveRouteParam(id, serversMap, activeId)
-        : { kind: "unknown" as const };
+      const isChatRoute = route.kind === "server-chat";
 
       const target = event.target;
       if (target instanceof Element) {
         if (
-          routeResolution.kind === "chat" &&
+          isChatRoute &&
           target.closest("[data-chat-composer='true']")
         ) {
           event.preventDefault();
-          exitChatToServer(
-            navigate,
-            serverRouteIdFromServerUrl(routeResolution.serverUrl),
-          );
+          exitChatToServer(navigate, route.serverId);
           return;
         }
 
@@ -118,13 +121,10 @@ function RootLayout() {
         }
       }
 
-      if (id) {
-        if (routeResolution.kind === "chat") {
+      if (route.kind === "server-chat" || route.kind === "server") {
+        if (route.kind === "server-chat") {
           event.preventDefault();
-          exitChatToServer(
-            navigate,
-            serverRouteIdFromServerUrl(routeResolution.serverUrl),
-          );
+          exitChatToServer(navigate, route.serverId);
           return;
         }
         event.preventDefault();

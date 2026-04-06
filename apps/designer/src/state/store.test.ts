@@ -106,7 +106,10 @@ describe("settings users mutations", () => {
   });
 
   it("updates allUsersForSelectedServerAtom after creating user", () => {
-    defaultStore.set(routeContextAtom, { type: "id", id: "localhost.5173" });
+    defaultStore.set(routeContextAtom, {
+      type: "server",
+      serverId: "localhost.5173",
+    });
     const before = defaultStore.get(allUsersForSelectedServerAtom).length;
 
     createServerUser({

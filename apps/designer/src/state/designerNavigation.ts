@@ -5,7 +5,7 @@ import { resolveDesignerRoutePath } from "./routePath";
 import { resolveChatForServerRoute } from "./store";
 
 export type DesignerNavigate = (opts: {
-  to: "/" | "/$serverId" | "/$serverId/$chatId";
+  to: "/" | "/config/$serverId" | "/$serverId" | "/$serverId/$chatId";
   params?: { serverId?: string; chatId?: string };
 }) => void | Promise<unknown>;
 
@@ -54,6 +54,11 @@ export function clearLastChatForServerRouteId(serverRouteId: string): void {
   });
 }
 
+export function isConfiguratorPath(pathname: string): boolean {
+  const route = resolveDesignerRoutePath(pathname);
+  return route.kind === "config" || route.kind === "config-server";
+}
+
 export function enterServer(
   navigate: DesignerNavigate,
   serverRouteId: string,
@@ -76,6 +81,14 @@ export function enterServer(
   }
 
   void navigate({ to: "/$serverId", params: { serverId: serverRouteId } });
+}
+
+export function enterConfigServer(
+  navigate: DesignerNavigate,
+  serverRouteId: string,
+): void {
+  defaultStore.set(activeServerIdAtom, serverRouteId);
+  void navigate({ to: "/config/$serverId", params: { serverId: serverRouteId } });
 }
 
 /** From chat-level URL to this server's segment; `lastChat` cleanup runs on pathname transition. */

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { serverRouteIdToClearAfterPathChange } from "./designerNavigation";
+import {
+  isConfiguratorPath,
+  serverRouteIdToClearAfterPathChange,
+} from "./designerNavigation";
 import { serverRouteIdFromServerUrl } from "./serverRouteId";
 
 const mainUrl = "https://kotel.localhost";
@@ -49,5 +52,18 @@ describe("serverRouteIdToClearAfterPathChange", () => {
         `/${altRid}`,
       ),
     ).toBeNull();
+  });
+});
+
+describe("isConfiguratorPath", () => {
+  it("returns true for /config and /config/:serverId routes", () => {
+    expect(isConfiguratorPath("/config")).toBe(true);
+    expect(isConfiguratorPath("/config/kotel.localhost")).toBe(true);
+  });
+
+  it("returns false for non-config routes", () => {
+    expect(isConfiguratorPath("/")).toBe(false);
+    expect(isConfiguratorPath("/kotel.localhost")).toBe(false);
+    expect(isConfiguratorPath("/kotel.localhost/chat_general")).toBe(false);
   });
 });

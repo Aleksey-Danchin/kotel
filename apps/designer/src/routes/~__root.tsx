@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { defaultStore } from "../global/defaultStore";
 import { DESIGNER_LOADING_DELAY_MS } from "../components/loadingDelay";
 import { SettingsOverlay } from "../components/SettingsOverlay";
@@ -23,10 +23,10 @@ import {
 } from "../state/store";
 import { serversAtom } from "../state/servers";
 import { resolveDesignerRoutePath } from "../state/routePath";
-import { isSettingsOpenAtom } from "../state/settingsOverlay";
 import { ChatColumn } from "./ChatColumn";
 import { ChatsColumn } from "./ChatsColumn";
 import { ServicesColumn } from "./ServicesColumn";
+import { selectedServerAtom } from "../state/store";
 
 export const Route = createRootRoute({
   component: () => <RootLayout />,
@@ -39,7 +39,10 @@ function RootLayout() {
   const pathnameRef = useRef(pathname);
   const prevPathnameRef = useRef<string | null>(null);
   const [startupLoading, setStartupLoading] = useState(true);
-  const setIsSettingsOpen = useSetAtom(isSettingsOpenAtom);
+  const selectedServer = useAtomValue(selectedServerAtom);
+  const parsedRoute = resolveDesignerRoutePath(pathname);
+  const isConfigMode =
+    parsedRoute.kind === "config" || parsedRoute.kind === "config-server";
 
   useLayoutEffect(() => {
     const prev = prevPathnameRef.current;
@@ -73,11 +76,6 @@ function RootLayout() {
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape" || event.repeat) {
-        return;
-      }
-      if (defaultStore.get(isSettingsOpenAtom)) {
-        event.preventDefault();
-        setIsSettingsOpen(false);
         return;
       }
       if (document.querySelector("dialog[open]")) {
@@ -122,7 +120,7 @@ function RootLayout() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [navigate, setIsSettingsOpen]);
+  }, [navigate]);
 
   return (
     <div className="h-dvh overflow-hidden bg-base-100">
@@ -131,18 +129,37 @@ function RootLayout() {
           <ServicesColumn isLoading={startupLoading} />
         </div>
 
-        <div className="flex h-full min-h-0 w-70 shrink-0">
-          <ChatsColumn isLoading={startupLoading} />
-        </div>
+        {isConfigMode ? (
+          <>
+            <div className="flex h-full min-h-0 w-70 shrink-0 border-r border-base-300 bg-base-200" />
+            <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-[gray]">
+              {selectedServer ? (
+                <SettingsOverlay mode="route" />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <p className="text-center text-2xl text-base-content/80">
+                    Выберите сервер
+                  </p>
+                </div>
+              )}
+              <Outlet />
+            </main>
+          </>
+        ) : (
+          <>
+            <div className="flex h-full min-h-0 w-70 shrink-0">
+              <ChatsColumn isLoading={startupLoading} />
+            </div>
 
-        <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-[gray]">
-          <ChatColumn isLoading={startupLoading}>
-            <Outlet />
-          </ChatColumn>
-        </main>
+            <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-[gray]">
+              <ChatColumn isLoading={startupLoading}>
+                <Outlet />
+              </ChatColumn>
+            </main>
+          </>
+        )}
 
         <TanStackRouterDevtools />
-        <SettingsOverlay />
       </div>
     </div>
   );

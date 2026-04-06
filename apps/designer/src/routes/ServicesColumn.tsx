@@ -1,12 +1,16 @@
 import { useRef, useState, type SubmitEventHandler } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
 import {
   serversAtom,
   setServerSession,
   type ServerSession,
 } from "../state/servers";
-import { enterServer } from "../state/designerNavigation";
+import {
+  enterConfigServer,
+  enterServer,
+  isConfiguratorPath,
+} from "../state/designerNavigation";
 import {
   getTotalUnreadForServerSession,
   selectedServerAtom,
@@ -51,6 +55,7 @@ function normalizeServerAddressInput(raw: string): string {
 
 export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const serversMap = useAtomValue(serversAtom);
   const selectedServer = useAtomValue(selectedServerAtom);
   const servers = Array.from(serversMap.values());
@@ -94,7 +99,11 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
 
       setServerSession(nextSession);
       const rid = serverRouteIdFromServerUrl(normalized);
-      enterServer(navigate, rid);
+      if (isConfiguratorPath(pathname)) {
+        enterConfigServer(navigate, rid);
+      } else {
+        enterServer(navigate, rid);
+      }
       setNewServerUrl("");
       addServerDialogRef.current?.close();
     } catch (addError) {
@@ -135,7 +144,11 @@ export function ServicesColumn({ isLoading = false }: ServicesColumnProps) {
               unreadCount={getTotalUnreadForServerSession(session)}
               onSelect={() => {
                 const rid = serverRouteIdFromServerUrl(session.serverUrl);
-                enterServer(navigate, rid);
+                if (isConfiguratorPath(pathname)) {
+                  enterConfigServer(navigate, rid);
+                } else {
+                  enterServer(navigate, rid);
+                }
               }}
             />
           );

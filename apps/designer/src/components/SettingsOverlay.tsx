@@ -113,16 +113,22 @@ function sessionClientType(sessionId: string): SessionClientType {
   return sum % 2 === 0 ? "web" : "app";
 }
 
-export function SettingsOverlay() {
+interface SettingsOverlayProps {
+  mode?: "overlay" | "route";
+}
+
+export function SettingsOverlay({ mode = "overlay" }: SettingsOverlayProps) {
+  const isRouteMode = mode === "route";
   const routeSelectedServer = useAtomValue(selectedServerAtom);
   const serversList = useAtomValue(serversListAtom);
   const settingsServerUrl = useAtomValue(settingsServerUrlAtom);
   const setSettingsServerUrl = useSetAtom(settingsServerUrlAtom);
-  const selectedServer =
-    (settingsServerUrl
-      ? serversList.find((server) => server.serverUrl === settingsServerUrl) ??
-        null
-      : null) ?? routeSelectedServer;
+  const selectedServer = isRouteMode
+    ? routeSelectedServer
+    : ((settingsServerUrl
+        ? serversList.find((server) => server.serverUrl === settingsServerUrl) ??
+          null
+        : null) ?? routeSelectedServer);
   const isOpen = useAtomValue(isSettingsOpenAtom);
   const setIsOpen = useSetAtom(isSettingsOpenAtom);
   const activeTab = useAtomValue(settingsActiveTabAtom);
@@ -336,7 +342,7 @@ export function SettingsOverlay() {
     selectedServer?.user.fullname,
   ]);
 
-  if (!isOpen || !safeActiveTab) {
+  if ((!isRouteMode && !isOpen) || !safeActiveTab) {
     return null;
   }
 
@@ -1319,9 +1325,13 @@ export function SettingsOverlay() {
 
   return (
     <div
-      className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-base-200"
-      role="dialog"
-      aria-modal="true"
+      className={
+        isRouteMode
+          ? "flex h-full min-h-0 flex-col overflow-hidden bg-base-200"
+          : "absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-base-200"
+      }
+      role={isRouteMode ? undefined : "dialog"}
+      aria-modal={isRouteMode ? undefined : true}
       aria-label="Настройки"
     >
       <section className="flex h-full w-full flex-col">
@@ -1329,75 +1339,81 @@ export function SettingsOverlay() {
           <div className="min-w-0 relative z-40">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-base-content">
               <span className="shrink-0">Настройка</span>
-              <div className="dropdown">
-                <button
-                  type="button"
-                  tabIndex={0}
-                  ref={settingsServerDropdownTriggerRef}
-                  className="btn btn-sm btn-outline min-w-0 max-w-xs justify-between"
-                  aria-label="Выбор сервера для настроек"
-                >
-                  <span className="truncate">{settingsServerLabel}</span>
-                  <span className="ml-2 text-xs opacity-70">v</span>
-                </button>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu z-30 mt-1 w-96 divide-y divide-gray-600 rounded-box border border-base-300 bg-base-100 p-1 shadow"
-                >
-                  {serversList.length === 0 ? (
-                    <li>
-                      <span className="text-sm text-base-content/70">
-                        Серверы не найдены
-                      </span>
-                    </li>
-                  ) : (
-                    serversList.map((server) => {
-                      const serverLabel =
-                        server.name?.trim() || displayServerHost(server.serverUrl);
-                      const isSelected = server.serverUrl === selectedServer?.serverUrl;
-                      const role = normalizeRole(server.user.role);
-                      const hasPrivilegedBadge =
-                        role === "ADMIN" || role === "ROOT";
-                      return (
-                        <li key={server.serverUrl} className="w-full">
-                          <button
-                            type="button"
-                            className={
-                              isSelected
-                                ? "active bg-primary text-primary-content flex! w-full! items-start! justify-start! px-4 py-3"
-                                : "flex! w-full! items-start! justify-start! px-4 py-3"
-                            }
-                            onClick={(event) => {
-                              setSettingsServerUrl(server.serverUrl);
-                              event.currentTarget.blur();
-                              settingsServerDropdownTriggerRef.current?.blur();
-                            }}
-                          >
-                            <span className="flex w-full min-w-0 flex-col items-start gap-1">
-                              <span className="min-w-0 truncate text-base font-bold leading-tight">
-                                {serverLabel}
-                              </span>
-                              <span className="min-w-0 truncate text-xs text-base-content/70">
-                                {displayServerHost(server.serverUrl)}
-                              </span>
-                              <span className="mt-2 flex w-full items-center justify-between gap-2 text-sm text-base-content/80">
-                                <span className="min-w-0 truncate">
-                                  {server.user.fullname}
+              {isRouteMode ? (
+                <span className="badge badge-outline badge-primary min-w-0 max-w-xs truncate">
+                  {settingsServerLabel}
+                </span>
+              ) : (
+                <div className="dropdown">
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    ref={settingsServerDropdownTriggerRef}
+                    className="btn btn-sm btn-outline min-w-0 max-w-xs justify-between"
+                    aria-label="Выбор сервера для настроек"
+                  >
+                    <span className="truncate">{settingsServerLabel}</span>
+                    <span className="ml-2 text-xs opacity-70">v</span>
+                  </button>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content menu z-30 mt-1 w-96 divide-y divide-gray-600 rounded-box border border-base-300 bg-base-100 p-1 shadow"
+                  >
+                    {serversList.length === 0 ? (
+                      <li>
+                        <span className="text-sm text-base-content/70">
+                          Серверы не найдены
+                        </span>
+                      </li>
+                    ) : (
+                      serversList.map((server) => {
+                        const serverLabel =
+                          server.name?.trim() || displayServerHost(server.serverUrl);
+                        const isSelected = server.serverUrl === selectedServer?.serverUrl;
+                        const role = normalizeRole(server.user.role);
+                        const hasPrivilegedBadge =
+                          role === "ADMIN" || role === "ROOT";
+                        return (
+                          <li key={server.serverUrl} className="w-full">
+                            <button
+                              type="button"
+                              className={
+                                isSelected
+                                  ? "active bg-primary text-primary-content flex! w-full! items-start! justify-start! px-4 py-3"
+                                  : "flex! w-full! items-start! justify-start! px-4 py-3"
+                              }
+                              onClick={(event) => {
+                                setSettingsServerUrl(server.serverUrl);
+                                event.currentTarget.blur();
+                                settingsServerDropdownTriggerRef.current?.blur();
+                              }}
+                            >
+                              <span className="flex w-full min-w-0 flex-col items-start gap-1">
+                                <span className="min-w-0 truncate text-base font-bold leading-tight">
+                                  {serverLabel}
                                 </span>
-                                {hasPrivilegedBadge ? (
-                                  <span className="badge badge-outline badge-xs uppercase">
-                                    {role?.toLowerCase()}
+                                <span className="min-w-0 truncate text-xs text-base-content/70">
+                                  {displayServerHost(server.serverUrl)}
+                                </span>
+                                <span className="mt-2 flex w-full items-center justify-between gap-2 text-sm text-base-content/80">
+                                  <span className="min-w-0 truncate">
+                                    {server.user.fullname}
                                   </span>
-                                ) : null}
+                                  {hasPrivilegedBadge ? (
+                                    <span className="badge badge-outline badge-xs uppercase">
+                                      {role?.toLowerCase()}
+                                    </span>
+                                  ) : null}
+                                </span>
                               </span>
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })
-                  )}
-                </ul>
-              </div>
+                            </button>
+                          </li>
+                        );
+                      })
+                    )}
+                  </ul>
+                </div>
+              )}
               <span className="shrink-0">сервера</span>
             </h2>
             {settingsServerHost && (
@@ -1406,14 +1422,16 @@ export function SettingsOverlay() {
               </p>
             )}
           </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            aria-label="Закрыть настройки"
-            onClick={() => setIsOpen(false)}
-          >
-            X
-          </button>
+          {isRouteMode ? null : (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              aria-label="Закрыть настройки"
+              onClick={() => setIsOpen(false)}
+            >
+              X
+            </button>
+          )}
         </header>
 
         <div className="flex min-h-0 flex-1">

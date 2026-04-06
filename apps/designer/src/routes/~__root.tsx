@@ -16,7 +16,12 @@ import {
   exitServerToRoot,
 } from "../state/designerNavigation";
 import { activeServerIdAtom } from "../state/selectionAtoms";
-import { routeContextAtom } from "../state/store";
+import {
+  resolveNextActiveServerId,
+  resolveRouteContextForPathname,
+  routeContextAtom,
+} from "../state/store";
+import { serversAtom } from "../state/servers";
 import { resolveDesignerRoutePath } from "../state/routePath";
 import { isSettingsOpenAtom } from "../state/settingsOverlay";
 import { ChatColumn } from "./ChatColumn";
@@ -43,37 +48,14 @@ function RootLayout() {
     }
     prevPathnameRef.current = pathname;
 
-    const route = resolveDesignerRoutePath(pathname);
-    if (route.kind === "server-chat") {
-      setRouteCtx({
-        type: "server-chat",
-        serverId: route.serverId,
-        chatId: route.chatId,
-      });
-      defaultStore.set(activeServerIdAtom, route.serverId);
-      return;
-    }
-    if (route.kind === "server") {
-      setRouteCtx({
-        type: "server",
-        serverId: route.serverId,
-      });
-      defaultStore.set(activeServerIdAtom, route.serverId);
-      return;
-    }
-    if (route.kind === "config-server") {
-      setRouteCtx({ type: "config-server", serverId: route.serverId });
-      defaultStore.set(activeServerIdAtom, route.serverId);
-      return;
-    }
-    if (route.kind === "config") {
-      setRouteCtx({ type: "config" });
-      defaultStore.set(activeServerIdAtom, null);
-      return;
-    }
-
-    setRouteCtx({ type: "index" });
-    defaultStore.set(activeServerIdAtom, null);
+    const serversMap = defaultStore.get(serversAtom);
+    const nextRouteContext = resolveRouteContextForPathname(pathname, serversMap);
+    setRouteCtx(nextRouteContext);
+    const currentActiveServerId = defaultStore.get(activeServerIdAtom);
+    defaultStore.set(
+      activeServerIdAtom,
+      resolveNextActiveServerId(nextRouteContext, currentActiveServerId),
+    );
   }, [pathname, setRouteCtx]);
 
   useEffect(() => {

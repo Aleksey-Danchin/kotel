@@ -5,6 +5,7 @@ import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
 import { normalizeDesignerRole } from "./roles";
 import type { ServerSession } from "./servers";
 import { serversAtom } from "./servers";
+import { resolveDesignerRoutePath } from "./routePath";
 import stateMocks from "./mocks.json";
 import { serverUrlFromServersByRouteId } from "./serverRouteId";
 
@@ -43,13 +44,14 @@ export function chatHeaderTitle(chat: ChatPreview): string {
 }
 
 /** Текущий маршрут песочницы: index/config/server/server-chat. */
-export const routeContextAtom = atom<
+export type RouteContext =
   | { type: "index" }
   | { type: "config" }
   | { type: "config-server"; serverId: string }
   | { type: "server"; serverId: string }
-  | { type: "server-chat"; serverId: string; chatId: string }
->({ type: "index" });
+  | { type: "server-chat"; serverId: string; chatId: string };
+
+export const routeContextAtom = atom<RouteContext>({ type: "index" });
 
 /** Идёт ли временная имитация загрузки треда при переходах внутри chat route. */
 export const threadTransitionLoadingAtom = atom(false);
@@ -415,7 +417,7 @@ function hasChatOnServer(session: ServerSession, chatId: string): boolean {
   return getServerChats(sid).some((chat) => chat.id === chatId);
 }
 
-function resolveServerByRouteId(
+export function resolveServerByRouteId(
   serverRouteId: string,
   serversMap: Map<string, ServerSession>,
 ): ServerSession | null {
@@ -424,6 +426,60 @@ function resolveServerByRouteId(
     return null;
   }
   return serversMap.get(serverUrl) ?? null;
+}
+
+export function resolveRouteContextForPathname(
+  pathname: string,
+  serversMap: Map<string, ServerSession>,
+): RouteContext {
+  const parsed = resolveDesignerRoutePath(pathname);
+  if (parsed.kind === "index") {
+    return { type: "index" };
+  }
+  if (parsed.kind === "config") {
+    return { type: "config" };
+  }
+  if (parsed.kind === "server") {
+    const server = resolveServerByRouteId(parsed.serverId, serversMap);
+    return server ? { type: "server", serverId: parsed.serverId } : { type: "index" };
+  }
+  if (parsed.kind === "config-server") {
+    const server = resolveServerByRouteId(parsed.serverId, serversMap);
+    return server
+      ? { type: "config-server", serverId: parsed.serverId }
+      : { type: "config" };
+  }
+
+  const server = resolveServerByRouteId(parsed.serverId, serversMap);
+  if (!server) {
+    return { type: "index" };
+  }
+  const chat = resolveChatForServerRoute(parsed.serverId, parsed.chatId, serversMap);
+  if (!chat) {
+    return { type: "server", serverId: parsed.serverId };
+  }
+  return {
+    type: "server-chat",
+    serverId: parsed.serverId,
+    chatId: parsed.chatId,
+  };
+}
+
+export function resolveNextActiveServerId(
+  routeContext: RouteContext,
+  currentActiveServerId: string | null,
+): string | null {
+  if (
+    routeContext.type === "server" ||
+    routeContext.type === "server-chat" ||
+    routeContext.type === "config-server"
+  ) {
+    return routeContext.serverId;
+  }
+  if (routeContext.type === "config") {
+    return currentActiveServerId;
+  }
+  return null;
 }
 
 export function resolveChatForServerRoute(
@@ -444,7 +500,6 @@ export function resolveChatForServerRoute(
 export const selectedServerAtom = atom((get) => {
   const ctx = get(routeContextAtom);
   const serversMap = get(serversAtom);
-  const activeId = get(activeServerIdAtom);
 
   if (ctx.type === "server" || ctx.type === "server-chat") {
     return resolveServerByRouteId(ctx.serverId, serversMap);
@@ -454,8 +509,7 @@ export const selectedServerAtom = atom((get) => {
     return resolveServerByRouteId(ctx.serverId, serversMap);
   }
 
-  if (!activeId) return null;
-  return resolveServerByRouteId(activeId, serversMap);
+  return null;
 });
 
 // Список чатов для выбранного (resolved) сервера.

@@ -7,11 +7,17 @@ import {
   getServerUsers,
   getServerChats,
   routeContextAtom,
+  resolveRouteContextForPathname,
+  resolveNextActiveServerId,
   resolvePersonChatPeer,
+  selectedServerAtom,
   updateServerUser,
   type ChatPreview,
   type MockUser,
 } from "./store";
+import { activeServerIdAtom } from "./selectionAtoms";
+import { serversAtom } from "./servers";
+import { serverRouteIdFromServerUrl } from "./serverRouteId";
 
 describe("findOrCreatePersonChat", () => {
   it("creates DM once and reuses it for repeated clicks", () => {
@@ -121,5 +127,62 @@ describe("settings users mutations", () => {
 
     const after = defaultStore.get(allUsersForSelectedServerAtom).length;
     expect(after).toBe(before + 1);
+  });
+});
+
+describe("hierarchical route resolution fallbacks", () => {
+  const validServerUrl = "http://localhost:5173";
+  const validServerId = serverRouteIdFromServerUrl(validServerUrl);
+
+  it("falls back to home for unknown server in selection routes", () => {
+    const servers = defaultStore.get(serversAtom);
+    expect(resolveRouteContextForPathname("/unknown-server", servers)).toEqual({
+      type: "index",
+    });
+    expect(
+      resolveRouteContextForPathname("/unknown-server/chat_general", servers),
+    ).toEqual({
+      type: "index",
+    });
+  });
+
+  it("falls back to /:serverId when chat is missing under valid server", () => {
+    const servers = defaultStore.get(serversAtom);
+    expect(
+      resolveRouteContextForPathname(`/${validServerId}/missing-chat`, servers),
+    ).toEqual({
+      type: "server",
+      serverId: validServerId,
+    });
+  });
+
+  it("falls back to /config for unknown server in config route", () => {
+    const servers = defaultStore.get(serversAtom);
+    expect(
+      resolveRouteContextForPathname("/config/unknown-server", servers),
+    ).toEqual({
+      type: "config",
+    });
+  });
+});
+
+describe("active server and selected server behavior", () => {
+  const validServerUrl = "http://localhost:5173";
+  const validServerId = serverRouteIdFromServerUrl(validServerUrl);
+
+  it("keeps active server for /config and clears on index", () => {
+    expect(resolveNextActiveServerId({ type: "config" }, validServerId)).toBe(
+      validServerId,
+    );
+    expect(resolveNextActiveServerId({ type: "index" }, validServerId)).toBeNull();
+  });
+
+  it("does not infer selected server from active id on index/config", () => {
+    defaultStore.set(activeServerIdAtom, validServerId);
+    defaultStore.set(routeContextAtom, { type: "index" });
+    expect(defaultStore.get(selectedServerAtom)).toBeNull();
+
+    defaultStore.set(routeContextAtom, { type: "config" });
+    expect(defaultStore.get(selectedServerAtom)).toBeNull();
   });
 });

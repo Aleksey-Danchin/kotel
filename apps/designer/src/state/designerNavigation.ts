@@ -1,13 +1,18 @@
 import { defaultStore } from "../global/defaultStore";
 import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
+import { serverRouteIdFromServerUrl } from "./serverRouteId";
 import { serversAtom } from "./servers";
 import { resolveDesignerRoutePath } from "./routePath";
 import { resolveChatForServerRoute } from "./store";
 
 export type DesignerNavigate = (opts: {
-  to: "/" | "/config/$serverId" | "/$serverId" | "/$serverId/$chatId";
+  to: "/" | "/config" | "/config/$serverId" | "/$serverId" | "/$serverId/$chatId";
   params?: { serverId?: string; chatId?: string };
 }) => void | Promise<unknown>;
+
+export type ConfiguratorNavigationTarget =
+  | { to: "/config/$serverId"; params: { serverId: string } }
+  | { to: "/config" };
 
 export function serverRouteIdToClearAfterPathChange(
   prevPathname: string,
@@ -89,6 +94,24 @@ export function enterConfigServer(
 ): void {
   defaultStore.set(activeServerIdAtom, serverRouteId);
   void navigate({ to: "/config/$serverId", params: { serverId: serverRouteId } });
+}
+
+export function resolveConfiguratorNavigationTarget(
+  activeServerId: string | null,
+  serversMap: Map<string, { serverUrl: string }>,
+): ConfiguratorNavigationTarget {
+  if (!activeServerId) {
+    return { to: "/config" };
+  }
+
+  const hasActiveServer = Array.from(serversMap.values()).some((session) => {
+    return serverRouteIdFromServerUrl(session.serverUrl) === activeServerId;
+  });
+  if (!hasActiveServer) {
+    return { to: "/config" };
+  }
+
+  return { to: "/config/$serverId", params: { serverId: activeServerId } };
 }
 
 /** From chat-level URL to this server's segment; `lastChat` cleanup runs on pathname transition. */

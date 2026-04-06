@@ -32,6 +32,25 @@ export const Route = createRootRoute({
   component: () => <RootLayout />,
 });
 
+export type EscapeNavigationAction = "exit-chat" | "exit-server" | "clear-active-server" | "none";
+
+export function resolveEscapeNavigationAction(
+  pathname: string,
+  activeServerId: string | null,
+): EscapeNavigationAction {
+  const route = resolveDesignerRoutePath(pathname);
+  if (route.kind === "server-chat") {
+    return "exit-chat";
+  }
+  if (route.kind === "server") {
+    return "exit-server";
+  }
+  if (activeServerId != null && activeServerId !== "") {
+    return "clear-active-server";
+  }
+  return "none";
+}
+
 function RootLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -84,6 +103,7 @@ function RootLayout() {
       const route = resolveDesignerRoutePath(pathnameRef.current);
       const activeId = defaultStore.get(activeServerIdAtom);
       const isChatRoute = route.kind === "server-chat";
+      const action = resolveEscapeNavigationAction(pathnameRef.current, activeId);
 
       const target = event.target;
       if (target instanceof Element) {
@@ -101,18 +121,19 @@ function RootLayout() {
         }
       }
 
-      if (route.kind === "server-chat" || route.kind === "server") {
-        if (route.kind === "server-chat") {
-          event.preventDefault();
-          exitChatToServer(navigate, route.serverId);
-          return;
-        }
+      if (action === "exit-chat" && route.kind === "server-chat") {
+        event.preventDefault();
+        exitChatToServer(navigate, route.serverId);
+        return;
+      }
+
+      if (action === "exit-server") {
         event.preventDefault();
         exitServerToRoot(navigate);
         return;
       }
 
-      if (activeId != null && activeId !== "") {
+      if (action === "clear-active-server") {
         event.preventDefault();
         defaultStore.set(activeServerIdAtom, null);
       }

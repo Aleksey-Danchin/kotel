@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue } from "jotai";
-import { FaLongArrowAltDown } from "react-icons/fa";
 import { ColumnHeaderGear } from "../components/ColumnHeaderGear";
 import { ChatCard } from "../components/ChatCard";
 import { UserCard } from "../components/UserCard";
@@ -13,6 +12,8 @@ import { isSearchMatch } from "../state/chatSearch";
 import {
   chatsForSelectedServerAtom,
   effectiveChatIdAtom,
+  getChatMessages,
+  chatHeaderTitle,
   selectedServerAtom,
   usersForSelectedServerAtom,
   findOrCreatePersonChat,
@@ -31,6 +32,10 @@ function displayServerHost(serverUrl: string): string {
 export interface ChatsColumnProps {
   isLoading?: boolean;
 }
+
+type ChatsFeedItem =
+  | { kind: "chat-item"; chatId: string; title: string; subtitle: string }
+  | { kind: "user-item"; userId: string; title: string; subtitle: string };
 
 export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
   const navigate = useNavigate();
@@ -81,19 +86,57 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
     return () => window.clearTimeout(timer);
   }, [search]);
 
-  const filteredChats = chats.filter((chat) =>
-    isSearchMatch(chat.title, debouncedSearch),
+  const usersWithPersonChats = new Set(
+    chats
+      .map((chat) => resolvePersonChatPeer(chat, users)?.id ?? null)
+      .filter((userId): userId is string => userId !== null),
   );
-  const filteredUsers = users.filter((user) =>
-    isSearchMatch(user.fullname, debouncedSearch),
-  );
+
+  const feedItems = [
+    ...chats.map((chat) => ({
+      item: {
+        kind: "chat-item",
+        chatId: chat.id,
+        title: chatHeaderTitle(chat),
+        subtitle: chat.subtitle,
+      } satisfies ChatsFeedItem,
+      latestMessageAt: getChatMessages(chat.id).at(-1)?.createdAt ?? null,
+    })),
+    ...users
+      .filter((user) => !usersWithPersonChats.has(user.id))
+      .map((user) => ({
+        item: {
+          kind: "user-item",
+          userId: user.id,
+          title: user.fullname,
+          subtitle: user.login,
+        } satisfies ChatsFeedItem,
+        latestMessageAt: null,
+      })),
+  ]
+    .sort((a, b) => {
+      if (a.latestMessageAt && b.latestMessageAt) {
+        return b.latestMessageAt.localeCompare(a.latestMessageAt);
+      }
+      if (a.latestMessageAt) return -1;
+      if (b.latestMessageAt) return 1;
+      return a.item.title.localeCompare(b.item.title, "ru");
+    })
+    .map(({ item }) => item)
+    .filter((item) => {
+      if (!debouncedSearch.trim()) return true;
+      return (
+        isSearchMatch(item.title, debouncedSearch) ||
+        isSearchMatch(item.subtitle, debouncedSearch)
+      );
+    });
 
   const content = (() => {
     if (serverSwitchLoading && selectedServer)
       return <ChatsColumnBodySkeleton />;
     if (!selectedServer) return null;
 
-    if (filteredChats.length === 0 && filteredUsers.length === 0) {
+    if (feedItems.length === 0) {
       return (
         <div className="p-2 text-base-content/80 w-full h-full flex justify-center items-center text-2xl">
           {debouncedSearch.trim() ? "Ничего не найдено" : "Чатов нет"}
@@ -103,50 +146,48 @@ export function ChatsColumn({ isLoading = false }: ChatsColumnProps) {
 
     return (
       <div className="flex flex-col gap-2 p-1">
-        {filteredChats.map((chat) => {
-          const peerUser =
-            chat.type === "person" ? resolvePersonChatPeer(chat, users) : null;
+        {feedItems.map((item) => {
+          if (item.kind === "chat-item") {
+            const chat = chats.find((entry) => entry.id === item.chatId);
+            if (!chat) return null;
+            const peerUser =
+              chat.type === "person"
+                ? resolvePersonChatPeer(chat, users)
+                : null;
+            return (
+              <ChatCard
+                key={chat.id}
+                chat={chat}
+                peerUser={peerUser}
+                active={chat.id === highlightedChatId}
+                onSelect={() => {
+                  const serverRid = serverRouteIdFromServerUrl(
+                    selectedServer.serverUrl,
+                  );
+                  enterChat(navigate, chat.id, serverRid);
+                }}
+              />
+            );
+          }
 
+          const user = users.find((entry) => entry.id === item.userId);
+          if (!user) return null;
           return (
-            <ChatCard
-              key={chat.id}
-              chat={chat}
-              peerUser={peerUser}
-              active={chat.id === highlightedChatId}
+            <UserCard
+              key={user.id}
+              user={user}
               onSelect={() => {
+                const serverId = selectedServer.id ?? selectedServer.serverUrl;
+                const dm = findOrCreatePersonChat(serverId, user.id);
+                if (!dm) return;
                 const serverRid = serverRouteIdFromServerUrl(
                   selectedServer.serverUrl,
                 );
-                enterChat(navigate, chat.id, serverRid);
+                enterChat(navigate, dm.id, serverRid);
               }}
             />
           );
         })}
-        <div className="mt-5 pt-4 border-t border-base-300">
-          <h3 className="flex items-center justify-center gap-1 px-1 pb-2 text-lg">
-            <FaLongArrowAltDown aria-hidden="true" />
-            <span>Пользователи</span>
-            <FaLongArrowAltDown aria-hidden="true" />
-          </h3>
-          <div className="flex flex-col gap-2">
-            {filteredUsers.map((user) => (
-              <UserCard
-                key={user.id}
-                user={user}
-                onSelect={() => {
-                  const serverId =
-                    selectedServer.id ?? selectedServer.serverUrl;
-                  const dm = findOrCreatePersonChat(serverId, user.id);
-                  if (!dm) return;
-                  const serverRid = serverRouteIdFromServerUrl(
-                    selectedServer.serverUrl,
-                  );
-                  enterChat(navigate, dm.id, serverRid);
-                }}
-              />
-            ))}
-          </div>
-        </div>
       </div>
     );
   })();

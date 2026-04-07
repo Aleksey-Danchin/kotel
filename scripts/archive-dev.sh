@@ -59,4 +59,8 @@ shopt -u dotglob nullglob
 mv "${ROUND_DIR_PATH}" "${ARCHIVE_DIR}/"
 touch "${DEV_DIR}/suggestion.md"
 
+cd "${PROJECT_ROOT}"
+git add .
+git commit -m "Архивация раунда разработк ${ROUND_DIR_NAME}"
+
 echo "Development round archived to ${ARCHIVED_ROUND_PATH}"

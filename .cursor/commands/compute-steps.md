@@ -54,7 +54,7 @@ The suggestion may contain URLs. Determine the purpose of each link:
 
 This is the core of your work. You must clarify EVERY ambiguity, gap, and assumption through questions to the user.
 
-All questions are managed exclusively through `questions.md` in the same directory as the provided suggestion file. Do NOT ask questions in chat — write them to that file.
+All questions are managed exclusively through `questions.md` in the same directory as the provided suggestion file, except the final readiness check described in `When to Stop`, which must be asked in chat.
 
 ### Questions Log File — `<suggestion-dir>/questions.md`
 
@@ -151,7 +151,7 @@ Stop the Q&A session when you have enough information to define every implementa
 
 > "I've gathered all the details I need and I'm ready to generate the implementation steps. Is there anything else I should know — any remaining details, concerns, or context?"
 
-Wait for the user's response. Only proceed to Phase 3 after the user confirms.
+Ask this final question in chat (not in `questions.md`). Wait for the user's response in chat. Only proceed to Phase 3 after the user confirms.
 
 ## Phase 3 — Decompose into Steps
 

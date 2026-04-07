@@ -7,6 +7,11 @@ alwaysApply: false
 
 # Designer Sandbox Rules
 
+## Automated testing policy
+- `apps/designer` uses manual verification only; automated tests are not required and must not be maintained in this app.
+- Do not add or preserve unit, component, or E2E test obligations for `apps/designer` by default.
+- Mandatory automated testing requirements remain enforced for `apps/frontend` and `apps/backend` under `.cursor/rules/testing.mdc`.
+
 ## What `apps/designer` is
 - `apps/designer` is a UI/visual development sandbox cloned from `app/frontend`, used to prototype layouts, flows, and UX.
 - It is intended to contain *UI-layer behavior only*, not real backend integration.

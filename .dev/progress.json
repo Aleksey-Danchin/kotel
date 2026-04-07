@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-04-07T07:13:52.923Z",
-  "updatedAt": "2026-04-07T07:18:28.548Z",
+  "updatedAt": "2026-04-07T07:22:23.458Z",
   "steps": [
     {
       "order": 1,
@@ -95,10 +95,10 @@
     {
       "order": 2,
       "file": "02-remove-designer-test-artifacts.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "50d45fb",
       "startedAt": "2026-04-07T07:16:31.034Z",
-      "completedAt": null,
+      "completedAt": "2026-04-07T07:19:05.563Z",
       "error": null,
       "retryCount": 0,
       "progress": [
@@ -182,12 +182,99 @@
     {
       "order": 3,
       "file": "03-fix-configurator-layout-and-navigation-ux.md",
-      "status": "pending",
+      "status": "in_progress",
       "commitHash": null,
-      "startedAt": null,
+      "startedAt": "2026-04-07T07:19:10.889Z",
       "completedAt": null,
       "error": null,
-      "retryCount": 0
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is not present in repo; no dedicated formatter script for designer step"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "cancelled",
+          "note": "apps/designer follows manual verification policy; no automated test maintenance"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "cancelled",
+          "note": "No task-specific automated tests for designer sandbox"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "cancelled",
+          "note": "No regression suite applicable for apps/designer"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "UI-only designer layout/navigation change; no docs updates required"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: No empty middle column in config mode",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: Route-mode header has working server dropdown",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: Dropdown selection navigates to /config/",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: Header back arrow exits config correctly",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: Gear re-click on /config exits",
+          "status": "completed"
+        },
+        {
+          "id": "ac-6",
+          "label": "AC: Initial settings tab reset by source preserved",
+          "status": "completed"
+        }
+      ]
     },
     {
       "order": 4,

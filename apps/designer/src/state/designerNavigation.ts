@@ -14,6 +14,11 @@ export type ConfiguratorNavigationTarget =
   | { to: "/config/$serverId"; params: { serverId: string } }
   | { to: "/config" };
 
+export type ConfiguratorExitTarget =
+  | { to: "/$serverId/$chatId"; params: { serverId: string; chatId: string } }
+  | { to: "/$serverId"; params: { serverId: string } }
+  | { to: "/" };
+
 export function serverRouteIdToClearAfterPathChange(
   prevPathname: string,
   nextPathname: string,
@@ -112,6 +117,36 @@ export function resolveConfiguratorNavigationTarget(
   }
 
   return { to: "/config/$serverId", params: { serverId: activeServerId } };
+}
+
+export function resolveConfiguratorExitTarget(
+  activeServerId: string | null,
+  lastChatByServerId: Record<string, string>,
+  serversMap: Map<string, { serverUrl: string }>,
+): ConfiguratorExitTarget {
+  if (!activeServerId) {
+    return { to: "/" };
+  }
+
+  const hasActiveServer = Array.from(serversMap.values()).some((session) => {
+    return serverRouteIdFromServerUrl(session.serverUrl) === activeServerId;
+  });
+  if (!hasActiveServer) {
+    return { to: "/" };
+  }
+
+  const lastChatId = lastChatByServerId[activeServerId];
+  if (lastChatId) {
+    const chat = resolveChatForServerRoute(activeServerId, lastChatId, serversMap);
+    if (chat) {
+      return {
+        to: "/$serverId/$chatId",
+        params: { serverId: activeServerId, chatId: chat.id },
+      };
+    }
+  }
+
+  return { to: "/$serverId", params: { serverId: activeServerId } };
 }
 
 /** From chat-level URL to this server's segment; `lastChat` cleanup runs on pathname transition. */

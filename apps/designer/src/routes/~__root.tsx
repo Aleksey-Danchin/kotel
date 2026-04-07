@@ -152,7 +152,6 @@ function RootLayout() {
 
         {isConfigMode ? (
           <>
-            <div className="flex h-full min-h-0 w-70 shrink-0 border-r border-base-300 bg-base-200" />
             <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-r border-[gray]">
               {selectedServer ? (
                 <SettingsOverlay mode="route" />

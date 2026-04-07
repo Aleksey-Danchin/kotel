@@ -1,13 +1,20 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  activeServerIdAtom,
+  lastChatByServerIdAtom,
+} from "../state/selectionAtoms";
 import {
   settingsActiveTabAtom,
   settingsInitialTabAtom,
   type SettingsOpenSource,
   initialSettingsTabForSource,
 } from "../state/settingsOverlay";
-import { activeServerIdAtom } from "../state/selectionAtoms";
-import { resolveConfiguratorNavigationTarget } from "../state/designerNavigation";
+import {
+  isConfiguratorPath,
+  resolveConfiguratorExitTarget,
+  resolveConfiguratorNavigationTarget,
+} from "../state/designerNavigation";
 import { serversAtom } from "../state/servers";
 
 function GearIcon({ className }: { className?: string }) {
@@ -41,7 +48,9 @@ interface ColumnHeaderGearProps {
 
 export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const activeServerId = useAtomValue(activeServerIdAtom);
+  const lastChatByServerId = useAtomValue(lastChatByServerIdAtom);
   const serversMap = useAtomValue(serversAtom);
   const setInitialTab = useSetAtom(settingsInitialTabAtom);
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
@@ -53,6 +62,16 @@ export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
       aria-label="Настройки колонки"
       onClick={(event) => {
         event.preventDefault();
+        if (isConfiguratorPath(pathname)) {
+          const exitTarget = resolveConfiguratorExitTarget(
+            activeServerId,
+            lastChatByServerId,
+            serversMap,
+          );
+          void navigate(exitTarget);
+          return;
+        }
+
         const initialTab = initialSettingsTabForSource(source);
         setInitialTab(initialTab);
         setActiveTab(initialTab);

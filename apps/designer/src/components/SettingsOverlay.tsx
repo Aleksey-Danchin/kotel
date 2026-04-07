@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
+  PiArrowLeft,
   PiClockCounterClockwise,
   PiGearSix,
   PiSlidersHorizontal,
@@ -40,6 +42,9 @@ import { formatUserPresenceSubtitle } from "../state/userPresence";
 import { shouldShowDesignerRoleBadge } from "../state/roles";
 import { setServerSession } from "../state/servers";
 import { isSearchMatch } from "../state/chatSearch";
+import { activeServerIdAtom, lastChatByServerIdAtom } from "../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
+import { resolveConfiguratorExitTarget } from "../state/designerNavigation";
 
 type AccountConfirmAction =
   | "demote-admin"
@@ -118,7 +123,10 @@ interface SettingsOverlayProps {
 }
 
 export function SettingsOverlay({ mode = "overlay" }: SettingsOverlayProps) {
+  const navigate = useNavigate();
   const isRouteMode = mode === "route";
+  const activeServerId = useAtomValue(activeServerIdAtom);
+  const lastChatByServerId = useAtomValue(lastChatByServerIdAtom);
   const routeSelectedServer = useAtomValue(selectedServerAtom);
   const serversList = useAtomValue(serversListAtom);
   const settingsServerUrl = useAtomValue(settingsServerUrlAtom);
@@ -204,6 +212,12 @@ export function SettingsOverlay({ mode = "overlay" }: SettingsOverlayProps) {
   const usersDetailsColumnRef = useRef<HTMLDivElement | null>(null);
   const settingsServerDropdownTriggerRef = useRef<HTMLButtonElement | null>(
     null,
+  );
+
+  const configuratorExitTarget = resolveConfiguratorExitTarget(
+    activeServerId,
+    lastChatByServerId,
+    new Map(serversList.map((server) => [server.serverUrl, server])),
   );
 
   useEffect(() => {
@@ -1338,82 +1352,97 @@ export function SettingsOverlay({ mode = "overlay" }: SettingsOverlayProps) {
         <header className="flex items-center justify-between gap-4 border-b border-gray-400 bg-base-300 p-4">
           <div className="min-w-0 relative z-40">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-base-content">
-              <span className="shrink-0">Настройка</span>
               {isRouteMode ? (
-                <span className="badge badge-outline badge-primary min-w-0 max-w-xs truncate">
-                  {settingsServerLabel}
-                </span>
-              ) : (
-                <div className="dropdown">
-                  <button
-                    type="button"
-                    tabIndex={0}
-                    ref={settingsServerDropdownTriggerRef}
-                    className="btn btn-sm btn-outline min-w-0 max-w-xs justify-between"
-                    aria-label="Выбор сервера для настроек"
-                  >
-                    <span className="truncate">{settingsServerLabel}</span>
-                    <span className="ml-2 text-xs opacity-70">v</span>
-                  </button>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content menu z-30 mt-1 w-96 divide-y divide-gray-600 rounded-box border border-base-300 bg-base-100 p-1 shadow"
-                  >
-                    {serversList.length === 0 ? (
-                      <li>
-                        <span className="text-sm text-base-content/70">
-                          Серверы не найдены
-                        </span>
-                      </li>
-                    ) : (
-                      serversList.map((server) => {
-                        const serverLabel =
-                          server.name?.trim() || displayServerHost(server.serverUrl);
-                        const isSelected = server.serverUrl === selectedServer?.serverUrl;
-                        const role = normalizeRole(server.user.role);
-                        const hasPrivilegedBadge =
-                          role === "ADMIN" || role === "ROOT";
-                        return (
-                          <li key={server.serverUrl} className="w-full">
-                            <button
-                              type="button"
-                              className={
-                                isSelected
-                                  ? "active bg-primary text-primary-content flex! w-full! items-start! justify-start! px-4 py-3"
-                                  : "flex! w-full! items-start! justify-start! px-4 py-3"
-                              }
-                              onClick={(event) => {
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-square btn-sm shrink-0"
+                  aria-label="Вернуться из конфигуратора"
+                  onClick={() => {
+                    void navigate(configuratorExitTarget);
+                  }}
+                >
+                  <PiArrowLeft className="text-base" aria-hidden="true" />
+                </button>
+              ) : null}
+              <span className="shrink-0">Настройка</span>
+              <div className="dropdown">
+                <button
+                  type="button"
+                  tabIndex={0}
+                  ref={settingsServerDropdownTriggerRef}
+                  className="btn btn-sm btn-outline min-w-0 max-w-xs justify-between"
+                  aria-label="Выбор сервера для настроек"
+                >
+                  <span className="truncate">{settingsServerLabel}</span>
+                  <span className="ml-2 text-xs opacity-70">v</span>
+                </button>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu z-30 mt-1 w-96 divide-y divide-gray-600 rounded-box border border-base-300 bg-base-100 p-1 shadow"
+                >
+                  {serversList.length === 0 ? (
+                    <li>
+                      <span className="text-sm text-base-content/70">
+                        Серверы не найдены
+                      </span>
+                    </li>
+                  ) : (
+                    serversList.map((server) => {
+                      const serverLabel =
+                        server.name?.trim() || displayServerHost(server.serverUrl);
+                      const isSelected = server.serverUrl === selectedServer?.serverUrl;
+                      const role = normalizeRole(server.user.role);
+                      const hasPrivilegedBadge = role === "ADMIN" || role === "ROOT";
+                      return (
+                        <li key={server.serverUrl} className="w-full">
+                          <button
+                            type="button"
+                            className={
+                              isSelected
+                                ? "active bg-primary text-primary-content flex! w-full! items-start! justify-start! px-4 py-3"
+                                : "flex! w-full! items-start! justify-start! px-4 py-3"
+                            }
+                            onClick={(event) => {
+                              if (isRouteMode) {
+                                const serverId = serverRouteIdFromServerUrl(
+                                  server.serverUrl,
+                                );
+                                void navigate({
+                                  to: "/config/$serverId",
+                                  params: { serverId },
+                                });
+                              } else {
                                 setSettingsServerUrl(server.serverUrl);
-                                event.currentTarget.blur();
-                                settingsServerDropdownTriggerRef.current?.blur();
-                              }}
-                            >
-                              <span className="flex w-full min-w-0 flex-col items-start gap-1">
-                                <span className="min-w-0 truncate text-base font-bold leading-tight">
-                                  {serverLabel}
-                                </span>
-                                <span className="min-w-0 truncate text-xs text-base-content/70">
-                                  {displayServerHost(server.serverUrl)}
-                                </span>
-                                <span className="mt-2 flex w-full items-center justify-between gap-2 text-sm text-base-content/80">
-                                  <span className="min-w-0 truncate">
-                                    {server.user.fullname}
-                                  </span>
-                                  {hasPrivilegedBadge ? (
-                                    <span className="badge badge-outline badge-xs uppercase">
-                                      {role?.toLowerCase()}
-                                    </span>
-                                  ) : null}
-                                </span>
+                              }
+                              event.currentTarget.blur();
+                              settingsServerDropdownTriggerRef.current?.blur();
+                            }}
+                          >
+                            <span className="flex w-full min-w-0 flex-col items-start gap-1">
+                              <span className="min-w-0 truncate text-base font-bold leading-tight">
+                                {serverLabel}
                               </span>
-                            </button>
-                          </li>
-                        );
-                      })
-                    )}
-                  </ul>
-                </div>
-              )}
+                              <span className="min-w-0 truncate text-xs text-base-content/70">
+                                {displayServerHost(server.serverUrl)}
+                              </span>
+                              <span className="mt-2 flex w-full items-center justify-between gap-2 text-sm text-base-content/80">
+                                <span className="min-w-0 truncate">
+                                  {server.user.fullname}
+                                </span>
+                                {hasPrivilegedBadge ? (
+                                  <span className="badge badge-outline badge-xs uppercase">
+                                    {role?.toLowerCase()}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              </div>
               <span className="shrink-0">сервера</span>
             </h2>
             {settingsServerHost && (

@@ -2,7 +2,7 @@
   "version": 1,
   "stepsDirectory": ".dev/steps",
   "createdAt": "2026-04-07T07:13:52.923Z",
-  "updatedAt": "2026-04-07T07:25:21.841Z",
+  "updatedAt": "2026-04-07T07:25:36.358Z",
   "steps": [
     {
       "order": 1,
@@ -279,10 +279,10 @@
     {
       "order": 4,
       "file": "04-unify-chats-column-into-single-sorted-feed.md",
-      "status": "in_progress",
-      "commitHash": null,
+      "status": "completed",
+      "commitHash": "2c45d4e",
       "startedAt": "2026-04-07T07:23:06.928Z",
-      "completedAt": null,
+      "completedAt": "2026-04-07T07:25:36.358Z",
       "error": null,
       "retryCount": 0,
       "progress": [

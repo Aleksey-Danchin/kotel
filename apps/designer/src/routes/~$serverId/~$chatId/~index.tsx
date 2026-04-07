@@ -2,28 +2,28 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
-import { ChatMessageBodySkeleton } from "../../components/ChatMessageBodySkeleton";
-import { ChatMessageList } from "../../components/ChatMessageList";
-import { DESIGNER_LOADING_DELAY_MS } from "../../components/loadingDelay";
+import { ChatMessageBodySkeleton } from "../../../components/ChatMessageBodySkeleton";
+import { ChatMessageList } from "../../../components/ChatMessageList";
+import { DESIGNER_LOADING_DELAY_MS } from "../../../components/loadingDelay";
 import {
   designerAppendedChatMessagesAtom,
   getMergedChatMessages,
-} from "../../state/chatComposerActions";
-import { lastChatByServerIdAtom } from "../../state/selectionAtoms";
-import { serverRouteIdFromServerUrl } from "../../state/serverRouteId";
-import { useChatThreadScroll } from "../../state/chatThreadScrollContext";
+} from "../../../state/chatComposerActions";
+import { lastChatByServerIdAtom } from "../../../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../../../state/serverRouteId";
+import { useChatThreadScroll } from "../../../state/chatThreadScrollContext";
 import {
   routeContextAtom,
   selectedChatAtom,
   selectedServerAtom,
   threadTransitionLoadingAtom,
-} from "../../state/store";
+} from "../../../state/store";
 
-export const Route = createFileRoute("/$id/")({
-  component: IdShellPage,
+export const Route = createFileRoute("/$serverId/$chatId/")({
+  component: ServerChatShellPage,
 });
 
-function IdShellPage() {
+function ServerChatShellPage() {
   const selectedServer = useAtomValue(selectedServerAtom);
   const selectedChat = useAtomValue(selectedChatAtom);
   const routeCtx = useAtomValue(routeContextAtom);
@@ -36,7 +36,10 @@ function IdShellPage() {
   const initializedRef = useRef(false);
   const transitionIdRef = useRef(0);
   const prevStreamLoadingRef = useRef(streamLoading);
-  const routeTransitionId = routeCtx.type === "id" ? routeCtx.id : null;
+  const routeTransitionId =
+    routeCtx.type === "server-chat"
+      ? `${routeCtx.serverId}:${routeCtx.chatId}`
+      : null;
 
   useEffect(() => {
     if (!selectedServer) return;
@@ -63,8 +66,6 @@ function IdShellPage() {
     transitionIdRef.current += 1;
     const myId = transitionIdRef.current;
 
-    // eslint/React rule: avoid direct setState in effect body.
-    // Flip the flag in a microtask and guard against stale transitions.
     queueMicrotask(() => {
       if (transitionIdRef.current !== myId) return;
       setStreamLoading(true);

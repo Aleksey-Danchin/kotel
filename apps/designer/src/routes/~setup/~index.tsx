@@ -117,7 +117,7 @@ function SetupPage() {
       const url = new URL(normalizedUrl).toString();
       const rid = serverRouteIdFromServerUrl(url);
       setActiveServerId(rid);
-      void navigate({ to: "/$id", params: { id: rid } });
+      void navigate({ to: "/$serverId", params: { serverId: rid } });
       setSetupError(null);
     } catch (e) {
       setSetupError(e instanceof Error ? e.message : "Неверный URL сервера");

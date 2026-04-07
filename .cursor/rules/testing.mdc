@@ -1,9 +1,14 @@
 ---
-description: Testing stack and DTO validation policy for all contributors and agents.
+description: Testing stack and DTO validation policy for apps/frontend and apps/backend contributors and agents.
 alwaysApply: true
 ---
 
 # Testing and DTO Rules
+
+## Scope
+
+- Mandatory automated testing requirements in this file apply to `apps/frontend` and `apps/backend`.
+- `apps/designer` is a manual UI sandbox and is explicitly excluded from automated test maintenance requirements (see `.cursor/rules/designer.mdc`).
 
 ## Mandatory Testing Stack
 

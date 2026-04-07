@@ -1,14 +1,21 @@
-import { useSetAtom } from "jotai";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  isSettingsOpenAtom,
-  settingsServerUrlAtom,
+  activeServerIdAtom,
+  lastChatByServerIdAtom,
+} from "../state/selectionAtoms";
+import {
   settingsActiveTabAtom,
   settingsInitialTabAtom,
   type SettingsOpenSource,
   initialSettingsTabForSource,
 } from "../state/settingsOverlay";
-import { selectedServerAtom } from "../state/store";
+import {
+  isConfiguratorPath,
+  resolveConfiguratorExitTarget,
+  resolveConfiguratorNavigationTarget,
+} from "../state/designerNavigation";
+import { serversAtom } from "../state/servers";
 
 function GearIcon({ className }: { className?: string }) {
   return (
@@ -40,9 +47,11 @@ interface ColumnHeaderGearProps {
 }
 
 export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
-  const selectedServer = useAtomValue(selectedServerAtom);
-  const setIsOpen = useSetAtom(isSettingsOpenAtom);
-  const setSettingsServerUrl = useSetAtom(settingsServerUrlAtom);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const activeServerId = useAtomValue(activeServerIdAtom);
+  const lastChatByServerId = useAtomValue(lastChatByServerIdAtom);
+  const serversMap = useAtomValue(serversAtom);
   const setInitialTab = useSetAtom(settingsInitialTabAtom);
   const setActiveTab = useSetAtom(settingsActiveTabAtom);
 
@@ -53,11 +62,24 @@ export function ColumnHeaderGear({ source }: ColumnHeaderGearProps) {
       aria-label="Настройки колонки"
       onClick={(event) => {
         event.preventDefault();
+        if (isConfiguratorPath(pathname)) {
+          const exitTarget = resolveConfiguratorExitTarget(
+            activeServerId,
+            lastChatByServerId,
+            serversMap,
+          );
+          void navigate(exitTarget);
+          return;
+        }
+
         const initialTab = initialSettingsTabForSource(source);
         setInitialTab(initialTab);
         setActiveTab(initialTab);
-        setSettingsServerUrl(selectedServer?.serverUrl ?? null);
-        setIsOpen(true);
+        const target = resolveConfiguratorNavigationTarget(
+          activeServerId,
+          serversMap,
+        );
+        void navigate(target);
       }}
     >
       <GearIcon className="size-5" />

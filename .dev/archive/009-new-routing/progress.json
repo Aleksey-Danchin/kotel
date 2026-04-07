@@ -1,0 +1,365 @@
+{
+  "version": 1,
+  "stepsDirectory": ".dev/steps",
+  "createdAt": "2026-04-06T09:52:53.549Z",
+  "updatedAt": "2026-04-06T10:13:01.388Z",
+  "steps": [
+    {
+      "order": 1,
+      "file": "01-introduce-hierarchical-router-structure.md",
+      "status": "completed",
+      "commitHash": "c04416d",
+      "startedAt": "2026-04-06T09:53:57.161Z",
+      "completedAt": "2026-04-06T09:59:35.738Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is missing in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "Full suite run completed with pre-existing failures in chatThreadScrollLogic/chatMessageTimeline/store.sessions"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/domain/model documentation impact; designer route refactor only"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed",
+          "note": "Docker postflight health check skipped: orchestrator verified dev health, local env vars for compose are unavailable in this shell"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: explicit routes for /, /:serverId, /:serverId/:chatId, /config, /config/:serverId",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: legacy / no longer primary contract",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: static routes keep exact resolution",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: TypeScript route types compile without any workarounds",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "file": "02-refactor-selection-resolution-for-server-chat-config.md",
+      "status": "completed",
+      "commitHash": "7707c80",
+      "startedAt": "2026-04-06T09:59:40.387Z",
+      "completedAt": "2026-04-06T10:03:34.400Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "completed",
+          "note": "scripts/prettier.sh отсутствует в репозитории; файлы приведены к текущему стилю проекта"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "Полный suite apps/designer: 52 passed, 5 pre-existing failures (chatThreadScrollLogic/chatMessageTimeline/store.sessions), не вызваны изменениями шага"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Документация не требуется: изменения локальны для state/route-логики designer"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: route context represents five URL modes",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: unknown server/chat fallbacks match rules",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: chat resolution never switches server",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: persistence keys remain compatible",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: root sync no longer uses legacy selectionIdFromPathname",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "file": "03-implement-configurator-route-mode-layout.md",
+      "status": "completed",
+      "commitHash": "4f3ba45",
+      "startedAt": "2026-04-06T10:03:38.934Z",
+      "completedAt": "2026-04-06T10:08:20.440Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh отсутствует в репозитории"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "Regression suite has pre-existing failures in chatThreadScrollLogic/chatMessageTimeline/store.sessions; unchanged by this step"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "Изменения ограничены layout/apps/designer без API/модели/доменных изменений"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: /config shows empty left and centered 'Выберите сервер'",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: /config/:serverId valid server shows configurator",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: invalid config server falls back to /config behavior",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: configurator rendered in-page not modal",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: role-based tabs/forms remain available",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "order": 4,
+      "file": "04-wire-navigation-and-ux-regressions-to-new-routes.md",
+      "status": "completed",
+      "commitHash": "8c9e98e",
+      "startedAt": "2026-04-06T10:08:25.665Z",
+      "completedAt": "2026-04-06T10:13:01.388Z",
+      "error": null,
+      "retryCount": 0,
+      "progress": [
+        {
+          "id": "preflight",
+          "label": "Pre-flight: dev containers healthy",
+          "status": "completed",
+          "note": "Skipped by orchestrator (dev health pre-verified)"
+        },
+        {
+          "id": "exploration",
+          "label": "Codebase exploration",
+          "status": "completed"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "status": "completed"
+        },
+        {
+          "id": "prettier",
+          "label": "Prettier formatting",
+          "status": "cancelled",
+          "note": "scripts/prettier.sh is not present in repository"
+        },
+        {
+          "id": "test-maintenance",
+          "label": "Test maintenance",
+          "status": "completed"
+        },
+        {
+          "id": "tests-task",
+          "label": "Tests: task-specific",
+          "status": "completed"
+        },
+        {
+          "id": "tests-regression",
+          "label": "Tests: regression",
+          "status": "completed",
+          "note": "Regression run executed; 5 unrelated pre-existing failures remained in chatThreadScrollLogic.test.ts, chatMessageTimeline.test.ts, store.sessions.test.ts"
+        },
+        {
+          "id": "verification",
+          "label": "Verification",
+          "status": "completed"
+        },
+        {
+          "id": "docs",
+          "label": "Documentation update",
+          "status": "cancelled",
+          "note": "No API/data/domain/architecture documentation changes required for designer route navigation updates"
+        },
+        {
+          "id": "postflight",
+          "label": "Post-flight: cleanup & health check",
+          "status": "completed"
+        },
+        {
+          "id": "ac-1",
+          "label": "AC: no primary interaction uses legacy / paths",
+          "status": "completed"
+        },
+        {
+          "id": "ac-2",
+          "label": "AC: server and chat selections produce hierarchical URLs",
+          "status": "completed"
+        },
+        {
+          "id": "ac-3",
+          "label": "AC: configurator open uses activeServerId fallback",
+          "status": "completed"
+        },
+        {
+          "id": "ac-4",
+          "label": "AC: escape/back transitions match route hierarchy",
+          "status": "completed"
+        },
+        {
+          "id": "ac-5",
+          "label": "AC: regression tests cover new navigation flows",
+          "status": "completed"
+        }
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import { activeServerIdAtom, lastChatByServerIdAtom } from "./selectionAtoms";
 import { normalizeDesignerRole } from "./roles";
 import type { ServerSession } from "./servers";
 import { serversAtom } from "./servers";
+import { resolveDesignerRoutePath } from "./routePath";
 import stateMocks from "./mocks.json";
 import { serverUrlFromServersByRouteId } from "./serverRouteId";
 
@@ -42,12 +43,17 @@ export function chatHeaderTitle(chat: ChatPreview): string {
   return chat.title;
 }
 
-/** Текущий сегмент маршрута: либо главная без id, либо `/$id`. */
-export const routeContextAtom = atom<
-  { type: "index" } | { type: "id"; id: string }
->({ type: "index" });
+/** Текущий маршрут песочницы: index/config/server/server-chat. */
+export type RouteContext =
+  | { type: "index" }
+  | { type: "config" }
+  | { type: "config-server"; serverId: string }
+  | { type: "server"; serverId: string }
+  | { type: "server-chat"; serverId: string; chatId: string };
 
-/** Идёт ли временная имитация загрузки треда при переходах внутри `/$id`. */
+export const routeContextAtom = atom<RouteContext>({ type: "index" });
+
+/** Идёт ли временная имитация загрузки треда при переходах внутри chat route. */
 export const threadTransitionLoadingAtom = atom(false);
 
 type MockServer = {
@@ -402,76 +408,108 @@ export const serversListAtom = atom((get) =>
   Array.from(get(serversAtom).values()),
 );
 
-export type RouteResolution =
-  | { kind: "unknown" }
-  | { kind: "server"; serverUrl: string }
-  | { kind: "chat"; serverUrl: string; chatId: string };
-
 function catalogServerId(session: ServerSession): string {
   return resolveCatalogServerId(session);
 }
 
-function pickServerUrlForChat(
-  chatId: string,
-  serversMap: Map<string, ServerSession>,
-  preferredServerRouteId: string | null,
-): string | null {
-  const matching: string[] = [];
-  for (const session of serversMap.values()) {
-    const sid = catalogServerId(session);
-    const chats = getServerChats(sid);
-    if (chats.some((c) => c.id === chatId)) {
-      matching.push(session.serverUrl);
-    }
-  }
-  if (matching.length === 0) return null;
-  if (preferredServerRouteId) {
-    const prefUrl = serverUrlFromServersByRouteId(
-      serversMap,
-      preferredServerRouteId,
-    );
-    if (prefUrl && matching.includes(prefUrl)) {
-      return prefUrl;
-    }
-  }
-  return matching[0] ?? null;
+function hasChatOnServer(session: ServerSession, chatId: string): boolean {
+  const sid = catalogServerId(session);
+  return getServerChats(sid).some((chat) => chat.id === chatId);
 }
 
-export function resolveRouteParam(
-  routeId: string,
+export function resolveServerByRouteId(
+  serverRouteId: string,
   serversMap: Map<string, ServerSession>,
-  preferredServerRouteId: string | null,
-): RouteResolution {
-  if (CHAT_BY_ID.has(routeId)) {
-    const serverUrl = pickServerUrlForChat(
-      routeId,
-      serversMap,
-      preferredServerRouteId,
-    );
-    if (!serverUrl) return { kind: "unknown" };
-    return { kind: "chat", serverUrl, chatId: routeId };
+): ServerSession | null {
+  const serverUrl = serverUrlFromServersByRouteId(serversMap, serverRouteId);
+  if (!serverUrl) {
+    return null;
+  }
+  return serversMap.get(serverUrl) ?? null;
+}
+
+export function resolveRouteContextForPathname(
+  pathname: string,
+  serversMap: Map<string, ServerSession>,
+): RouteContext {
+  const parsed = resolveDesignerRoutePath(pathname);
+  if (parsed.kind === "index") {
+    return { type: "index" };
+  }
+  if (parsed.kind === "config") {
+    return { type: "config" };
+  }
+  if (parsed.kind === "server") {
+    const server = resolveServerByRouteId(parsed.serverId, serversMap);
+    return server ? { type: "server", serverId: parsed.serverId } : { type: "index" };
+  }
+  if (parsed.kind === "config-server") {
+    const server = resolveServerByRouteId(parsed.serverId, serversMap);
+    return server
+      ? { type: "config-server", serverId: parsed.serverId }
+      : { type: "config" };
   }
 
-  const serverUrl = serverUrlFromServersByRouteId(serversMap, routeId);
-  if (serverUrl) return { kind: "server", serverUrl };
-  return { kind: "unknown" };
+  const server = resolveServerByRouteId(parsed.serverId, serversMap);
+  if (!server) {
+    return { type: "index" };
+  }
+  const chat = resolveChatForServerRoute(parsed.serverId, parsed.chatId, serversMap);
+  if (!chat) {
+    return { type: "server", serverId: parsed.serverId };
+  }
+  return {
+    type: "server-chat",
+    serverId: parsed.serverId,
+    chatId: parsed.chatId,
+  };
+}
+
+export function resolveNextActiveServerId(
+  routeContext: RouteContext,
+  currentActiveServerId: string | null,
+): string | null {
+  if (
+    routeContext.type === "server" ||
+    routeContext.type === "server-chat" ||
+    routeContext.type === "config-server"
+  ) {
+    return routeContext.serverId;
+  }
+  if (routeContext.type === "config") {
+    return currentActiveServerId;
+  }
+  return null;
+}
+
+export function resolveChatForServerRoute(
+  serverRouteId: string,
+  chatId: string,
+  serversMap: Map<string, ServerSession>,
+): ChatPreview | null {
+  const server = resolveServerByRouteId(serverRouteId, serversMap);
+  if (!server) {
+    return null;
+  }
+  if (!hasChatOnServer(server, chatId)) {
+    return null;
+  }
+  return CHAT_BY_ID.get(chatId) ?? null;
 }
 
 export const selectedServerAtom = atom((get) => {
   const ctx = get(routeContextAtom);
   const serversMap = get(serversAtom);
-  const activeId = get(activeServerIdAtom);
 
-  if (ctx.type === "id") {
-    const r = resolveRouteParam(ctx.id, serversMap, activeId);
-    if (r.kind === "unknown") return null;
-    return serversMap.get(r.serverUrl) ?? null;
+  if (ctx.type === "server" || ctx.type === "server-chat") {
+    return resolveServerByRouteId(ctx.serverId, serversMap);
   }
 
-  if (!activeId) return null;
-  const url = serverUrlFromServersByRouteId(serversMap, activeId);
-  if (!url) return null;
-  return serversMap.get(url) ?? null;
+  if (ctx.type === "config-server") {
+    return resolveServerByRouteId(ctx.serverId, serversMap);
+  }
+
+  return null;
 });
 
 // Список чатов для выбранного (resolved) сервера.
@@ -523,16 +561,16 @@ export const selectedPersonChatPeerAtom = atom((get) => {
 export const effectiveChatIdAtom = atom((get) => {
   const ctx = get(routeContextAtom);
   const serversMap = get(serversAtom);
-  const activeId = get(activeServerIdAtom);
   const lastMap = get(lastChatByServerIdAtom);
   const chats = get(chatsForSelectedServerAtom);
 
-  if (ctx.type === "id") {
-    const r = resolveRouteParam(ctx.id, serversMap, activeId);
-    if (r.kind === "unknown") return null;
-    if (r.kind === "chat") return r.chatId;
+  if (ctx.type === "server-chat") {
+    const resolved = resolveChatForServerRoute(ctx.serverId, ctx.chatId, serversMap);
+    return resolved?.id ?? null;
+  }
 
-    const last = lastMap[ctx.id];
+  if (ctx.type === "server") {
+    const last = lastMap[ctx.serverId];
     if (last && chats.some((c) => c.id === last)) {
       return last;
     }

@@ -69,7 +69,7 @@ function SessionTestPage() {
       });
       const rid = serverRouteIdFromServerUrl(normalized);
       setActiveServerId(rid);
-      void navigate({ to: "/$id", params: { id: rid } });
+      void navigate({ to: "/$serverId", params: { serverId: rid } });
 
       setNewServerUrl("");
       setBanner(`(mock) Сервер добавлен: ${host}`);

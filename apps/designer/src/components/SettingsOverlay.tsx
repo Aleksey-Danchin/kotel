@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useAtomValue, useSetAtom } from "jotai";
 import {
+  PiArrowLeft,
   PiClockCounterClockwise,
   PiGearSix,
   PiSlidersHorizontal,
@@ -40,6 +42,9 @@ import { formatUserPresenceSubtitle } from "../state/userPresence";
 import { shouldShowDesignerRoleBadge } from "../state/roles";
 import { setServerSession } from "../state/servers";
 import { isSearchMatch } from "../state/chatSearch";
+import { activeServerIdAtom, lastChatByServerIdAtom } from "../state/selectionAtoms";
+import { serverRouteIdFromServerUrl } from "../state/serverRouteId";
+import { resolveConfiguratorExitTarget } from "../state/designerNavigation";
 
 type AccountConfirmAction =
   | "demote-admin"
@@ -113,16 +118,25 @@ function sessionClientType(sessionId: string): SessionClientType {
   return sum % 2 === 0 ? "web" : "app";
 }
 
-export function SettingsOverlay() {
+interface SettingsOverlayProps {
+  mode?: "overlay" | "route";
+}
+
+export function SettingsOverlay({ mode = "overlay" }: SettingsOverlayProps) {
+  const navigate = useNavigate();
+  const isRouteMode = mode === "route";
+  const activeServerId = useAtomValue(activeServerIdAtom);
+  const lastChatByServerId = useAtomValue(lastChatByServerIdAtom);
   const routeSelectedServer = useAtomValue(selectedServerAtom);
   const serversList = useAtomValue(serversListAtom);
   const settingsServerUrl = useAtomValue(settingsServerUrlAtom);
   const setSettingsServerUrl = useSetAtom(settingsServerUrlAtom);
-  const selectedServer =
-    (settingsServerUrl
-      ? serversList.find((server) => server.serverUrl === settingsServerUrl) ??
-        null
-      : null) ?? routeSelectedServer;
+  const selectedServer = isRouteMode
+    ? routeSelectedServer
+    : ((settingsServerUrl
+        ? serversList.find((server) => server.serverUrl === settingsServerUrl) ??
+          null
+        : null) ?? routeSelectedServer);
   const isOpen = useAtomValue(isSettingsOpenAtom);
   const setIsOpen = useSetAtom(isSettingsOpenAtom);
   const activeTab = useAtomValue(settingsActiveTabAtom);
@@ -198,6 +212,12 @@ export function SettingsOverlay() {
   const usersDetailsColumnRef = useRef<HTMLDivElement | null>(null);
   const settingsServerDropdownTriggerRef = useRef<HTMLButtonElement | null>(
     null,
+  );
+
+  const configuratorExitTarget = resolveConfiguratorExitTarget(
+    activeServerId,
+    lastChatByServerId,
+    new Map(serversList.map((server) => [server.serverUrl, server])),
   );
 
   useEffect(() => {
@@ -336,7 +356,7 @@ export function SettingsOverlay() {
     selectedServer?.user.fullname,
   ]);
 
-  if (!isOpen || !safeActiveTab) {
+  if ((!isRouteMode && !isOpen) || !safeActiveTab) {
     return null;
   }
 
@@ -1319,15 +1339,31 @@ export function SettingsOverlay() {
 
   return (
     <div
-      className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-base-200"
-      role="dialog"
-      aria-modal="true"
+      className={
+        isRouteMode
+          ? "flex h-full min-h-0 flex-col overflow-hidden bg-base-200"
+          : "absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-base-200"
+      }
+      role={isRouteMode ? undefined : "dialog"}
+      aria-modal={isRouteMode ? undefined : true}
       aria-label="Настройки"
     >
       <section className="flex h-full w-full flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-gray-400 bg-base-300 p-4">
           <div className="min-w-0 relative z-40">
             <h2 className="flex items-center gap-2 text-lg font-semibold text-base-content">
+              {isRouteMode ? (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-square btn-sm shrink-0"
+                  aria-label="Вернуться из конфигуратора"
+                  onClick={() => {
+                    void navigate(configuratorExitTarget);
+                  }}
+                >
+                  <PiArrowLeft className="text-base" aria-hidden="true" />
+                </button>
+              ) : null}
               <span className="shrink-0">Настройка</span>
               <div className="dropdown">
                 <button
@@ -1356,8 +1392,7 @@ export function SettingsOverlay() {
                         server.name?.trim() || displayServerHost(server.serverUrl);
                       const isSelected = server.serverUrl === selectedServer?.serverUrl;
                       const role = normalizeRole(server.user.role);
-                      const hasPrivilegedBadge =
-                        role === "ADMIN" || role === "ROOT";
+                      const hasPrivilegedBadge = role === "ADMIN" || role === "ROOT";
                       return (
                         <li key={server.serverUrl} className="w-full">
                           <button
@@ -1368,7 +1403,17 @@ export function SettingsOverlay() {
                                 : "flex! w-full! items-start! justify-start! px-4 py-3"
                             }
                             onClick={(event) => {
-                              setSettingsServerUrl(server.serverUrl);
+                              if (isRouteMode) {
+                                const serverId = serverRouteIdFromServerUrl(
+                                  server.serverUrl,
+                                );
+                                void navigate({
+                                  to: "/config/$serverId",
+                                  params: { serverId },
+                                });
+                              } else {
+                                setSettingsServerUrl(server.serverUrl);
+                              }
                               event.currentTarget.blur();
                               settingsServerDropdownTriggerRef.current?.blur();
                             }}
@@ -1406,14 +1451,16 @@ export function SettingsOverlay() {
               </p>
             )}
           </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            aria-label="Закрыть настройки"
-            onClick={() => setIsOpen(false)}
-          >
-            X
-          </button>
+          {isRouteMode ? null : (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              aria-label="Закрыть настройки"
+              onClick={() => setIsOpen(false)}
+            >
+              X
+            </button>
+          )}
         </header>
 
         <div className="flex min-h-0 flex-1">
